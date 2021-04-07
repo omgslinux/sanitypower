@@ -1,0 +1,33 @@
+{% extends 'bootstrap_4_layout.html.twig' %}
+
+{% block answer_widget %}
+    <tr>
+        <td>{{ form_widget(form.text) }}</td>
+        <td>{{ form_widget(form.valid) }}</td>
+        <td><a href="#" class="delete-answer btn btn-danger">X</a></td>
+    </tr>
+{%- endblock answer_widget %}
+
+{% block _expert_optimization_optimizationInputs_entry_widget %}
+        <div class="col-3 border-right font-weight-bold">
+        {#}
+        {% set expertId = form.vars.data.expertInput.getId() %}
+        <input type="hidden" id="expert_optimization_optimizationInputs_{{ expertId }}_expertInput" name="expert_optimization[optimizationInputs][{{ expertId }}][expertInput]" value="{{ expertId }}"/>
+        {% do form.expertInput.setRendered %} #}
+        {{ form.vars.data.expertInput }}
+
+        </div>
+        <div class="col text-center">{{ form_widget(form.variable, { 'label' : ' ' }) }}</div>
+        <div class="col">{{ form_widget(form.value) }}</div>
+        <div class="col">{{ form_widget(form.StartValue) }}</div>
+        <div class="col">{{ form_widget(form.StepValue) }}</div>
+        <div class="col">{{ form_widget(form.EndValue) }}</div>
+        <div class="col">{{ form_widget(form.paramOrder) }}</div>
+{% endblock _expert_optimization_optimizationInputs_entry_widget %}
+
+{% block _optimization_dump_optimizationDumpInputs_entry_widget %}
+        <div class="col border-right font-weight-bold">
+        {{ form.vars.data.OptimizationInput.expertInput }}
+        </div>
+        <div class="col">{{ form_widget(form.value) }}</div>
+{% endblock _optimization_dump_optimizationDumpInputs_entry_widget %}

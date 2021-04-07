@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit CompanyLevel{% endblock %}
+
+{% block body %}
+    <h1>Edit CompanyLevel</h1>
+
+    {{ include('company_level/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('company_level_index') }}">back to list</a>
+
+    {{ include('company_level/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CurrencyExchange{% endblock %}
+
+{% block body %}
+    <h1>CurrencyExchange</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Fecha</th>
+                <td>{{ currency_exchange.year ? currency_exchange.year|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Cantidad</th>
+                <td>{{ currency_exchange.amount }} {{ currency_exchange.currency.name }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('currency_exchange_index') }}">back to list</a>
+
+    <a href="{{ path('currency_exchange_edit', {'id': currency_exchange.id}) }}">edit</a>
+
+    {{ include('currency_exchange/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Empresas{% endblock %}
+
+{% block body %}
+    <h1>Empresas</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre largo</th>
+                <th>Nombre corto</th>
+                <th>País</th>
+                <th>Activa</th>
+                <th>Nivel</th>
+                <th>Notas</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for company in companies %}
+            <tr>
+                <td><a href="{{ path('company_show', {'id': company.id}) }}">{{ company.fullname }}</a></td>
+                <td>{{ company.ShortName }}</td>
+                <td>{{ company.country }}</td>
+                <td>{{ company.active ? 'Yes' : 'No' }}</td>
+                <td>{{ company.level }}</td>
+                <td>{{ company.notes }}</td>
+                <td>
+                    <a href="{{ path('company_edit', {'id': company.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('company_new') }}">Create new</a>
+{% endblock %}

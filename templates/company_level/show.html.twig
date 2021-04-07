@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CompanyLevel{% endblock %}
+
+{% block body %}
+    <h1>CompanyLevel</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ company_level.id }}</td>
+            </tr>
+            <tr>
+                <th>Level</th>
+                <td>{{ company_level.level }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('company_level_index') }}">back to list</a>
+
+    <a href="{{ path('company_level_edit', {'id': company_level.id}) }}">edit</a>
+
+    {{ include('company_level/_delete_form.html.twig') }}
+{% endblock %}

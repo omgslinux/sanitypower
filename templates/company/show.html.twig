@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Company{% endblock %}
+
+{% block body %}
+    <h1>{{ company.fullname }}</h1>
+
+    <div class="row">
+        <div class="col-2">ShortName</div>
+        <div class="col-1">Country</div>
+        <div class="col-3">Nivel</div>
+        <div class="col-1">Active</div>
+    </div>
+    <div class="row">
+        <div class="col-2">
+            <a href="{{ path('company_edit', {'id': company.id}) }}">{{ company.ShortName }}</a>
+        </div>
+        <div class="col-1">{{ company.country }}</div>
+        <div class="col-3">{{ company.level }}</div>
+        <div class="col-1">{{ company.active ? 'Yes' : 'No' }}</div>
+    </div>
+    <div class="row">
+    <div class="col-12">Notes</div>
+    </div>
+    <div class="row">
+        <div class="col-12">{{ company.notes }}</div>
+    </div>
+
+
+        <!-- Tabs navs -->
+        {% set active1 = '' %}{% set active2 = '' %}{% set active3 = '' %}{% set active4 = '' %}
+        {% if active_tab is not defined %}{% set active_tab = 1 %}{% endif %}
+        {% if active_tab == 1 %}{% set active1 = 'active' %}
+        {% else %}
+            {% if active_tab == 2 %}{% set active2 = 'active' %}
+            {% else %}{% set active3 = 'active' %}
+            {% endif %}
+        {% endif %}
+        {% set tabname = 'myTabList' %}
+        <ul class="nav nav-tabs md-tabs" id="{{tabname}}" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link {{ active1 }}" id="tab1-tab" data-toggle="tab" href="#tab1" role="tab" aria-controls="tab1"
+              aria-selected="true">Ingresos de explotación</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ active2 }}" id="tab2-tab" data-toggle="tab" href="#tab2" role="tab" aria-controls="tab2"
+              aria-selected="false">Accionistas</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ active3 }}" id="tab3-tab" data-toggle="tab" href="#tab3" role="tab" aria-controls="tab3"
+              aria-selected="false">Enlaces</a>
+          </li>
+              <li class="nav-item">
+            <a class="nav-link {{ active4 }}" id="tab4-tab" data-toggle="tab" href="#tab4" role="tab" aria-controls="tab4"
+              aria-selected="false">Eventos</a>
+          </li>
+    </ul>
+          <!-- Tabs navs -->
+
+          <!-- Tabs content -->
+          <div class="tab-content border-right border-bottom border-left" id="{{tabname}}-content">
+            <div class="tab-pane fade show mb-4 {{ active1 }}" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+
+                {% if company.incomings|length > 0 %}
+                    <h2>Ingresos de explotación</h2>
+                    <div class="row">
+                        <div class="col-3 font-weight-bold">Fecha</div>
+                        <div class="col font-weight-bold text-center">Cantidad original</div>
+                        <div class="col font-weight-bold text-center">Valor euros</div>
+                    </div>
+                    {% for incoming in company.incomings %}
+                        <div class="row border">
+                            <div class="col-3 border-right font-weight-bold">{{ incoming.date|format('d/m/Y') }}</div>
+                            <div class="col text-center">{{ incoming.amount }}</div>
+                            <div class="col text-center">{{ incoming.amount }}</div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+̣̣                  <p>No hay ingresos para esta empresa</p>
+                {% endif %}
+            </div>
+
+            <div class="tab-pane fade {{ active2 }}" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+                <h4>Accionistas</h4>
+                <p></p>
+            </div>
+
+
+            <div class="tab-pane fade {{ active3 }}" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
+                <h4>Enlaces</h4>
+            </div>
+
+
+            <div class="tab-pane fade {{ active4 }}" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">
+                <h4>Eventos</h4>
+                {% if company.companyEvents|length > 0 %}
+                    <div class="row">
+                        <div class="col-3 font-weight-bold">Fecha</div>
+                        <div class="col font-weight-bold text-center">Descripción</div>
+                    </div>
+                    {% for event in company.companyEvents %}
+                        <div class="row border">
+                            <div class="col-3 border-right font-weight-bold">{{ event.date|format('d/m/Y') }}</div>
+                            <div class="col text-center">{{ event.descripción }}</div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No hay eventos para esta empresa</p>
+                {% endif %}
+                <p></p>
+            </div>
+        </div>
+        <!-- Tabs content -->
+
+
+
+{% endblock %}

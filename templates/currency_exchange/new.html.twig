@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Crear tipo de cambio{% endblock %}
+
+{% block body %}
+    <h1>Crear tipo de cambio</h1>
+
+    {{ include('currency_exchange/_form.html.twig') }}
+
+    <a href="{{ path('currency_exchange_index') }}">back to list</a>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Moneda{% endblock %}
+
+{% block body %}
+    <h1>Ver moneda</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ currency.name }}</td>
+            </tr>
+            <tr>
+                <th>Código ISO 4217 (https://en.wikipedia.org/wiki/ISO_4217)</th>
+                <td>{{ currency.code }}</td>
+            </tr>
+            <tr>
+                <th>Símbolo</th>
+                <td>{{ currency.symbol }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('currency_edit', {'id': currency.id}) }}">editar</a>
+
+{% endblock %}
