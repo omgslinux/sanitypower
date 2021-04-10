@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=IncomingRepository::class)
+ * @ORM\Table(name="incomings")
  */
 class Incoming
 {
