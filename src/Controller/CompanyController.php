@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Company;
+use App\Entity\Incoming;
 use App\Form\CompanyType;
+use App\Form\IncomingType;
 use App\Repository\CompanyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,8 +55,19 @@ class CompanyController extends AbstractController
      */
     public function show(Company $company): Response
     {
+        $incoming = new Incoming();
+        $incoming ->setCompany($company);
+        $incomingForm = $this->createForm(
+            IncomingType::class,
+            $incoming,
+            [
+                'action' => 'company_incomings'
+            ]
+        );
+
         return $this->render('company/show.html.twig', [
             'company' => $company,
+            'incomingForm' => $incomingForm->createView(),
         ]);
     }
 
@@ -76,6 +89,23 @@ class CompanyController extends AbstractController
             'company' => $company,
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/incomings/{id}", name="incoming", methods={"GET","POST"})
+     */
+    public function incomings(Request $request, Company $company): Response
+    {
+        $incoming = new Incoming();
+        $incoming->setCompany($company);
+        $form = $this->createForm(IncomingType::class, $incoming);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
+        }
+
+        return $this->redirectToRoute('company_show', ['id' => $incoming->getCompany()->getId()]);
     }
 
     /**

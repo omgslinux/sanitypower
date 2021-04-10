@@ -1,0 +1,18 @@
+{% if company.incomings|length > 0 %}
+    <h2>Ingresos de explotación</h2>
+    <div class="row">
+        <div class="col-3 font-weight-bold">Fecha</div>
+        <div class="col font-weight-bold text-center">Cantidad original</div>
+        <div class="col font-weight-bold text-center">Valor euros</div>
+    </div>
+    {% for incoming in company.incomings %}
+        <div class="row border">
+            <div class="col-3 border-right font-weight-bold">{{ incoming.date|format('d/m/Y') }}</div>
+            <div class="col text-center">{{ incoming.amount }}</div>
+            <div class="col text-center">{{ incoming.amount }}</div>
+        </div>
+    {% endfor %}
+{% else %}
+̣̣                  <p>No hay ingresos para esta empresa</p>
+{% endif %}
+<p><a href="{{ path('company_incoming', {'id': company.id } )}}">Añadir ingreso explotación</a></p>

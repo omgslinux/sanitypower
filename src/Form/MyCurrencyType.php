@@ -13,7 +13,13 @@ class MyCurrencyType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('name')
+            ->add(
+                'name',
+                null,
+                [
+                    'label' => 'Nombre'
+                ]
+            )
             ->add(
                 'code',
                 CurrencyType::class,
@@ -22,7 +28,13 @@ class MyCurrencyType extends AbstractType
                     'choice_translation_locale' => 'es',
                 ]
             )
-            ->add('symbol')
+            ->add(
+                'symbol',
+                null,
+                [
+                    'label' => 'Símbolo'
+                ]
+            )
         ;
     }
 

@@ -1,4 +1,10 @@
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <div class="row">
+        <div class="col-4">{{ form_row(form.name)}}</div>
+        <div class="col-2">{{ form_row(form.code)}}</div>
+        <div class="col-1">{{ form_row(form.symbol)}}</div>
+        <div class="col-4"><br><br>Símbolos: https://www.xe.com/symbols.php</div>
+    </div>
+
+    <button class="btn btn-info">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}

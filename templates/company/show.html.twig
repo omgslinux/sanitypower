@@ -6,10 +6,10 @@
     <h1>{{ company.fullname }}</h1>
 
     <div class="row">
-        <div class="col-2">ShortName</div>
-        <div class="col-1">Country</div>
+        <div class="col-2">Nombre corto</div>
+        <div class="col-1">País</div>
         <div class="col-3">Nivel</div>
-        <div class="col-1">Active</div>
+        <div class="col-1">Activa</div>
     </div>
     <div class="row">
         <div class="col-2">
@@ -59,56 +59,30 @@
 
           <!-- Tabs content -->
           <div class="tab-content border-right border-bottom border-left" id="{{tabname}}-content">
+              <!-- Tab1 -->
             <div class="tab-pane fade show mb-4 {{ active1 }}" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
-
-                {% if company.incomings|length > 0 %}
-                    <h2>Ingresos de explotación</h2>
-                    <div class="row">
-                        <div class="col-3 font-weight-bold">Fecha</div>
-                        <div class="col font-weight-bold text-center">Cantidad original</div>
-                        <div class="col font-weight-bold text-center">Valor euros</div>
-                    </div>
-                    {% for incoming in company.incomings %}
-                        <div class="row border">
-                            <div class="col-3 border-right font-weight-bold">{{ incoming.date|format('d/m/Y') }}</div>
-                            <div class="col text-center">{{ incoming.amount }}</div>
-                            <div class="col text-center">{{ incoming.amount }}</div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-̣̣                  <p>No hay ingresos para esta empresa</p>
-                {% endif %}
+                {{ include('company/incomings.html.twig') }}
             </div>
+            <!-- Fin Tab1 -->
 
+            <!-- Tab2 -->
             <div class="tab-pane fade {{ active2 }}" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
                 <h4>Accionistas</h4>
                 <p></p>
             </div>
+            <!-- Fin Tab2 -->
 
-
+            <!-- Tab3 -->
             <div class="tab-pane fade {{ active3 }}" id="tab3" role="tabpanel" aria-labelledby="tab3-tab">
                 <h4>Enlaces</h4>
             </div>
+            <!-- Fin tab3 -->
 
-
+            <!-- Tab4 -->
             <div class="tab-pane fade {{ active4 }}" id="tab4" role="tabpanel" aria-labelledby="tab4-tab">
-                <h4>Eventos</h4>
-                {% if company.companyEvents|length > 0 %}
-                    <div class="row">
-                        <div class="col-3 font-weight-bold">Fecha</div>
-                        <div class="col font-weight-bold text-center">Descripción</div>
-                    </div>
-                    {% for event in company.companyEvents %}
-                        <div class="row border">
-                            <div class="col-3 border-right font-weight-bold">{{ event.date|format('d/m/Y') }}</div>
-                            <div class="col text-center">{{ event.descripción }}</div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p>No hay eventos para esta empresa</p>
-                {% endif %}
-                <p></p>
+                {{ include('company/events.html.twig') }}
             </div>
+            <!-- Fin tab4 -->
         </div>
         <!-- Tabs content -->
 

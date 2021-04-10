@@ -1,0 +1,16 @@
+<h4>Eventos</h4>
+{% if company.companyEvents|length > 0 %}
+    <div class="row">
+        <div class="col-3 font-weight-bold">Fecha</div>
+        <div class="col font-weight-bold text-center">Descripción</div>
+    </div>
+    {% for event in company.companyEvents %}
+        <div class="row border">
+            <div class="col-3 border-right font-weight-bold">{{ event.date|format('d/m/Y') }}</div>
+            <div class="col text-center">{{ event.descripción }}</div>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No hay eventos para esta empresa</p>
+{% endif %}
+<p></p>
