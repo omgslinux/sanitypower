@@ -36,6 +36,7 @@ class Company
 
     /**
      * @ORM\OneToMany(targetEntity=Incoming::class, mappedBy="Company", orphanRemoval=true)
+     * @ORM\OrderBy({"year" = "ASC"})
      */
     private $incomings;
 
@@ -65,11 +66,23 @@ class Company
      */
     private $companyRelationships;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="company")
+     */
+    private $shareholders;
+
+    /**
+     * @ORM\OneToMany(targetEntity=StaffMembership::class, mappedBy="company")
+     */
+    private $staffMemberships;
+
     public function __construct()
     {
         $this->incomings = new ArrayCollection();
         $this->companyEvents = new ArrayCollection();
         $this->companyRelationships = new ArrayCollection();
+        $this->shareholders = new ArrayCollection();
+        $this->staffMemberships = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -242,5 +255,65 @@ class Company
     public function __toString()
     {
         return $this->getFullname();
+    }
+
+    /**
+     * @return Collection|Shareholder[]
+     */
+    public function getShareholders(): Collection
+    {
+        return $this->shareholders;
+    }
+
+    public function addShareholder(Shareholder $shareholder): self
+    {
+        if (!$this->shareholders->contains($shareholder)) {
+            $this->shareholders[] = $shareholder;
+            $shareholder->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShareholder(Shareholder $shareholder): self
+    {
+        if ($this->shareholders->removeElement($shareholder)) {
+            // set the owning side to null (unless already changed)
+            if ($shareholder->getCompany() === $this) {
+                $shareholder->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|StaffMembership[]
+     */
+    public function getStaffMemberships(): Collection
+    {
+        return $this->staffMemberships;
+    }
+
+    public function addStaffMembership(StaffMembership $staffMembership): self
+    {
+        if (!$this->staffMemberships->contains($staffMembership)) {
+            $this->staffMemberships[] = $staffMembership;
+            $staffMembership->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStaffMembership(StaffMembership $staffMembership): self
+    {
+        if ($this->staffMemberships->removeElement($staffMembership)) {
+            // set the owning side to null (unless already changed)
+            if ($staffMembership->getCompany() === $this) {
+                $staffMembership->setCompany(null);
+            }
+        }
+
+        return $this;
     }
 }

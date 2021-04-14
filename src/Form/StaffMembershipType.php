@@ -2,13 +2,13 @@
 
 namespace App\Form;
 
-use App\Entity\Incoming;
+use App\Entity\StaffMembership;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class IncomingType extends AbstractType
+class StaffMembershipType extends AbstractType
 {
     const LABEL = 'label';
 
@@ -16,34 +16,44 @@ class IncomingType extends AbstractType
     {
         $builder
             ->add(
-                'amount',
+                'staffmember',
                 null,
                 [
-                    self::LABEL => 'Cantidad',
+                    self::LABEL => 'Miembro de Junta',
                 ]
             )
             ->add(
-                'year',
+                'title',
+                null,
+                [
+                    self::LABEL => 'Cargo',
+                ]
+            )
+            ->add(
+                'datefrom',
                 DateType::class,
                 [
-                    self::LABEL => 'Fecha',
+                    self::LABEL => 'Fecha desde',
                     'widget' => 'single_text',
-                    'format' => 'yyyy-MM-dd'
+                    'format' => 'yyyy-MM-dd',
+                    'required' => false,
                 ]
             )
             ->add(
-                'currency',
-                null,
+                'dateto',
+                DateType::class,
                 [
-                    self::LABEL => 'Moneda'
+                    self::LABEL => 'Fecha hasta',
+                    'widget' => 'single_text',
+                    'format' => 'yyyy-MM-dd',
+                    'required' => false,
                 ]
             )
         ;
-
         if (!$options['child']) {
             $builder
             ->add(
-                'Company',
+                'company',
                 null,
                 [
                     self::LABEL => 'Empresa'
@@ -55,8 +65,8 @@ class IncomingType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Incoming::class,
-            'child' => true
+            'data_class' => StaffMembership::class,
+            'child' => true,
         ]);
     }
 }

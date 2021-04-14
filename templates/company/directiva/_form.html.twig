@@ -1,0 +1,18 @@
+{{ form_start(form) }}
+    <div class="row">&nbsp;</div>
+    <div class="row">
+        <div class="col-4">
+        {{ form_row(form.staffmember) }}
+        </div>
+        <div class="col-4">
+        {{ form_row(form.title) }}
+        </div>
+        <div class="col-2">
+        {{ form_row(form.datefrom) }}
+        </div>
+        <div class="col-2">
+        {{ form_row(form.dateto) }}
+        </div>
+    </div>
+    <button class="btn btn-info">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

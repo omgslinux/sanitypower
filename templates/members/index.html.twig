@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Listado de miembros de Juntas Directivas{% endblock %}
+
+{% block body %}
+    <h1>Miembros de Juntas Directivas</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Apellidos</th>
+                <th>Nombre</th>
+                <th>Notas</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for member in members %}
+            <tr>
+                <td><a href="{{ path(prefix ~ 'show', {'id': member.id}) }}">{{ member.surname }}</a></td>
+                <td>{{ member.name }}</td>
+                <td>{{ member.notes }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path(prefix ~ 'new') }}">Crear nuevo</a>
+{% endblock %}

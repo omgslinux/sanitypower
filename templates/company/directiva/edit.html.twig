@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar miembro de directiva{% endblock %}
+
+{% block body %}
+{% set company = entity.company %}
+    {{ include('company/directiva/_form.html.twig') }}
+
+    <a href="{{ path('company_show', {'id': entity.company.id }) }}">Volver a {{ company }}</a>
+
+</div>
+</div>
+</div>
+
+{% endblock %}

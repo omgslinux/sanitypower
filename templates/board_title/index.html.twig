@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lista de cargos de una junta directiva{% endblock %}
+
+{% block body %}
+    <h1>Lista de cargos</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Alias</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for board_title in board_titles %}
+            <tr>
+                <td><a href="{{ path('board_title_edit', {'id': board_title.id}) }}">{{ board_title.name }}</a></td>
+                <td>{{ board_title.alias }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('board_title_new') }}">Crear un nuevo cargo</a>
+{% endblock %}

@@ -7,7 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=IncomingRepository::class)
- * @ORM\Table(name="incomings")
+ * @ORM\Table(name="incomings",
+ *   uniqueConstraints={@ORM\UniqueConstraint(columns={"year", "company_id"})}
+ * )
  */
 class Incoming
 {

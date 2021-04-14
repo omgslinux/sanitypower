@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nuevo ingreso de explotación{% endblock %}
+
+{% block body %}
+
+{% set modalTitle = 'Añadir ingreso de explotación para ' ~ form.vars.data.company %}
+    {#}<h1>Añadir ingreso de explotación para {{ form.vars.data.company }}</h1> #}
+    {{ include('_modal.html.twig', {
+        modalTitle: modalTitle,
+    }) }}
+    {{ include('company/incomings/_form.html.twig') }}
+
+    <a href="{{ path('company_index') }}">back to list</a>
+
+</div>
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar miembro directiva{% endblock %}
+
+{% block body %}
+    <h1>Editar miembro de Junta Directiva</h1>
+
+    {{ include('members/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path(prefix ~ 'index') }}">back to list</a>
+
+    {{ include('members/_delete_form.html.twig') }}
+{% endblock %}

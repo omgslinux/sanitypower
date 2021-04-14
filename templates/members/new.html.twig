@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Crear miembro directiva{% endblock %}
+
+{% block body %}
+    <h1>Crear miembro directiva</h1>
+
+    {{ include('members/_form.html.twig') }}
+
+    <a href="{{ path(prefix ~ 'index') }}">back to list</a>
+{% endblock %}

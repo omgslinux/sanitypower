@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Company;
 use App\Entity\Incoming;
+use App\Entity\StaffMembership;
 use App\Form\CompanyType;
 use App\Form\IncomingType;
+use App\Form\StaffMembershipType;
 use App\Repository\CompanyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +19,39 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CompanyController extends AbstractController
 {
+    const TABS = [
+        [
+            'n' => 'incomings',
+            't' => 'Ingresos explotación',
+            'a' => true
+        ],
+        [
+            'n' => 'accionistas',
+            't' => 'Accionistas',
+            'a' => false
+        ],
+        [
+            'n' => 'directiva',
+            't' => 'Directiva',
+            'a' => false
+        ],
+        [
+            'n' => 'participadas',
+            't' => 'Participadas',
+            'a' => false
+        ],
+        [
+            'n' => 'grupo',
+            't' => 'Grupo de empresas',
+            'a' => false
+        ],
+        [
+            'n' => 'eventos',
+            't' => 'Eventos',
+            'a' => false
+        ],
+    ];
+
     /**
      * @Route("/", name="index", methods={"GET"})
      */
@@ -68,6 +103,7 @@ class CompanyController extends AbstractController
         return $this->render('company/show.html.twig', [
             'company' => $company,
             'incomingForm' => $incomingForm->createView(),
+            'tabs' => self::TABS,
         ]);
     }
 
@@ -92,9 +128,9 @@ class CompanyController extends AbstractController
     }
 
     /**
-     * @Route("/incomings/{id}", name="incoming", methods={"GET","POST"})
+     * @Route("/incomings/new/{id}", name="incomings_new", methods={"GET","POST"})
      */
-    public function incomings(Request $request, Company $company): Response
+    public function incomingsAdd(Request $request, Company $company): Response
     {
         $incoming = new Incoming();
         $incoming->setCompany($company);
@@ -102,11 +138,103 @@ class CompanyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($incoming);
+            $em->flush();
+            return $this->redirectToRoute(
+                'company_show',
+                [
+                    'id' => $incoming->getCompany()->getId()
+                ]
+            );
         }
 
-        return $this->redirectToRoute('company_show', ['id' => $incoming->getCompany()->getId()]);
+        return $this->render('company/incomings/new.html.twig', [
+            'company' => $company,
+            'form' => $form->createView(),
+        ]);
     }
+
+    /**
+     * @Route("/incomings/edit/{id}", name="incoming_edit", methods={"GET","POST"})
+     */
+    public function incomingEdit(Request $request, Incoming $incoming): Response
+    {
+        $form = $this->createForm(IncomingType::class, $incoming);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($incoming);
+            $em->flush();
+            return $this->redirectToRoute(
+                'company_show',
+                [
+                    'id' => $incoming->getCompany()->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/incomings/edit.html.twig', [
+            'company' => $incoming->getCompany(),
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/membership/new/{id}", name="membership_new", methods={"GET","POST"})
+     */
+    public function membershipAdd(Request $request, Company $company): Response
+    {
+        $membership = new StaffMembership();
+        $membership->setCompany($company);
+        $form = $this->createForm(StaffMembershipType::class, $membership);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($membership);
+            $em->flush();
+            return $this->redirectToRoute(
+                'company_show',
+                [
+                    'id' => $company->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/directiva/new.html.twig', [
+            'entity' => $company,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/membership/edit/{id}", name="membership_edit", methods={"GET","POST"})
+     */
+    public function membershipEdit(Request $request, StaffMembership $membership): Response
+    {
+        $form = $this->createForm(StaffMembershipType::class, $membership);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($membership);
+            $em->flush();
+            return $this->redirectToRoute(
+                'company_show',
+                [
+                    'id' => $membership->getCompany()->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/directiva/edit.html.twig', [
+            'entity' => $membership,
+            'form' => $form->createView(),
+        ]);
+    }
+
 
     /**
      * @Route("/delete/{id}", name="delete", methods={"POST"})
