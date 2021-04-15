@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva participada{% endblock %}
+
+{% block body %}
+
+    {{ include('company/participadas/_form.html.twig') }}
+
+    <a href="{{ path('company_show', { 'id': parent.id }) }}">Volver a {{ parent }}</a>
+
+{% endblock %}

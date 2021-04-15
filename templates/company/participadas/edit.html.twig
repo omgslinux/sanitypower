@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar participada{% endblock %}
+
+{% block body %}
+{% set company = entity.owner %}
+    <h2>Editar participada de {{ company }}</h2>
+    {{ include('company/participadas/_form.html.twig') }}
+
+    <a href="{{ path('company_show', {'id': company.id }) }}">Volver a {{ company }}</a>
+
+{% endblock %}

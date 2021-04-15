@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Entity\Company;
 use App\Entity\Incoming;
 use App\Entity\StaffMembership;
+use App\Entity\Subsidiary;
 use App\Form\CompanyType;
 use App\Form\IncomingType;
 use App\Form\StaffMembershipType;
+use App\Form\SubsidiaryType;
 use App\Repository\CompanyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,6 +53,7 @@ class CompanyController extends AbstractController
             'a' => false
         ],
     ];
+    const PREFIX = 'company_';
 
     /**
      * @Route("/", name="index", methods={"GET"})
@@ -96,7 +99,7 @@ class CompanyController extends AbstractController
             IncomingType::class,
             $incoming,
             [
-                'action' => 'company_incomings'
+                'action' => self::PREFIX . 'incomings'
             ]
         );
 
@@ -104,6 +107,7 @@ class CompanyController extends AbstractController
             'company' => $company,
             'incomingForm' => $incomingForm->createView(),
             'tabs' => self::TABS,
+            'prefix' => self::PREFIX,
         ]);
     }
 
@@ -142,7 +146,7 @@ class CompanyController extends AbstractController
             $em->persist($incoming);
             $em->flush();
             return $this->redirectToRoute(
-                'company_show',
+                self::PREFIX . 'show',
                 [
                     'id' => $incoming->getCompany()->getId()
                 ]
@@ -168,7 +172,7 @@ class CompanyController extends AbstractController
             $em->persist($incoming);
             $em->flush();
             return $this->redirectToRoute(
-                'company_show',
+                self::PREFIX . 'show',
                 [
                     'id' => $incoming->getCompany()->getId()
                 ]
@@ -196,7 +200,7 @@ class CompanyController extends AbstractController
             $em->persist($membership);
             $em->flush();
             return $this->redirectToRoute(
-                'company_show',
+                self::PREFIX . 'show',
                 [
                     'id' => $company->getId()
                 ]
@@ -222,7 +226,7 @@ class CompanyController extends AbstractController
             $em->persist($membership);
             $em->flush();
             return $this->redirectToRoute(
-                'company_show',
+                self::PREFIX . 'show',
                 [
                     'id' => $membership->getCompany()->getId()
                 ]
@@ -237,6 +241,60 @@ class CompanyController extends AbstractController
 
 
     /**
+     * @Route("/subsidiary/new/{id}", name="subsidiary_new", methods={"GET","POST"})
+     */
+    public function subsidiaryAdd(Request $request, Company $company): Response
+    {
+        $entity = new Subsidiary();
+        $entity->setOwner($company);
+        $form = $this->createForm(SubsidiaryType::class, $entity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($entity);
+            $em->flush();
+            return $this->redirectToRoute(
+                self::PREFIX . 'show',
+                [
+                    'id' => $company->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/participadas/new.html.twig', [
+            'parent' => $company,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/subsidiary/edit/{id}", name="subsidiary_edit", methods={"GET","POST"})
+     */
+    public function subsidiaryEdit(Request $request, Subsidiary $entity): Response
+    {
+        $form = $this->createForm(SubsidiaryType::class, $entity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($entity);
+            $em->flush();
+            return $this->redirectToRoute(
+                self::PREFIX . 'show',
+                [
+                    'id' => $entity->getOwner()->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/participadas/edit.html.twig', [
+            'entity' => $entity,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
      * @Route("/delete/{id}", name="delete", methods={"POST"})
      */
     public function delete(Request $request, Company $company): Response
@@ -247,6 +305,6 @@ class CompanyController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('company_index');
+        return $this->redirectToRoute(self::PREFIX . 'index');
     }
 }

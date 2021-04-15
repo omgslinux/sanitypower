@@ -1,15 +1,12 @@
 {{ form_start(form) }}
     <div class="row">&nbsp;</div>
     <div class="row">
-        <div class="col-2">
-        {{ form_row(form.year) }}
+        <div class="col-4">
+        {{ form_row(form.owned) }}
         </div>
         <div class="col-4">
-        {{ form_row(form.amount) }}
-        </div>
-        <div class="col-4">
-        {{ form_row(form.currency) }}
+        {{ form_row(form.percent) }} %
         </div>
     </div>
-    <button class="btn btn-info">{{ button_label|default('Save') }}</button>
+    <button class="btn btn-info">{{ button_label|default('Guardar') }}</button>
 {{ form_end(form) }}
