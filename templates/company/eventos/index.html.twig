@@ -1,20 +1,17 @@
-{% if company.incomings|length > 0 %}
-    {# <h2>Ingresos de explotación</h2> #}
+{% if company.companyEvents|length > 0 %}
+    {# <h2>Eventos</h2> #}
     <div class="row">
         <div class="col-3 font-weight-bold">Fecha</div>
-        <div class="col font-weight-bold">Cantidad original</div>
-        <div class="col font-weight-bold">Valor euros</div>
+        <div class="col font-weight-bold">Descripción</div>
     </div>
-    {% for incoming in company.incomings %}
+    {% for event in company.companyEvents %}
         <div class="row border">
-            <div class="col-3 border-right"><a href="{{ path('company_incoming_edit', { 'id': incoming.id }) }}">{{ incoming.year|date('d/m/Y') }}</a></div>
-            <div class="col">{{ incoming.amount|number_format(0, '.', ',') }} {{ incoming.currency.symbol }}</div>
-            {% if incoming.currency.code == 'EUR' %}
-            <div class="col">{{ incoming.currency.symbol }}</div>
-            {% endif %}
+            <div class="col-3 border-right"><a href="{{ path(prefix ~ 'event_edit', { 'id': event.id }) }}">{{ event.date|date('d/m/Y') }}</a></div>
+            <div class="col">{{ event.description }}</div>
         </div>
     {% endfor %}
 {% else %}
-    <p>No hay ingresos para esta empresa</p>
+    <p>No hay eventos para esta empresa</p>
 {% endif %}
-<p><a href="{{ path('company_incomings_new', {'id': company.id } )}}">Añadir ingreso explotación</a></p>
+<br>
+<p><a href="{{ path(prefix ~ 'event_new', {'id': company.id } )}}">Añadir evento</a></p>

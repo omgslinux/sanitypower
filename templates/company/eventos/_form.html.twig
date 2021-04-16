@@ -2,14 +2,11 @@
     <div class="row">&nbsp;</div>
     <div class="row">
         <div class="col-2">
-        {{ form_row(form.year) }}
+        {{ form_row(form.date) }}
         </div>
-        <div class="col-4">
-        {{ form_row(form.amount) }}
-        </div>
-        <div class="col-4">
-        {{ form_row(form.currency) }}
+        <div class="col-10">
+        {{ form_row(form.description) }}
         </div>
     </div>
-    <button class="btn btn-info">{{ button_label|default('Save') }}</button>
+    <button class="btn btn-info">{{ button_label|default('Guardar') }}</button>
 {{ form_end(form) }}

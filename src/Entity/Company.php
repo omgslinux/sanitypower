@@ -42,6 +42,7 @@ class Company
 
     /**
      * @ORM\OneToMany(targetEntity=CompanyEvent::class, mappedBy="company")
+     * @ORM\OrderBy({"date" = "ASC"})
      */
     private $companyEvents;
 

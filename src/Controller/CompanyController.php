@@ -6,10 +6,12 @@ use App\Entity\Company;
 use App\Entity\Incoming;
 use App\Entity\StaffMembership;
 use App\Entity\Subsidiary;
+use App\Entity\CompanyEvent;
 use App\Form\CompanyType;
 use App\Form\IncomingType;
 use App\Form\StaffMembershipType;
 use App\Form\SubsidiaryType;
+use App\Form\CompanyEventType;
 use App\Repository\CompanyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,8 +30,8 @@ class CompanyController extends AbstractController
             'a' => true
         ],
         [
-            'n' => 'accionistas',
-            't' => 'Accionistas',
+            'n' => 'eventos',
+            't' => 'Eventos',
             'a' => false
         ],
         [
@@ -43,13 +45,13 @@ class CompanyController extends AbstractController
             'a' => false
         ],
         [
-            'n' => 'grupo',
-            't' => 'Grupo de empresas',
+            'n' => 'accionistas',
+            't' => 'Accionistas',
             'a' => false
         ],
         [
-            'n' => 'eventos',
-            't' => 'Eventos',
+            'n' => 'grupo',
+            't' => 'Grupo de empresas',
             'a' => false
         ],
     ];
@@ -66,9 +68,23 @@ class CompanyController extends AbstractController
     }
 
     /**
+     * @Route("/delete/{id}", name="delete", methods={"POST"})
+     */
+    public function companyDelete(Request $request, Company $company): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$company->getId(), $request->request->get('_token'))) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($company);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute(self::PREFIX . 'index');
+    }
+
+    /**
      * @Route("/new", name="new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function companyNew(Request $request): Response
     {
         $company = new Company();
         $form = $this->createForm(CompanyType::class, $company);
@@ -91,7 +107,7 @@ class CompanyController extends AbstractController
     /**
      * @Route("/show/{id}", name="show", methods={"GET"})
      */
-    public function show(Company $company): Response
+    public function companyShow(Company $company): Response
     {
         $incoming = new Incoming();
         $incoming ->setCompany($company);
@@ -114,7 +130,7 @@ class CompanyController extends AbstractController
     /**
      * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Company $company): Response
+    public function companyEdit(Request $request, Company $company): Response
     {
         $form = $this->createForm(CompanyType::class, $company);
         $form->handleRequest($request);
@@ -127,6 +143,60 @@ class CompanyController extends AbstractController
 
         return $this->render('company/edit.html.twig', [
             'company' => $company,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/event/new/{id}", name="event_new", methods={"GET","POST"})
+     */
+    public function eventAdd(Request $request, Company $company): Response
+    {
+        $child = new CompanyEvent();
+        $child->setCompany($company);
+        $form = $this->createForm(CompanyEventType::class, $child);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($child);
+            $em->flush();
+            return $this->redirectToRoute(
+                self::PREFIX . 'show',
+                [
+                    'id' => $company->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/eventos/new.html.twig', [
+            'parent' => $company,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/event/edit/{id}", name="event_edit", methods={"GET","POST"})
+     */
+    public function eventEdit(Request $request, CompanyEvent $entity): Response
+    {
+        $form = $this->createForm(CompanyEventType::class, $entity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($entity);
+            $em->flush();
+            return $this->redirectToRoute(
+                self::PREFIX . 'show',
+                [
+                    'id' => $entity->getCompany()->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/eventos/edit.html.twig', [
+            'entity' => $entity,
             'form' => $form->createView(),
         ]);
     }
@@ -292,19 +362,5 @@ class CompanyController extends AbstractController
             'entity' => $entity,
             'form' => $form->createView(),
         ]);
-    }
-
-    /**
-     * @Route("/delete/{id}", name="delete", methods={"POST"})
-     */
-    public function delete(Request $request, Company $company): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$company->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($company);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute(self::PREFIX . 'index');
     }
 }

@@ -14,7 +14,6 @@
                 <th>Activa</th>
                 <th>Nivel</th>
                 <th>Notas</th>
-                <th>actions</th>
             </tr>
         </thead>
         <tbody>
@@ -26,9 +25,6 @@
                 <td>{{ company.active ? 'Yes' : 'No' }}</td>
                 <td>{{ company.level }}</td>
                 <td>{{ company.notes }}</td>
-                <td>
-                    <a href="{{ path('company_edit', {'id': company.id}) }}">edit</a>
-                </td>
             </tr>
         {% else %}
             <tr>
