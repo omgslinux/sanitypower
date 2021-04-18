@@ -27,32 +27,26 @@ class CompanyController extends AbstractController
         [
             'n' => 'incomings',
             't' => 'Ingresos explotación',
-            'a' => true
         ],
         [
             'n' => 'eventos',
             't' => 'Eventos',
-            'a' => false
         ],
         [
             'n' => 'directiva',
             't' => 'Directiva',
-            'a' => false
         ],
         [
             'n' => 'participadas',
             't' => 'Participadas',
-            'a' => false
         ],
         [
             'n' => 'accionistas',
             't' => 'Accionistas',
-            'a' => false
         ],
         [
             'n' => 'grupo',
             't' => 'Grupo de empresas',
-            'a' => false
         ],
     ];
     const PREFIX = 'company_';
@@ -172,6 +166,7 @@ class CompanyController extends AbstractController
         return $this->render('company/eventos/new.html.twig', [
             'parent' => $company,
             'form' => $form->createView(),
+            'activetab' => 'eventos',
         ]);
     }
 
@@ -198,6 +193,7 @@ class CompanyController extends AbstractController
         return $this->render('company/eventos/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
+            'activetab' => 'eventos',
         ]);
     }
 
@@ -280,6 +276,7 @@ class CompanyController extends AbstractController
         return $this->render('company/directiva/new.html.twig', [
             'entity' => $company,
             'form' => $form->createView(),
+            'activetab' => 'directiva',
         ]);
     }
 
@@ -306,6 +303,7 @@ class CompanyController extends AbstractController
         return $this->render('company/directiva/edit.html.twig', [
             'entity' => $membership,
             'form' => $form->createView(),
+            'activetab' => 'eventos',
         ]);
     }
 
@@ -335,6 +333,7 @@ class CompanyController extends AbstractController
         return $this->render('company/participadas/new.html.twig', [
             'parent' => $company,
             'form' => $form->createView(),
+            'activetab' => 'participadas',
         ]);
     }
 
@@ -361,6 +360,7 @@ class CompanyController extends AbstractController
         return $this->render('company/participadas/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
+            'activetab' => 'participadas',
         ]);
     }
 }
