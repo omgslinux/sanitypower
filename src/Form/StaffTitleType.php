@@ -2,12 +2,12 @@
 
 namespace App\Form;
 
-use App\Entity\BoardTitle;
+use App\Entity\StaffTitle;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class BoardTitleType extends AbstractType
+class StaffTitleType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -20,7 +20,7 @@ class BoardTitleType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => BoardTitle::class,
+            'data_class' => StaffTitle::class,
         ]);
     }
 }

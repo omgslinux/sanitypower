@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}BoardTitle{% endblock %}
+
+{% block body %}
+    <h1>BoardTitle</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Name</th>
+                <td>{{ entity.name }}</td>
+            </tr>
+            <tr>
+                <th>Alias</th>
+                <td>{{ entity.alias }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path(prefix ~ 'index') }}">back to list</a>
+
+    <a href="{{ path(prefix ~ 'edit', {'id': entity.id}) }}">edit</a>
+
+    {{ include(tdir ~ '/_delete_form.html.twig') }}
+{% endblock %}

@@ -33,7 +33,7 @@ class StaffMembership
     private $staffmember;
 
     /**
-     * @ORM\ManyToOne(targetEntity=BoardTitle::class)
+     * @ORM\ManyToOne(targetEntity=StaffTitle::class)
      * @ORM\JoinColumn(nullable=false)
      */
     private $title;
@@ -77,12 +77,12 @@ class StaffMembership
         return $this;
     }
 
-    public function getTitle(): ?BoardTitle
+    public function getTitle(): ?StaffTitle
     {
         return $this->title;
     }
 
-    public function setTitle(?BoardTitle $title): self
+    public function setTitle(?StaffTitle $title): self
     {
         $this->title = $title;
 

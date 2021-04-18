@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\BoardTitle;
+use App\Entity\StaffTitle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method BoardTitle|null find($id, $lockMode = null, $lockVersion = null)
- * @method BoardTitle|null findOneBy(array $criteria, array $orderBy = null)
- * @method BoardTitle[]    findAll()
- * @method BoardTitle[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method StaffTitle|null find($id, $lockMode = null, $lockVersion = null)
+ * @method StaffTitle|null findOneBy(array $criteria, array $orderBy = null)
+ * @method StaffTitle[]    findAll()
+ * @method StaffTitle[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BoardTitleRepository extends ServiceEntityRepository
+class StaffTitleRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, BoardTitle::class);
+        parent::__construct($registry, StaffTitle::class);
     }
 
     // /**
-    //  * @return BoardTitle[] Returns an array of BoardTitle objects
+    //  * @return StaffTitle[] Returns an array of StaffTitle objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class BoardTitleRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?BoardTitle
+    public function findOneBySomeField($value): ?StaffTitle
     {
         return $this->createQueryBuilder('b')
             ->andWhere('b.exampleField = :val')

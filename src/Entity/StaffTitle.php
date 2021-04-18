@@ -2,13 +2,16 @@
 
 namespace App\Entity;
 
-use App\Repository\BoardTitleRepository;
+use App\Repository\StaffTitleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=BoardTitleRepository::class)
+ * @ORM\Entity(repositoryClass=StaffTitleRepository::class)
+ * @ORM\Table(name="staff_titles",
+ *   uniqueConstraints={@ORM\UniqueConstraint(columns={"name"})}
+ * )
  */
-class BoardTitle
+class StaffTitle
 {
     /**
      * @ORM\Id

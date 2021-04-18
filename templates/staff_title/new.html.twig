@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Create new BoardTitle</h1>
 
-    {{ include('board_title/_form.html.twig') }}
+    {{ include(tdir ~ '/_form.html.twig') }}
 
-    <a href="{{ path('board_title_index') }}">back to list</a>
+    <a href="{{ path(prefix ~ 'index') }}">back to list</a>
 {% endblock %}

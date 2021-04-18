@@ -13,10 +13,10 @@
             </tr>
         </thead>
         <tbody>
-        {% for board_title in board_titles %}
+        {% for entity in entities %}
             <tr>
-                <td><a href="{{ path('board_title_edit', {'id': board_title.id}) }}">{{ board_title.name }}</a></td>
-                <td>{{ board_title.alias }}</td>
+                <td><a href="{{ path(prefix ~ 'edit', {'id': entity.id}) }}">{{ entity.name }}</a></td>
+                <td>{{ entity.alias }}</td>
             </tr>
         {% else %}
             <tr>
@@ -26,5 +26,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('board_title_new') }}">Crear un nuevo cargo</a>
+    <a href="{{ path(prefix ~ 'new') }}">Crear un nuevo cargo</a>
 {% endblock %}
