@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar ingreso{% endblock %}
+
+{% block body %}
+{% set company = entity.company %}
+    <h2>Editar evento de {{ company }}</h2>
+    {{ include('company/incomings/_form.html.twig') }}
+
+    <a href="{{ path('company_show', {'id': company.id }) }}">Volver a {{ company }}</a>
+
+{% endblock %}

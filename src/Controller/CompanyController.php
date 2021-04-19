@@ -220,7 +220,7 @@ class CompanyController extends AbstractController
         }
 
         return $this->render('company/incomings/new.html.twig', [
-            'company' => $company,
+            'parent' => $company,
             'form' => $form->createView(),
         ]);
     }
@@ -228,25 +228,25 @@ class CompanyController extends AbstractController
     /**
      * @Route("/incomings/edit/{id}", name="incoming_edit", methods={"GET","POST"})
      */
-    public function incomingEdit(Request $request, Incoming $incoming): Response
+    public function incomingEdit(Request $request, Incoming $entity): Response
     {
-        $form = $this->createForm(IncomingType::class, $incoming);
+        $form = $this->createForm(IncomingType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($incoming);
+            $em->persist($entity);
             $em->flush();
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $incoming->getCompany()->getId()
+                    'id' => $entity->getCompany()->getId()
                 ]
             );
         }
 
         return $this->render('company/incomings/edit.html.twig', [
-            'company' => $incoming->getCompany(),
+            'entity' => $entity,
             'form' => $form->createView(),
         ]);
     }
