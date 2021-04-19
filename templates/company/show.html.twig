@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Company{% endblock %}
+{% block title %}Empresa {{ company }}{% endblock %}
 
 {% block body %}
     <h1>{{ company.fullname }}</h1>
@@ -13,14 +13,14 @@
     </div>
     <div class="row">
         <div class="col-2">
-            <a href="{{ path('company_edit', {'id': company.id}) }}">{{ company.ShortName }}</a>
+            <a href="{{ path('company_edit', {'id': company.id}) }}">{{ company.ShortName == '' ? '(no tiene)' : company.ShortName }}</a>
         </div>
         <div class="col-1">{{ company.country }}</div>
         <div class="col-3">{{ company.level }}</div>
-        <div class="col-1">{{ company.active ? 'Yes' : 'No' }}</div>
+        <div class="col-1">{{ company.active ? 'Sí' : 'No' }}</div>
     </div>
     <div class="row">
-    <div class="col-12">Notes</div>
+    <div class="col-12">Notas</div>
     </div>
     <div class="row">
         <div class="col-12">{{ company.notes }}</div>
@@ -28,11 +28,11 @@
 
 
         <!-- Tabs navs -->
-        {% set tabname = 'myTabList' %}
+        {% set tabname = 'myTabList' %}{% if activetab is not defined %}{% set activetab = 'incomings' %}{% endif %}
         <ul class="nav nav-tabs md-tabs" id="{{tabname}}" role="tablist">
             {% for tab in tabs %}
                 <li class="nav-item">
-                    <a class="nav-link{{ tab.a == true ? ' active' }}" id="{{ tab.n }}-tab" data-toggle="tab" href="#{{ tab.n }}" role="tab" aria-controls="{{ tab.n }}" aria-selected="true">{{ tab.t }}</a>
+                    <a class="nav-link{{ tab.n == activetab ? ' active' }}" id="{{ tab.n }}-tab" data-toggle="tab" href="#{{ tab.n }}" role="tab" aria-controls="{{ tab.n }}" aria-selected="true">{{ tab.t }}</a>
                 </li>
             {% endfor %}
         </ul>
@@ -42,7 +42,7 @@
           <div class="tab-content border-right border-bottom border-left" id="{{tabname}}-content">
             {% for tab in tabs %}
                 <!-- Tab X -->
-                <div class="tab-pane fade{{ tab.a == true ? ' active' }}" id="{{ tab.n }}" role="tabpanel" aria-labelledby="{{ tab.n }}-tab">
+                <div class="tab-pane fade{{ tab.n == activetab ? ' active' }}" id="{{ tab.n }}" role="tabpanel" aria-labelledby="{{ tab.n }}-tab">
                 {{ include('company/' ~ tab.n ~ '/index.html.twig') }}
                 </div>
                 <!-- Fin TabX -->
