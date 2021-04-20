@@ -19,22 +19,25 @@ class CompanyRepository extends ServiceEntityRepository
         parent::__construct($registry, Company::class);
     }
 
-    // /**
-    //  * @return Company[] Returns an array of Company objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Company[] Returns an array of Company objects
+     */
+
+    public function findByGroup($value)
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
+            ->leftJoin('ownedSubsidiaries s')
+            ->andWhere('c.active = :active')
+            ->andWhere('s.percent >= :percent')
+            ->setParameter('active', 1)
+            ->setParameter('percent', 50)
+            ->orderBy('s.', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+
 
     /*
     public function findOneBySomeField($value): ?Company

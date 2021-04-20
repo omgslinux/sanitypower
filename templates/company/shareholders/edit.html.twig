@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar accionista{% endblock %}
+
+{% block body %}
+
+    <h1>Editar accionista</h1>
+
+    {{ include('company/shareholders/_form.html.twig') }}
+
+    <a href="{{ path('company_show', { 'id': entity.company.id }) }}">Volver a {{ entity.company }}</a>
+
+{% endblock %}

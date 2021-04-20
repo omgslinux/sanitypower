@@ -1,0 +1,17 @@
+{% if parent.companyEvents|length > 0 %}
+    {# <h2>Historial</h2> #}
+    <div class="row">
+        <div class="col-3 font-weight-bold">Fecha</div>
+        <div class="col font-weight-bold">Descripción</div>
+    </div>
+    {% for entity in parent.companyEvents %}
+        <div class="row border">
+            <div class="col-3 border-right"><a href="{{ path(prefix ~ 'event_edit', { 'id': entity.id }) }}">{{ entity.date|date('d/m/Y') }}</a></div>
+            <div class="col">{{ entity.description }}</div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No hay eventos para esta empresa</p>
+{% endif %}
+<br>
+<p><a href="{{ path(prefix ~ 'event_new', {'id': parent.id } )}}">Añadir evento</a></p>

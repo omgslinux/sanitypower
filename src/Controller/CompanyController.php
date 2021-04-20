@@ -6,9 +6,11 @@ use App\Entity\Company;
 use App\Entity\Incoming;
 use App\Entity\StaffMembership;
 use App\Entity\Subsidiary;
+use App\Entity\Shareholder;
 use App\Entity\CompanyEvent;
 use App\Form\CompanyType;
 use App\Form\IncomingType;
+use App\Form\ShareholderType;
 use App\Form\StaffMembershipType;
 use App\Form\SubsidiaryType;
 use App\Form\CompanyEventType;
@@ -29,8 +31,8 @@ class CompanyController extends AbstractController
             't' => 'Ingresos explotación',
         ],
         [
-            'n' => 'eventos',
-            't' => 'Eventos',
+            'n' => 'history',
+            't' => 'Historial',
         ],
         [
             'n' => 'directiva',
@@ -41,7 +43,7 @@ class CompanyController extends AbstractController
             't' => 'Participadas',
         ],
         [
-            'n' => 'accionistas',
+            'n' => 'shareholders',
             't' => 'Accionistas',
         ],
         [
@@ -103,19 +105,8 @@ class CompanyController extends AbstractController
      */
     public function companyShow(Company $company): Response
     {
-        $incoming = new Incoming();
-        $incoming ->setCompany($company);
-        $incomingForm = $this->createForm(
-            IncomingType::class,
-            $incoming,
-            [
-                'action' => self::PREFIX . 'incomings'
-            ]
-        );
-
         return $this->render('company/show.html.twig', [
-            'company' => $company,
-            'incomingForm' => $incomingForm->createView(),
+            'parent' => $company,
             'tabs' => self::TABS,
             'prefix' => self::PREFIX,
         ]);
@@ -142,9 +133,9 @@ class CompanyController extends AbstractController
     }
 
     /**
-     * @Route("/event/new/{id}", name="event_new", methods={"GET","POST"})
+     * @Route("/history/new/{id}", name="event_new", methods={"GET","POST"})
      */
-    public function eventAdd(Request $request, Company $company): Response
+    public function historyAdd(Request $request, Company $company): Response
     {
         $child = new CompanyEvent();
         $child->setCompany($company);
@@ -163,17 +154,17 @@ class CompanyController extends AbstractController
             );
         }
 
-        return $this->render('company/eventos/new.html.twig', [
+        return $this->render('company/history/new.html.twig', [
             'parent' => $company,
             'form' => $form->createView(),
-            'activetab' => 'eventos',
+            'activetab' => 'history',
         ]);
     }
 
     /**
-     * @Route("/event/edit/{id}", name="event_edit", methods={"GET","POST"})
+     * @Route("/history/edit/{id}", name="event_edit", methods={"GET","POST"})
      */
-    public function eventEdit(Request $request, CompanyEvent $entity): Response
+    public function historyEdit(Request $request, CompanyEvent $entity): Response
     {
         $form = $this->createForm(CompanyEventType::class, $entity);
         $form->handleRequest($request);
@@ -190,38 +181,39 @@ class CompanyController extends AbstractController
             );
         }
 
-        return $this->render('company/eventos/edit.html.twig', [
+        return $this->render('company/history/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
-            'activetab' => 'eventos',
+            'activetab' => 'history',
         ]);
     }
 
     /**
      * @Route("/incomings/new/{id}", name="incomings_new", methods={"GET","POST"})
      */
-    public function incomingsAdd(Request $request, Company $company): Response
+    public function incomingsAdd(Request $request, Company $parent): Response
     {
-        $incoming = new Incoming();
-        $incoming->setCompany($company);
-        $form = $this->createForm(IncomingType::class, $incoming);
+        $entity = new Incoming();
+        $entity->setCompany($company);
+        $form = $this->createForm(IncomingType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($incoming);
+            $em->persist($entity);
             $em->flush();
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $incoming->getCompany()->getId()
+                    'id' => $parent->getId()
                 ]
             );
         }
 
         return $this->render('company/incomings/new.html.twig', [
-            'parent' => $company,
+            'parent' => $parent,
             'form' => $form->createView(),
+            'activetab' => 'incomings',
         ]);
     }
 
@@ -248,33 +240,34 @@ class CompanyController extends AbstractController
         return $this->render('company/incomings/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
+            'activetab' => 'incomings',
         ]);
     }
 
     /**
      * @Route("/membership/new/{id}", name="membership_new", methods={"GET","POST"})
      */
-    public function membershipAdd(Request $request, Company $company): Response
+    public function membershipAdd(Request $request, Company $parent): Response
     {
-        $membership = new StaffMembership();
-        $membership->setCompany($company);
-        $form = $this->createForm(StaffMembershipType::class, $membership);
+        $entity = new StaffMembership();
+        $entity->setCompany($parent);
+        $form = $this->createForm(StaffMembershipType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($membership);
+            $em->persist($entity);
             $em->flush();
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $company->getId()
+                    'id' => $parent->getId()
                 ]
             );
         }
 
         return $this->render('company/directiva/new.html.twig', [
-            'entity' => $company,
+            'parent' => $parent,
             'form' => $form->createView(),
             'activetab' => 'directiva',
         ]);
@@ -283,38 +276,94 @@ class CompanyController extends AbstractController
     /**
      * @Route("/membership/edit/{id}", name="membership_edit", methods={"GET","POST"})
      */
-    public function membershipEdit(Request $request, StaffMembership $membership): Response
+    public function membershipEdit(Request $request, StaffMembership $entity): Response
     {
-        $form = $this->createForm(StaffMembershipType::class, $membership);
+        $form = $this->createForm(StaffMembershipType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($membership);
+            $em->persist($entity);
             $em->flush();
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $membership->getCompany()->getId()
+                    'id' => $entity->getCompany()->getId()
                 ]
             );
         }
 
         return $this->render('company/directiva/edit.html.twig', [
-            'entity' => $membership,
+            'entity' => $entity,
             'form' => $form->createView(),
-            'activetab' => 'eventos',
+            'activetab' => 'directiva',
         ]);
     }
 
 
     /**
+     * @Route("/shareholder/new/{id}", name="shareholder_new", methods={"GET","POST"})
+     */
+    public function shareholderAdd(Request $request, Company $parent): Response
+    {
+        $entity = new Shareholder();
+        $entity->setCompany($parent);
+        $form = $this->createForm(ShareholderType::class, $entity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($entity);
+            $em->flush();
+            return $this->redirectToRoute(
+                self::PREFIX . 'show',
+                [
+                    'id' => $parent->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/shareholders/new.html.twig', [
+            'parent' => $parent,
+            'form' => $form->createView(),
+            'activetab' => 'shareholders',
+        ]);
+    }
+
+    /**
+     * @Route("/shareholder/edit/{id}", name="shareholder_edit", methods={"GET","POST"})
+     */
+    public function shareholderEdit(Request $request, Shareholder $entity): Response
+    {
+        $form = $this->createForm(ShareholderType::class, $entity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($entity);
+            $em->flush();
+            return $this->redirectToRoute(
+                self::PREFIX . 'show',
+                [
+                    'id' => $entity->getCompany()->getId()
+                ]
+            );
+        }
+
+        return $this->render('company/shareholders/edit.html.twig', [
+            'entity' => $entity,
+            'form' => $form->createView(),
+            'activetab' => 'shareholders',
+        ]);
+    }
+
+    /**
      * @Route("/subsidiary/new/{id}", name="subsidiary_new", methods={"GET","POST"})
      */
-    public function subsidiaryAdd(Request $request, Company $company): Response
+    public function subsidiaryAdd(Request $request, Company $parent): Response
     {
         $entity = new Subsidiary();
-        $entity->setOwner($company);
+        $entity->setOwner($parent);
         $form = $this->createForm(SubsidiaryType::class, $entity);
         $form->handleRequest($request);
 
@@ -325,13 +374,13 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $company->getId()
+                    'id' => $parent->getId()
                 ]
             );
         }
 
         return $this->render('company/participadas/new.html.twig', [
-            'parent' => $company,
+            'parent' => $parent,
             'form' => $form->createView(),
             'activetab' => 'participadas',
         ]);

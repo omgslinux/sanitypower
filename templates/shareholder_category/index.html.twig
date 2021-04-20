@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ShareholderCategory index{% endblock %}
+
+{% block body %}
+    <h1>ShareholderCategory index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Letter</th>
+                <th>Description</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in shareholder_categories %}
+            <tr>
+                <td>{{ entity.letter }}</td>
+                <td>{{ entity.description }}</td>
+                <td>
+                    <a href="{{ path(prefix ~ 'show', {'id': entity.id}) }}">show</a>
+                    <a href="{{ path(prefix ~ 'edit', {'id': entity.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path(prefix ~ 'new') }}">Crear tipo accionista</a>
+{% endblock %}

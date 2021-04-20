@@ -5,7 +5,7 @@
 {% block body %}
 {% set company = entity.company %}
     <h2>Editar evento de {{ company }}</h2>
-    {{ include('company/eventos/_form.html.twig') }}
+    {{ include('company/history/_form.html.twig') }}
 
     <a href="{{ path('company_show', {'id': company.id }) }}">Volver a {{ company }}</a>
 

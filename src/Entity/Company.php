@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=CompanyRepository::class)
+ * @ORM\Table(name="company",
+ *   uniqueConstraints={@ORM\UniqueConstraint(columns={"fullname"})}
+ * )
  */
 class Company
 {
@@ -70,7 +73,7 @@ class Company
     /**
      * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="company")
      */
-    private $shareholders;
+    private $companyHolders;
 
     /**
      * @ORM\OneToMany(targetEntity=StaffMembership::class, mappedBy="company")
@@ -84,6 +87,7 @@ class Company
 
     /**
      * @ORM\OneToMany(targetEntity=Subsidiary::class, mappedBy="owned")
+     * @ORM\OrderBy({"date" = "ASC"})
      */
     private $ownedSubdiaries;
 
@@ -92,7 +96,7 @@ class Company
         $this->incomings = new ArrayCollection();
         $this->companyEvents = new ArrayCollection();
         $this->companyRelationships = new ArrayCollection();
-        $this->shareholders = new ArrayCollection();
+        $this->companyHolders = new ArrayCollection();
         $this->staffMemberships = new ArrayCollection();
         $this->ownerSubsidiaries = new ArrayCollection();
         $this->ownedSubdiaries = new ArrayCollection();
@@ -273,27 +277,27 @@ class Company
     /**
      * @return Collection|Shareholder[]
      */
-    public function getShareholders(): Collection
+    public function getCompanyHolders(): Collection
     {
-        return $this->shareholders;
+        return $this->companyHolders;
     }
 
-    public function addShareholder(Shareholder $shareholder): self
+    public function addCompanyHolder(Shareholder $holder): self
     {
-        if (!$this->shareholders->contains($shareholder)) {
-            $this->shareholders[] = $shareholder;
-            $shareholder->setCompany($this);
+        if (!$this->companyHolders->contains($holder)) {
+            $this->companyHolders[] = $holder;
+            $holder->setCompany($this);
         }
 
         return $this;
     }
 
-    public function removeShareholder(Shareholder $shareholder): self
+    public function removeCompanyHolder(Shareholder $holder): self
     {
-        if ($this->shareholders->removeElement($shareholder)) {
+        if ($this->companyHolders->removeElement($holder)) {
             // set the owning side to null (unless already changed)
-            if ($shareholder->getCompany() === $this) {
-                $shareholder->setCompany(null);
+            if ($holder->getCompany() === $this) {
+                $holder->setCompany(null);
             }
         }
 

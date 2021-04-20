@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Empresa {{ company }}{% endblock %}
+{% block title %}Empresa {{ parent }}{% endblock %}
 
 {% block body %}
-    <h1>{{ company.fullname }}</h1>
+    <h1>{{ parent.fullname }}</h1>
 
     <div class="row">
         <div class="col-2">Nombre corto</div>
@@ -13,17 +13,17 @@
     </div>
     <div class="row">
         <div class="col-2">
-            <a href="{{ path('company_edit', {'id': company.id}) }}">{{ company.ShortName == '' ? '(no tiene)' : company.ShortName }}</a>
+            <a href="{{ path(prefix~ 'edit', {'id': parent.id}) }}">{{ parent.ShortName == '' ? '(no tiene)' : parent.ShortName }}</a>
         </div>
-        <div class="col-1">{{ company.country }}</div>
-        <div class="col-3">{{ company.level }}</div>
-        <div class="col-1">{{ company.active ? 'Sí' : 'No' }}</div>
+        <div class="col-1">{{ parent.country }}</div>
+        <div class="col-3">{{ parent.level }}</div>
+        <div class="col-1">{{ parent.active ? 'Sí' : 'No' }}</div>
     </div>
     <div class="row">
     <div class="col-12">Notas</div>
     </div>
     <div class="row">
-        <div class="col-12">{{ company.notes }}</div>
+        <div class="col-12">{{ parent.notes }}</div>
     </div>
 
 

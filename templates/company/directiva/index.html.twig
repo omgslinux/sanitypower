@@ -1,4 +1,4 @@
-{% if company.staffMemberships|length > 0 %}
+{% if parent.staffMemberships|length > 0 %}
     {# <h2>Junta directiva</h2> #}
     <div class="row">
         <div class="col-4 font-weight-bold">Apellidos y nombre</div>
@@ -6,16 +6,16 @@
         <div class="col font-weight-bold">Desde</div>
         <div class="col font-weight-bold">Hasta</div>
     </div>
-    {% for membership in company.staffMemberships %}
+    {% for entity in parent.staffMemberships %}
         <div class="row border">
-            <div class="col-4 border-right"><a href="{{ path('company_membership_edit', { 'id': membership.id }) }}">{{ membership.staffmember }}</a></div>
-            <div class="col-4">{{ membership.title }}</div>
-            <div class="col">{{ membership.datefrom|date('d/m/Y') }}</div>
-            <div class="col">{{ membership.dateto|date('d/m/Y') }}</div>
+            <div class="col-4 border-right"><a href="{{ path(prefix ~ 'membership_edit', { 'id': entity.id }) }}">{{ entity.staffmember }}</a></div>
+            <div class="col-4">{{ entity.title }}</div>
+            <div class="col">{{ entity.datefrom|date('d/m/Y') }}</div>
+            <div class="col">{{ entity.dateto|date('d/m/Y') }}</div>
         </div>
     {% endfor %}
 {% else %}
     <p>No hay directivos para esta empresa</p>
 {% endif %}
 <br>
-<p><a href="{{ path('company_membership_new', {'id': company.id } )}}">Añadir miembro</a></p>
+<p><a href="{{ path(prefix ~ 'membership_new', {'id': parent.id } )}}">Añadir miembro</a></p>

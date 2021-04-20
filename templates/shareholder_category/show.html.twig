@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ShareholderCategory{% endblock %}
+
+{% block body %}
+    <h1>ShareholderCategory</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Letter</th>
+                <td>{{ entity.letter }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ entity.description }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path(prefix ~ 'index') }}">back to list</a>
+
+    <a href="{{ path(prefix ~ 'edit', {'id': entity.id}) }}">edit</a>
+
+    {{ include('shareholder_category/_delete_form.html.twig') }}
+{% endblock %}
