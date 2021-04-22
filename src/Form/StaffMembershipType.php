@@ -16,7 +16,7 @@ class StaffMembershipType extends AbstractType
     {
         $builder
             ->add(
-                'staffmember',
+                'staffMember',
                 null,
                 [
                     self::LABEL => 'Miembro de Junta',

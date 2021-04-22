@@ -73,6 +73,11 @@ class Company
     /**
      * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="company")
      */
+    private $heldCompanys;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="holder")
+     */
     private $companyHolders;
 
     /**
@@ -87,7 +92,7 @@ class Company
 
     /**
      * @ORM\OneToMany(targetEntity=Subsidiary::class, mappedBy="owned")
-     * @ORM\OrderBy({"date" = "ASC"})
+     * @ORM\OrderBy({"owned" = "ASC"})
      */
     private $ownedSubdiaries;
 
@@ -96,6 +101,7 @@ class Company
         $this->incomings = new ArrayCollection();
         $this->companyEvents = new ArrayCollection();
         $this->companyRelationships = new ArrayCollection();
+        $this->heldCompanys = new ArrayCollection();
         $this->companyHolders = new ArrayCollection();
         $this->staffMemberships = new ArrayCollection();
         $this->ownerSubsidiaries = new ArrayCollection();
@@ -272,6 +278,36 @@ class Company
     public function __toString()
     {
         return $this->getFullname();
+    }
+
+    /**
+     * @return Collection|Shareholder[]
+     */
+    public function getHeldCompanys(): Collection
+    {
+        return $this->heldCompanys;
+    }
+
+    public function addHeldCompany(Shareholder $company): self
+    {
+        if (!$this->heldCompanys->contains($company)) {
+            $this->heldCompanys[] = $company;
+            $company->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHeldCompany(Shareholder $company): self
+    {
+        if ($this->heldCompanys->removeElement($company)) {
+            // set the owning side to null (unless already changed)
+            if ($company->getCompany() === $this) {
+                $company->setCompany(null);
+            }
+        }
+
+        return $this;
     }
 
     /**

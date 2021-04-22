@@ -21,15 +21,15 @@ class Shareholder
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="shareholders")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="heldCompanys")
+    * @ORM\JoinColumn(nullable=false)
+    */
     private $company;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="holders")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="companyHolders")
+    * @ORM\JoinColumn(nullable=false)
+    */
     private $holder;
 
     /**

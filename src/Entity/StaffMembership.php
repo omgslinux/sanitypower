@@ -28,9 +28,9 @@ class StaffMembership
 
     /**
      * @ORM\ManyToOne(targetEntity=StaffMembers::class, inversedBy="staffMemberships")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="staffmember_id", nullable=false)
      */
-    private $staffmember;
+    private $staffMember;
 
     /**
      * @ORM\ManyToOne(targetEntity=StaffTitle::class)
@@ -65,14 +65,14 @@ class StaffMembership
         return $this;
     }
 
-    public function getStaffmember(): ?StaffMembers
+    public function getStaffMember(): ?StaffMembers
     {
-        return $this->staffmember;
+        return $this->staffMember;
     }
 
-    public function setStaffmember(?StaffMembers $staffmember): self
+    public function setStaffMember(?StaffMembers $staffMember): self
     {
-        $this->staffmember = $staffmember;
+        $this->staffMember = $staffMember;
 
         return $this;
     }

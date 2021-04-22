@@ -45,7 +45,7 @@ class ShareholderType extends AbstractType
         ;
         if (!$options['child']) {
             $builder
-            ->add('companyHolder');
+            ->add('company');
         }
     }
 

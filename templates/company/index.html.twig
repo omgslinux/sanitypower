@@ -2,9 +2,34 @@
 
 {% block title %}Empresas{% endblock %}
 
+{% block pagination %}
+{% if maxPages > 1 %}
+<ul class="pagination pg-blue">
+    {# `«` arrow  #}
+    <li class="page-item{{ thisPage == 1 ? ' disabled' }}">
+        <a class="page-link" href="{{ path(indexURL, {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
+    </li>
+
+    {# Render each page number #}
+    {% for i in 1..maxPages %}
+        <li class="page-item{{ thisPage == i ? ' active' }}">
+            <a class="page-link" href="{{ path(indexURL, {page: i}) }}">{{ i }}</a>
+        </li>
+    {% endfor %}
+
+    {# `»` arrow #}
+    <li class="page-item{{ thisPage == maxPages ? ' disabled' }}">
+        <a class="page-link" href="{{ path(indexURL, {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
+    </li>
+</ul>
+{% endif %}
+
+{% endblock %}
+
 {% block body %}
     <h1>Empresas</h1>
-
+    {% set indexURL = 'company_index' %}
+    {{ block('pagination') }}
     <table class="table">
         <thead>
             <tr>
@@ -33,6 +58,7 @@
         {% endfor %}
         </tbody>
     </table>
+    {{ block('pagination') }}
 
     <a href="{{ path('company_new') }}">Create new</a>
 {% endblock %}

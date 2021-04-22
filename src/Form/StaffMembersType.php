@@ -9,12 +9,31 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StaffMembersType extends AbstractType
 {
+    const LABEL = 'label';
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('surname')
-            ->add('name')
-            ->add('notes')
+            ->add(
+                'surname',
+                null,
+                [
+                    self::LABEL => 'Apellidos',
+                ]
+            )
+            ->add(
+                'name',
+                null,
+                [
+                    self::LABEL => 'Nombre',
+                ]
+            )
+            ->add(
+                'notes',
+                null,
+                [
+                    self::LABEL => 'Notas',
+                ]
+            )
         ;
     }
 

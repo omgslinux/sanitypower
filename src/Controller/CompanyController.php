@@ -54,12 +54,29 @@ class CompanyController extends AbstractController
     const PREFIX = 'company_';
 
     /**
-     * @Route("/", name="index", methods={"GET"})
+     * @Route("/index/{page}", name="index", methods={"GET"})
      */
-    public function index(CompanyRepository $companyRepository): Response
+    public function index(CompanyRepository $repo, $page = 1): Response
     {
+        $limit = 20;
+        // ... get posts from DB...
+        // Controller Action
+        $paginator = $repo->getAllPaginated($page, $limit); // Returns 5 posts out of 20
+
+        # Count of ALL posts (ie: `20` posts)
+        //$totalEntities = $paginator->count();
+
+        // You can also call the count methods (check PHPDoc for `paginate()`)
+        # ArrayIterator
+        // $iterator = $paginator->getIterator();
+        # Total fetched (ie: `5` posts)
+        // $totalEntitiesReturned = $iterator()->count();
+
         return $this->render('company/index.html.twig', [
-            'companies' => $companyRepository->findAll(),
+            //'companies' => $companyRepository->getAllPaginated(),
+            'companies' => $paginator->getIterator(),
+            'maxPages' => ceil($paginator->count() / $limit),
+            'thisPage' => $page,
         ]);
     }
 

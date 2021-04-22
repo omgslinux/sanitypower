@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\StaffMembersRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -34,6 +36,16 @@ class StaffMembers
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $notes;
+
+    /**
+     * @ORM\OneToMany(targetEntity=StaffMembers::class, mappedBy="staffMember")
+     */
+    private $staffMemberships;
+
+    public function __construct()
+    {
+        $this->StaffMemberships = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -79,5 +91,35 @@ class StaffMembers
     public function __toString()
     {
         return $this->getSurname() . ', ' . $this->getName();
+    }
+
+    /**
+     * @return Collection|self[]
+     */
+    public function getStaffMemberships(): Collection
+    {
+        return $this->StaffMemberships;
+    }
+
+    public function addStaffMembership(self $staffMembership): self
+    {
+        if (!$this->StaffMemberships->contains($staffMembership)) {
+            $this->StaffMemberships[] = $staffMembership;
+            $staffMembership->setStaffMembers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStaffMembership(self $staffMembership): self
+    {
+        if ($this->StaffMemberships->removeElement($staffMembership)) {
+            // set the owning side to null (unless already changed)
+            if ($staffMembership->getStaffMembers() === $this) {
+                $staffMembership->setStaffMembers(null);
+            }
+        }
+
+        return $this;
     }
 }
