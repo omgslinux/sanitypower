@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=ShareholderCategoryRepository::class)
- * @ORM\Table(name="shareholder_typès",
+ * @ORM\Table(name="shareholder_types",
  *   uniqueConstraints={@ORM\UniqueConstraint(columns={"letter"})}
  * )
  */
