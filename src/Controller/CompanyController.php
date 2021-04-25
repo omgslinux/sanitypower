@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Company;
 use App\Entity\Incoming;
 use App\Entity\StaffMembership;
+use App\Entity\CurrencyExchange;
 use App\Entity\Subsidiary;
 use App\Entity\Shareholder;
 use App\Entity\CompanyEvent;
@@ -126,6 +127,7 @@ class CompanyController extends AbstractController
             'parent' => $company,
             'tabs' => self::TABS,
             'prefix' => self::PREFIX,
+            'incomings' => $this->incomingFindExchange($company),
         ]);
     }
 
@@ -211,7 +213,7 @@ class CompanyController extends AbstractController
     public function incomingsAdd(Request $request, Company $parent): Response
     {
         $entity = new Incoming();
-        $entity->setCompany($company);
+        $entity->setCompany($parent);
         $form = $this->createForm(IncomingType::class, $entity);
         $form->handleRequest($request);
 
@@ -259,6 +261,23 @@ class CompanyController extends AbstractController
             'form' => $form->createView(),
             'activetab' => 'incomings',
         ]);
+    }
+
+    public function incomingFindExchange(Company $parent)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $allIncomings = $parent->getIncomings();
+        $currencyExchangeRepo = $em->getRepository(CurrencyExchange::class);
+        $converted = [];
+        foreach ($allIncomings as $incoming) {
+            $exchange = $currencyExchangeRepo->getExchange($incoming);
+            $converted [] = [
+                'incoming' => $incoming,
+                'exchange' => $exchange[0],
+            ];
+        }
+
+        return $converted;
     }
 
     /**
