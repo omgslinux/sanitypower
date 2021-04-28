@@ -1,7 +1,7 @@
 <!--Navbar-->
 
 {% set navbarbright = 'light' %}{# 'dark' o 'light' #}
-{% set navbarbg = 'light' %}{# 'light', 'dark', 'primary', 'success', 'info', 'warning' o 'danger' #}
+{% set navbarbg = 'primary' %}{# 'light', 'dark', 'primary', 'success', 'info', 'warning' o 'danger' #}
 <nav class="navbar navbar-expand-md navbar-{{ navbarbright }} bg-{{navbarbg}} fixed-top mb-4">
     <div class="container">
         <!-- Links -->
@@ -9,19 +9,27 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{{ path('company_index') }}">Empresas<span></span></a>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ path('currency_index') }}">Monedas<span></span></a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ path('staff_title_index') }}">Cargos<span></span></a>
-            </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ path('staff_members_index') }}">Miembros<span></span></a>
-            </li>
+              <!-- Dropdown -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">Mantenimiento</a>
+                <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="{{ path('currency_index') }}">Monedas</a>
+                  <a class="dropdown-item" href="{{ path('currency_exchange_index') }}">Cambio monedas</a>
+                  <a class="dropdown-item" href="{{ path('staff_title_index') }}">Cargos Consejo Administración</a>
+                  <a class="dropdown-item" href="{{ path('staff_members_index') }}">Miembros de Consejo de Administración</a>
+                  <a class="dropdown-item" href="{{ path('company_level_index') }}">Niveles de empresas</a>
+                </div>
+              </li>
+
         </ul>
     </div>
 </nav>
 <!-- Navbar -->
+
+
+
+
 
 {# Ejemplo completo de navbar. Video en https://www.youtube.com/watch?v=L0uNai3XyKQ
 <!--Navbar-->
@@ -77,5 +85,39 @@
 
 </nav>
 <!--/.Navbar-->
+
+
+
+
+Con un poco de JavaScript:
+
+https://mdbootstrap.com/docs/b4/jquery/navigation/navs/
+
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" href="#">Active</a>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+      aria-expanded="false">Dropdown</a>
+    <div class="dropdown-menu">
+      <a class="dropdown-item" href="#">Action</a>
+      <a class="dropdown-item" href="#">Another action</a>
+      <a class="dropdown-item" href="#">Something else here</a>
+      <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="#">Separated link</a>
+    </div>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">Link</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link disabled" href="#">Disabled</a>
+  </li>
+</ul>
+
+
+
+
 
 #}

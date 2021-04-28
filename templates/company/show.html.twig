@@ -20,7 +20,7 @@
         <div class="col-1">{{ parent.active ? 'Sí' : 'No' }}</div>
     </div>
     <div class="row">
-    <div class="col-12">Notas</div>
+        <div class="col-12">Notas</div>
     </div>
     <div class="row">
         <div class="col-12">{{ parent.notes }}</div>
@@ -32,20 +32,20 @@
         <ul class="nav nav-tabs md-tabs" id="{{tabname}}" role="tablist">
             {% for tab in tabs %}
                 <li class="nav-item">
-                    <a class="nav-link{{ tab.n == activetab ? ' active' }}" id="{{ tab.n }}-tab" data-toggle="tab" href="#{{ tab.n }}" role="tab" aria-controls="{{ tab.n }}" aria-selected="true">{{ tab.t }}</a>
+                    <a class="nav-link{{ tab.n == activetab ? ' active" aria-selected="true' }}" id="{{ tab.n }}-tab" data-toggle="tab" href="#{{ tab.n }}" role="tab" aria-controls="{{ tab.n }}">{{ tab.t }}</a>
                 </li>
             {% endfor %}
         </ul>
         <!-- Tabs navs -->
 
-          <!-- Tabs content -->
-          <div class="tab-content border-right border-bottom border-left" id="{{tabname}}-content">
+        <!-- Tabs content -->
+        <div class="tab-content border-right border-bottom border-left" id="{{tabname}}-content">
             {% for tab in tabs %}
-                <!-- Tab X -->
+                <!-- Tab {{ tab.n }} -->
                 <div class="tab-pane fade{{ tab.n == activetab ? ' active' }}" id="{{ tab.n }}" role="tabpanel" aria-labelledby="{{ tab.n }}-tab">
                 {{ include('company/' ~ tab.n ~ '/index.html.twig') }}
                 </div>
-                <!-- Fin TabX -->
+                <!-- Fin Tab {{ tab.n }} -->
             {% endfor %}
         </div>
         <!-- Tabs content -->

@@ -11,12 +11,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/companylevel")
+ * @Route("/companylevel", name="company_level_")
  */
 class CompanyLevelController extends AbstractController
 {
     /**
-     * @Route("/", name="company_level_index", methods={"GET"})
+     * @Route("/", name="index", methods={"GET"})
      */
     public function index(CompanyLevelRepository $companyLevelRepository): Response
     {
@@ -26,7 +26,7 @@ class CompanyLevelController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="company_level_new", methods={"GET","POST"})
+     * @Route("/new", name="new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
     {
@@ -49,7 +49,7 @@ class CompanyLevelController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="company_level_show", methods={"GET"})
+     * @Route("/{id}", name="show", methods={"GET"})
      */
     public function show(CompanyLevel $companyLevel): Response
     {
@@ -59,7 +59,7 @@ class CompanyLevelController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="company_level_edit", methods={"GET","POST"})
+     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
      */
     public function edit(Request $request, CompanyLevel $companyLevel): Response
     {
@@ -79,7 +79,7 @@ class CompanyLevelController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="company_level_delete", methods={"POST"})
+     * @Route("/{id}", name="delete", methods={"POST"})
      */
     public function delete(Request $request, CompanyLevel $companyLevel): Response
     {

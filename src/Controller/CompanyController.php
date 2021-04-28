@@ -37,7 +37,7 @@ class CompanyController extends AbstractController
         ],
         [
             'n' => 'directiva',
-            't' => 'Directiva',
+            't' => 'Consejo de administración',
         ],
         [
             'n' => 'participadas',
@@ -63,15 +63,6 @@ class CompanyController extends AbstractController
         // ... get posts from DB...
         // Controller Action
         $paginator = $repo->getAllPaginated($page, $limit); // Returns 5 posts out of 20
-
-        # Count of ALL posts (ie: `20` posts)
-        //$totalEntities = $paginator->count();
-
-        // You can also call the count methods (check PHPDoc for `paginate()`)
-        # ArrayIterator
-        // $iterator = $paginator->getIterator();
-        # Total fetched (ie: `5` posts)
-        // $totalEntitiesReturned = $iterator()->count();
 
         return $this->render('company/index.html.twig', [
             //'companies' => $companyRepository->getAllPaginated(),
@@ -128,6 +119,7 @@ class CompanyController extends AbstractController
             'tabs' => self::TABS,
             'prefix' => self::PREFIX,
             'incomings' => $this->incomingFindExchange($company),
+            'groupparticipants' => $this->groupIndex($company)
         ]);
     }
 
@@ -149,6 +141,15 @@ class CompanyController extends AbstractController
             'company' => $company,
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/group/index/{page}", name="group_index", methods={"GET"})
+     */
+    public function groupIndex(Company $company, $page = 1)
+    {
+        return $this->getDoctrine()->getManager()->getRepository(Subsidiary::class)
+        ->findCompanyGroup($company);
     }
 
     /**

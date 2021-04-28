@@ -24,13 +24,15 @@ class CompanyRepository extends ServiceEntityRepository
      * @return Company[] Returns an array of Company objects
      */
 
-    public function findByGroup($value)
+    public function findCompanyGroup(Company $company)
     {
         return $this->createQueryBuilder('c')
-            ->leftJoin('ownedSubsidiaries s')
+            ->leftJoin('c.ownedSubsidiaries', 's')
+            ->andWhere('s.company = :company')
             ->andWhere('c.active = :active')
             ->andWhere('s.percent >= :percent')
             ->setParameter('active', 1)
+            ->setParameter('company', $company)
             ->setParameter('percent', 50)
             ->orderBy('s.', 'ASC')
             ->setMaxResults(10)
