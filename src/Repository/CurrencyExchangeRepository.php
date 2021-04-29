@@ -41,7 +41,8 @@ class CurrencyExchangeRepository extends ServiceEntityRepository
             WHERE ce.currency = i.currency
             AND ce.year <= i.year
             AND i = :incoming
-            ORDER BY ce.year ASC'
+            ORDER BY ce.year ASC
+            -- LIMIT 1;'
         );
         return $query
             ->setParameter('incoming', $incoming)

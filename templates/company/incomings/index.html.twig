@@ -10,7 +10,7 @@
             <div class="col-3 border-right"><a href="{{ path(prefix ~ 'incoming_edit', { 'id': entity.incoming.id }) }}">{{ entity.incoming.year|date('d/m/Y') }}</a></div>
             <div class="col">{{ entity.incoming.amount|number_format(0, '.', ',') }} {{ entity.incoming.currency.symbol }}</div>
             {% if entity.incoming.currency.code != 'EUR' %}
-            <div class="col">{{ (entity.incoming.amount * entity.exchange.amount)|number_format(0, '.', ',') }} €</div>
+            <div class="col"> x {{ entity.exchange.amount }} = {{ (entity.incoming.amount * entity.exchange.amount)|number_format(0, '.', ',') }} €</div>
             {% endif %}
         </div>
     {% endfor %}

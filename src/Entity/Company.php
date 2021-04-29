@@ -71,12 +71,16 @@ class Company
     private $companyRelationships;
 
     /**
-     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="company")
+     * Empresas de las que la actual es accionista (posee)
+     *
+     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="holder")
      */
     private $heldCompanys;
 
     /**
-     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="holder")
+     * Empresas que son propietarias de la actual
+     *
+     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="company")
      */
     private $companyHolders;
 

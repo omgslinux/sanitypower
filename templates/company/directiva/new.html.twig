@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Añadir miembro de Junta directiva{% endblock %}
+{% block title %}Añadir miembro(s) de Consejo de Administración{% endblock %}
 
 {% block body %}
 
     {{ include('company/directiva/_form.html.twig') }}
 
-    <a href="{{ path('company_show', { 'id': entity.id }) }}">Volver a {{ entity }}</a>
+    <a href="{{ path('company_show', { 'id': parent.id }) }}">Volver a {{ parent }}</a>
 
 {% endblock %}

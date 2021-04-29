@@ -6,9 +6,11 @@ use App\Entity\Company;
 use App\Entity\Incoming;
 use App\Entity\StaffMembership;
 use App\Entity\CurrencyExchange;
+use App\Entity\ShareholderCategory;
 use App\Entity\Subsidiary;
 use App\Entity\Shareholder;
 use App\Entity\CompanyEvent;
+use App\Entity\CompanyLevel;
 use App\Form\CompanyType;
 use App\Form\IncomingType;
 use App\Form\ShareholderType;
@@ -345,12 +347,56 @@ class CompanyController extends AbstractController
     {
         $entity = new Shareholder();
         $entity->setCompany($parent);
-        $form = $this->createForm(ShareholderType::class, $entity);
+        $form = $this->createForm(ShareholderType::class, $entity, [ 'batch' => true ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
+            $params = $request->request->all();
+            $batch = false;
+            $companyRepo = $em->getRepository(Company::class);
+            $holderRepo = $em->getRepository(Shareholder::class);
+            $categoryRepo = $em->getRepository(ShareholderCategory::class);
+            foreach ($params as $param) {
+                if (!empty($param['batch'])) {
+                    $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Sin identificar']);
+                    $batch = true;
+                    foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
+                        $keys = explode(",", $line);
+                        if (!empty($fullname = str_replace('"', '', $keys[0]))) {
+                            //dump($keys);
+                            if (null == ($holder = $companyRepo->findOneBy(['fullname' => $fullname]))) {
+                                $holder = new Company();
+                                $holder->setFullname($fullname)
+                                ->setCountry(str_replace('"', '', $keys[2]))
+                                ->setActive(false)
+                                ->setLevel($level)
+                                ;
+                                $em->persist($holder);
+                            }
+                            //dump($holder);
+                            if (null == ($entity = $holderRepo->findOneBy(['holder' => $fullname]))) {
+                                $entity = new Shareholder();
+                                $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[3]));
+                                $directOwnership = str_replace('"', '', $keys[4]);
+                                $totalOwnership = str_replace('"', '', $keys[5]);
+                                $entity->setCompany($parent)
+                                ->setHolder($holder)
+                                ->setVia(!empty(str_replace('"', '', $keys[1])))
+                                ->setHolderCategory($category)
+                                ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
+                                ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
+                                ;
+                            }
+                            $em->persist($entity);
+                        }
+                    }
+                }
+            }
+
+            if (!$batch) {
+                $em->persist($entity);
+            }
             $em->flush();
             return $this->redirectToRoute(
                 self::PREFIX . 'show',

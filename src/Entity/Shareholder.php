@@ -21,13 +21,17 @@ class Shareholder
     private $id;
 
     /**
-    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="heldCompanys")
+    * En accionistas, $company es $parent, la que es poseída por un holder
+    *
+    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="companyHolders")
     * @ORM\JoinColumn(nullable=false)
     */
     private $company;
 
     /**
-    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="companyHolders")
+    * En accionistas, $holder es quien tiene acciones de $company
+    *
+    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="heldCompanys")
     * @ORM\JoinColumn(nullable=false)
     */
     private $holder;
@@ -48,6 +52,11 @@ class Shareholder
      * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
      */
     private $totalOwnership;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $via = false;
 
     public function getId(): ?int
     {
@@ -112,5 +121,22 @@ class Shareholder
         $this->totalOwnership = $totalOwnership;
 
         return $this;
+    }
+
+    public function getVia()
+    {
+        return $this->via;
+    }
+
+    public function setVia(int $via): self
+    {
+        $this->via = $via;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getHolder() . ($this->getVia() !=0 ? ' (via its funds)':'');
     }
 }
