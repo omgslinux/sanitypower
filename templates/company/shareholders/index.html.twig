@@ -1,5 +1,6 @@
-{% if parent.companyHolders|length > 0 %}
+{% set total = parent.companyHolders|length %}{% if total > 0 %}
     {# <h2>Accionistas</h2> #}
+    <h4>Total: {{ total }} accionistas</h4>
     <div class="row">
         <div class="col-7 font-weight-bold">Nombre</div>
         <div class="col-1 font-weight-bold text-center">País</div>

@@ -8,5 +8,12 @@
         {{ form_row(form.percent) }} %
         </div>
     </div>
+    {% if parent is defined %}
+    <div class="row">
+        <div class="col-12">
+        {{ form_row(form.batch) }}
+        </div>
+    </div>
+    {% endif %}
     <button class="btn btn-info">{{ button_label|default('Guardar') }}</button>
 {{ form_end(form) }}

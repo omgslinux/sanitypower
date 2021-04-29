@@ -92,13 +92,13 @@ class Company
     /**
      * @ORM\OneToMany(targetEntity=Subsidiary::class, mappedBy="owner")
      */
-    private $ownerSubsidiaries;
+    private $ownedSubsidiaries;
 
     /**
      * @ORM\OneToMany(targetEntity=Subsidiary::class, mappedBy="owned")
      * @ORM\OrderBy({"owned" = "ASC"})
      */
-    private $ownedSubdiaries;
+    private $ownerSubsidiaries;
 
     public function __construct()
     {
@@ -109,7 +109,7 @@ class Company
         $this->companyHolders = new ArrayCollection();
         $this->staffMemberships = new ArrayCollection();
         $this->ownerSubsidiaries = new ArrayCollection();
-        $this->ownedSubdiaries = new ArrayCollection();
+        $this->ownedSubsidiaries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -407,27 +407,27 @@ class Company
     /**
      * @return Collection|Subsidiary[]
      */
-    public function getOwnedSubdiaries(): Collection
+    public function getOwnedSubsidiaries(): Collection
     {
-        return $this->ownedSubdiaries;
+        return $this->ownedSubsidiaries;
     }
 
-    public function addOwnedSubdiary(Subsidiary $ownedSubdiary): self
+    public function addOwnedSubsidiary(Subsidiary $ownedSubsidiary): self
     {
-        if (!$this->ownedSubdiaries->contains($ownedSubdiary)) {
-            $this->ownedSubdiaries[] = $ownedSubdiary;
-            $ownedSubdiary->setOwned($this);
+        if (!$this->ownedSubsidiaries->contains($ownedSubsidiary)) {
+            $this->ownedSubsidiaries[] = $ownedSubsidiary;
+            $ownedSubsidiary->setOwned($this);
         }
 
         return $this;
     }
 
-    public function removeOwnedSubdiary(Subsidiary $ownedSubdiary): self
+    public function removeOwnedSubsidiary(Subsidiary $ownedSubsidiary): self
     {
-        if ($this->ownedSubdiaries->removeElement($ownedSubdiary)) {
+        if ($this->ownedSubsidiaries->removeElement($ownedSubsidiary)) {
             // set the owning side to null (unless already changed)
-            if ($ownedSubdiary->getOwned() === $this) {
-                $ownedSubdiary->setOwned(null);
+            if ($ownedSubsidiary->getOwned() === $this) {
+                $ownedSubsidiary->setOwned(null);
             }
         }
 

@@ -18,13 +18,13 @@ class Subsidiary
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="ownerSubsidiaries")
+     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="ownedSubsidiaries")
      * @ORM\JoinColumn(nullable=false)
      */
     private $owner;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="ownedSubdiaries")
+     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="ownerSubsidiaries")
      * @ORM\JoinColumn(nullable=false)
      */
     private $owned;

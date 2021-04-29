@@ -290,7 +290,7 @@ class CompanyController extends AbstractController
     {
         $entity = new StaffMembership();
         $entity->setCompany($parent);
-        $form = $this->createForm(StaffMembershipType::class, $entity);
+        $form = $this->createForm(StaffMembershipType::class, $entity, [ 'batch' => true ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -447,12 +447,54 @@ class CompanyController extends AbstractController
     {
         $entity = new Subsidiary();
         $entity->setOwner($parent);
-        $form = $this->createForm(SubsidiaryType::class, $entity);
+        $form = $this->createForm(SubsidiaryType::class, $entity, [ 'batch' => true ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
+            $params = $request->request->all();
+            $batch = false;
+            $companyRepo = $em->getRepository(Company::class);
+            $subsidiaryRepo = $em->getRepository(Subsidiary::class);
+            foreach ($params as $param) {
+                if (!empty($param['batch'])) {
+                    $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Sin identificar']);
+                    $batch = true;
+                    foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
+                        $keys = explode(",", $line);
+                        if (!empty($fullname = str_replace('.', '', str_replace('"', '', $keys[0])))) {
+                            $country = str_replace('"', '', $keys[1]);
+                            if ($country == 'ES') {
+                                if (null == ($owned = $companyRepo->findOneBy(['fullname' => $fullname]))) {
+                                    $owned = new Company();
+                                    $owned->setFullname($fullname)
+                                    ->setCountry($country)
+                                    ->setActive(false)
+                                    ->setLevel($level)
+                                    ;
+                                    $em->persist($owned);
+                                }
+                                //dump($owned);
+                                if (null == ($entity = $subsidiaryRepo->findOneBy(['owned' => $fullname]))) {
+                                    $entity = new Subsidiary();
+                                    $percent = str_replace('"', '', $keys[2]);
+                                    $entity->setOwner($parent)
+                                    ->setOwned($owned)
+                                    ->setPercent(is_numeric($percent)?$percent:0)
+                                    ;
+                                    $em->persist($entity);
+                                    //dump($entity);
+                                }
+                                $em->flush();
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!$batch) {
+                $em->persist($entity);
+            }
             $em->flush();
             return $this->redirectToRoute(
                 self::PREFIX . 'show',

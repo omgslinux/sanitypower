@@ -1,13 +1,13 @@
 {% if groupparticipants|length > 0 %}
     {# <h2>Grupo de empresa</h2> #}
     <div class="row">
-        <div class="col-3 font-weight-bold">Participada</div>
+        <div class="col-8 font-weight-bold">Participada</div>
         <div class="col font-weight-bold">País</div>
         <div class="col font-weight-bold">% Total</div>
     </div>
     {% for entity in groupparticipants %}
         <div class="row border">
-            <div class="col-3 border-right">{{ entity.owned }}</div>
+            <div class="col-8 border-right">{{ entity.owned }}</div>
             <div class="col">{{ entity.owned.country }}</div>
             <div class="col">{{ entity.percent|number_format(2, '.', ',') }} %</div>
         </div>

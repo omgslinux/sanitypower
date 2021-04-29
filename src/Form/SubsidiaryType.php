@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Subsidiary;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SubsidiaryType extends AbstractType
@@ -33,6 +34,17 @@ class SubsidiaryType extends AbstractType
             $builder
             ->add('owner');
         }
+        if ($options['batch']) {
+            $builder
+            ->add(
+                'batch',
+                TextareaType::class,
+                [
+                    self::LABEL => 'Carga masiva',
+                    'mapped' => false,
+                ]
+            );
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver)
@@ -40,6 +52,7 @@ class SubsidiaryType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Subsidiary::class,
             'child' => true,
+            'batch' => false,
         ]);
     }
 }
