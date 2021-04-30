@@ -112,14 +112,15 @@ class CompanyController extends AbstractController
     }
 
     /**
-     * @Route("/show/{id}", name="show", methods={"GET"})
+     * @Route("/show/{id}/{activetab}", name="show", methods={"GET"})
      */
-    public function companyShow(Company $company): Response
+    public function companyShow(Company $company, $activetab = 'incomings'): Response
     {
         return $this->render('company/show.html.twig', [
             'parent' => $company,
             'tabs' => self::TABS,
             'prefix' => self::PREFIX,
+            'activetab' => $activetab,
             'incomings' => $this->incomingFindExchange($company),
             'groupparticipants' => $this->groupIndex($company)
         ]);
@@ -171,7 +172,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $company->getId()
+                    'id' => $company->getId(),
+                    'activetab' => 'history',
                 ]
             );
         }
@@ -179,7 +181,6 @@ class CompanyController extends AbstractController
         return $this->render('company/history/new.html.twig', [
             'parent' => $company,
             'form' => $form->createView(),
-            'activetab' => 'history',
         ]);
     }
 
@@ -198,7 +199,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $entity->getCompany()->getId()
+                    'id' => $entity->getCompany()->getId(),
+                    'activetab' => 'history',
                 ]
             );
         }
@@ -206,7 +208,6 @@ class CompanyController extends AbstractController
         return $this->render('company/history/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
-            'activetab' => 'history',
         ]);
     }
 
@@ -227,7 +228,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $parent->getId()
+                    'id' => $parent->getId(),
+                    'activetab' => 'incomings',
                 ]
             );
         }
@@ -235,7 +237,6 @@ class CompanyController extends AbstractController
         return $this->render('company/incomings/new.html.twig', [
             'parent' => $parent,
             'form' => $form->createView(),
-            'activetab' => 'incomings',
         ]);
     }
 
@@ -254,7 +255,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $entity->getCompany()->getId()
+                    'id' => $entity->getCompany()->getId(),
+                    'activetab' => 'incomings',
                 ]
             );
         }
@@ -262,7 +264,6 @@ class CompanyController extends AbstractController
         return $this->render('company/incomings/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
-            'activetab' => 'incomings',
         ]);
     }
 
@@ -300,7 +301,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $parent->getId()
+                    'id' => $parent->getId(),
+                    'activetab' => 'directiva',
                 ]
             );
         }
@@ -308,7 +310,6 @@ class CompanyController extends AbstractController
         return $this->render('company/directiva/new.html.twig', [
             'parent' => $parent,
             'form' => $form->createView(),
-            'activetab' => 'directiva',
         ]);
     }
 
@@ -327,7 +328,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $entity->getCompany()->getId()
+                    'id' => $entity->getCompany()->getId(),
+                    'activetab' => 'directiva',
                 ]
             );
         }
@@ -335,7 +337,6 @@ class CompanyController extends AbstractController
         return $this->render('company/directiva/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
-            'activetab' => 'directiva',
         ]);
     }
 
@@ -401,7 +402,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $parent->getId()
+                    'id' => $parent->getId(),
+                    'activetab' => 'shareholders',
                 ]
             );
         }
@@ -409,7 +411,6 @@ class CompanyController extends AbstractController
         return $this->render('company/shareholders/new.html.twig', [
             'parent' => $parent,
             'form' => $form->createView(),
-            'activetab' => 'shareholders',
         ]);
     }
 
@@ -428,7 +429,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $entity->getCompany()->getId()
+                    'id' => $entity->getCompany()->getId(),
+                    'activetab' => 'shareholders',
                 ]
             );
         }
@@ -436,7 +438,6 @@ class CompanyController extends AbstractController
         return $this->render('company/shareholders/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
-            'activetab' => 'shareholders',
         ]);
     }
 
@@ -499,7 +500,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $parent->getId()
+                    'id' => $parent->getId(),
+                    'activetab' => 'participadas',
                 ]
             );
         }
@@ -507,7 +509,6 @@ class CompanyController extends AbstractController
         return $this->render('company/participadas/new.html.twig', [
             'parent' => $parent,
             'form' => $form->createView(),
-            'activetab' => 'participadas',
         ]);
     }
 
@@ -526,7 +527,8 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $entity->getOwner()->getId()
+                    'id' => $entity->getOwner()->getId(),
+                    'activetab' => 'participadas',
                 ]
             );
         }
@@ -534,7 +536,6 @@ class CompanyController extends AbstractController
         return $this->render('company/participadas/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
-            'activetab' => 'participadas',
         ]);
     }
 }
