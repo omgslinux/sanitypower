@@ -16,10 +16,17 @@ class SubsidiaryType extends AbstractType
     {
         $builder
             ->add(
+                'direct',
+                null,
+                [
+                    self::LABEL => 'Porcentaje directo'
+                ]
+            )
+            ->add(
                 'percent',
                 null,
                 [
-                    self::LABEL => 'Porcentaje de participación'
+                    self::LABEL => 'Porcentaje total'
                 ]
             )
             ->add(

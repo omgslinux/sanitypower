@@ -6,7 +6,7 @@ use App\Entity\Company;
 use App\Entity\Incoming;
 use App\Entity\StaffMembership;
 use App\Entity\CurrencyExchange;
-use App\Entity\ShareholderCategory;
+use App\Entity\CompanyCategory;
 use App\Entity\Subsidiary;
 use App\Entity\Shareholder;
 use App\Entity\CompanyEvent;
@@ -357,15 +357,17 @@ class CompanyController extends AbstractController
             $batch = false;
             $companyRepo = $em->getRepository(Company::class);
             $holderRepo = $em->getRepository(Shareholder::class);
-            $categoryRepo = $em->getRepository(ShareholderCategory::class);
+            $categoryRepo = $em->getRepository(CompanyCategory::class);
             foreach ($params as $param) {
                 if (!empty($param['batch'])) {
                     $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Sin identificar']);
+
                     $batch = true;
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
                         $keys = explode(",", $line);
                         if (!empty($fullname = str_replace('"', '', $keys[0]))) {
                             //dump($keys);
+                            $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[3]));
                             if (null == ($holder = $companyRepo->findOneBy(['fullname' => $fullname]))) {
                                 $holder = new Company();
                                 $holder->setFullname($fullname)
@@ -373,18 +375,17 @@ class CompanyController extends AbstractController
                                 ->setActive(false)
                                 ->setLevel($level)
                                 ;
-                                $em->persist($holder);
                             }
+                            $holder->setCategory($category);
+                            $em->persist($holder);
                             //dump($holder);
                             if (null == ($entity = $holderRepo->findOneBy(['holder' => $fullname]))) {
                                 $entity = new Shareholder();
-                                $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[3]));
                                 $directOwnership = str_replace('"', '', $keys[4]);
                                 $totalOwnership = str_replace('"', '', $keys[5]);
                                 $entity->setCompany($parent)
                                 ->setHolder($holder)
                                 ->setVia(!empty(str_replace('"', '', $keys[1])))
-                                ->setHolderCategory($category)
                                 ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
                                 ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
                                 ;
@@ -457,31 +458,50 @@ class CompanyController extends AbstractController
             $batch = false;
             $companyRepo = $em->getRepository(Company::class);
             $subsidiaryRepo = $em->getRepository(Subsidiary::class);
+            $categoryRepo = $em->getRepository(CompanyCategory::class);
             foreach ($params as $param) {
                 if (!empty($param['batch'])) {
-                    $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Sin identificar']);
+                    $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Participada']);
                     $batch = true;
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
                         $keys = explode(",", $line);
                         if (!empty($fullname = str_replace('.', '', str_replace('"', '', $keys[0])))) {
                             $country = str_replace('"', '', $keys[1]);
                             if ($country == 'ES') {
+                                $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[2]));
                                 if (null == ($owned = $companyRepo->findOneBy(['fullname' => $fullname]))) {
                                     $owned = new Company();
                                     $owned->setFullname($fullname)
                                     ->setCountry($country)
                                     ->setActive(false)
-                                    ->setLevel($level)
                                     ;
-                                    $em->persist($owned);
                                 }
-                                //dump($owned);
-                                if (null == ($entity = $subsidiaryRepo->findOneBy(['owned' => $fullname]))) {
+                                $owned->setCategory($category)
+                                ->setLevel($level);
+                                $em->persist($owned);
+                                //dump($owned, $keys);
+                                if (null == ($entity = $subsidiaryRepo->findOneBy(['owned' => $owned]))) {
                                     $entity = new Subsidiary();
-                                    $percent = str_replace('"', '', $keys[2]);
+                                    $_direct = $direct = str_replace('"', '', $keys[3]);
+                                    $_percent = $percent = str_replace('"', '', $keys[4]);
+                                    if ($_direct == "MO" || $_direct == ">50") {
+                                        $direct = 50.01;
+                                    } elseif ($_direct == "WO") {
+                                        $direct = 100;
+                                    } elseif (!is_numeric($_direct)) {
+                                        $direct = 0;
+                                    }
+                                    if ($_percent == "MO" || $_percent == ">50") {
+                                        $percent = 50.01;
+                                    } elseif ($_percent == "WO") {
+                                        $percent = 100;
+                                    } elseif (!is_numeric($_percent)) {
+                                        $percent = 0;
+                                    }
                                     $entity->setOwner($parent)
                                     ->setOwned($owned)
-                                    ->setPercent(is_numeric($percent)?$percent:0)
+                                    ->setDirect($direct)
+                                    ->setPercent($percent)
                                     ;
                                     $em->persist($entity);
                                     //dump($entity);

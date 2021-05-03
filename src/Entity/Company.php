@@ -61,6 +61,12 @@ class Company
     private $active;
 
     /**
+    * @ORM\ManyToOne(targetEntity=CompanyCategory::class, inversedBy="companies")
+    * @ORM\JoinColumn(nullable=true)
+    */
+    private $category;
+
+    /**
      * @ORM\Column(type="text", nullable=true)
      */
     private $notes;
@@ -430,6 +436,18 @@ class Company
                 $ownedSubsidiary->setOwned(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCategory(): ?CompanyCategory
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?CompanyCategory $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }

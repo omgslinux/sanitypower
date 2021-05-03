@@ -2,30 +2,30 @@
 
 namespace App\Controller;
 
-use App\Entity\ShareholderCategory;
-use App\Form\ShareholderCategoryType;
-use App\Repository\ShareholderCategoryRepository;
+use App\Entity\CompanyCategory;
+use App\Form\CompanyCategoryType;
+use App\Repository\CompanyCategoryRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/shareholdercategory", name="shareholder_category_")
+ * @Route("/CompanyCategory", name="company_category_")
  */
-class ShareholderCategoryController extends AbstractController
+class CompanyCategoryController extends AbstractController
 {
     const ENTITY = 'entity';
-    const PREFIX = 'shareholder_category_';
-    const TDIR = 'shareholder_category';
+    const PREFIX = 'company_category_';
+    const TDIR = 'company_category';
 
     /**
      * @Route("/", name="index", methods={"GET"})
      */
-    public function index(ShareholderCategoryRepository $shareholderCategoryRepository): Response
+    public function index(CompanyCategoryRepository $CompanyCategoryRepository): Response
     {
         return $this->render(self::TDIR . '/index.html.twig', [
-            'shareholder_categories' => $shareholderCategoryRepository->findAll(),
+            'categories' => $CompanyCategoryRepository->findAll(),
             'prefix' => self::PREFIX,
         ]);
     }
@@ -35,8 +35,8 @@ class ShareholderCategoryController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        $entity = new ShareholderCategory();
-        $form = $this->createForm(ShareholderCategoryType::class, $entity);
+        $entity = new CompanyCategory();
+        $form = $this->createForm(CompanyCategoryType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -57,7 +57,7 @@ class ShareholderCategoryController extends AbstractController
     /**
      * @Route("/show/{id}", name="show", methods={"GET"})
      */
-    public function show(ShareholderCategory $entity): Response
+    public function show(CompanyCategory $entity): Response
     {
         return $this->render(self::TDIR . '/show.html.twig', [
             self::ENTITY => $entity,
@@ -68,9 +68,9 @@ class ShareholderCategoryController extends AbstractController
     /**
      * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, ShareholderCategory $entity): Response
+    public function edit(Request $request, CompanyCategory $entity): Response
     {
-        $form = $this->createForm(ShareholderCategoryType::class, $entity);
+        $form = $this->createForm(CompanyCategoryType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -89,7 +89,7 @@ class ShareholderCategoryController extends AbstractController
     /**
      * @Route("/delete/{id}", name="delete", methods={"POST"})
      */
-    public function delete(Request $request, ShareholderCategory $entity): Response
+    public function delete(Request $request, CompanyCategory $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();

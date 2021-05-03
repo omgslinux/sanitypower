@@ -1,0 +1,11 @@
+{{ form_start(form) }}
+    <div class="row">
+        <div class="col-8">
+        {{ form_row(form.letter) }}
+        </div>
+        <div class="col-4">
+        {{ form_row(form.description) }}
+        </div>
+    </div>
+    <button class="btn">{{ button_label|default('Guardar') }}</button>
+{{ form_end(form) }}

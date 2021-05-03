@@ -2,12 +2,12 @@
 
 namespace App\Form;
 
-use App\Entity\ShareholderCategory;
+use App\Entity\CompanyCategory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ShareholderCategoryType extends AbstractType
+class CompanyCategoryType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -20,7 +20,7 @@ class ShareholderCategoryType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => ShareholderCategory::class,
+            'data_class' => CompanyCategory::class,
         ]);
     }
 }

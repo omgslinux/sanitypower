@@ -10,6 +10,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CompanyType extends AbstractType
 {
+    const LABEL = 'label';
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -17,21 +19,21 @@ class CompanyType extends AbstractType
                 'fullname',
                 null,
                 [
-                    'label' => 'Nombre largo'
+                    self::LABEL => 'Nombre largo'
                 ]
             )
             ->add(
                 'ShortName',
                 null,
                 [
-                    'label' => 'Nombre corto'
+                    self::LABEL => 'Nombre corto'
                 ]
             )
             ->add(
                 'country',
                 CountryType::class,
                 [
-                    'label' => 'País',
+                    self::LABEL => 'País',
                     'choice_translation_locale' => 'es',
                     'data' => 'ES'
                 ]
@@ -40,21 +42,28 @@ class CompanyType extends AbstractType
                 'active',
                 null,
                 [
-                    'label' => 'Activa'
+                    self::LABEL => 'Activa'
                 ]
             )
             ->add(
                 'notes',
                 null,
                 [
-                    'label' => 'Notas'
+                    self::LABEL => 'Notas'
                 ]
             )
             ->add(
                 'level',
                 null,
                 [
-                    'label' => 'Nivel'
+                    self::LABEL => 'Nivel'
+                ]
+            )
+            ->add(
+                'category',
+                null,
+                [
+                    self::LABEL => 'Tipo'
                 ]
             )
         ;

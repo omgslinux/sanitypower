@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\ShareholderCategory;
+use App\Entity\CompanyCategory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method ShareholderCategory|null find($id, $lockMode = null, $lockVersion = null)
- * @method ShareholderCategory|null findOneBy(array $criteria, array $orderBy = null)
- * @method ShareholderCategory[]    findAll()
- * @method ShareholderCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method CompanyCategory|null find($id, $lockMode = null, $lockVersion = null)
+ * @method CompanyCategory|null findOneBy(array $criteria, array $orderBy = null)
+ * @method CompanyCategory[]    findAll()
+ * @method CompanyCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ShareholderCategoryRepository extends ServiceEntityRepository
+class CompanyCategoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, ShareholderCategory::class);
+        parent::__construct($registry, CompanyCategory::class);
     }
 
     // /**
-    //  * @return ShareholderCategory[] Returns an array of ShareholderCategory objects
+    //  * @return CompanyCategory[] Returns an array of CompanyCategory objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class ShareholderCategoryRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?ShareholderCategory
+    public function findOneBySomeField($value): ?CompanyCategory
     {
         return $this->createQueryBuilder('s')
             ->andWhere('s.exampleField = :val')

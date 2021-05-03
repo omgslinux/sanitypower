@@ -32,13 +32,6 @@ class ShareholderType extends AbstractType
                 ]
             )
             ->add(
-                'holderCategory',
-                null,
-                [
-                    self::LABEL => 'Tipo'
-                ]
-            )
-            ->add(
                 'directOwnership',
                 null,
                 [

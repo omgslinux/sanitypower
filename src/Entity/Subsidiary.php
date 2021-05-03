@@ -34,6 +34,11 @@ class Subsidiary
      */
     private $percent;
 
+    /**
+     * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
+     */
+    private $direct;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -71,6 +76,18 @@ class Subsidiary
     public function setPercent(?string $percent): self
     {
         $this->percent = $percent;
+
+        return $this;
+    }
+
+    public function getDirect(): ?string
+    {
+        return $this->direct;
+    }
+
+    public function setDirect(?string $direct): self
+    {
+        $this->direct = $direct;
 
         return $this;
     }

@@ -37,13 +37,6 @@ class Shareholder
     private $holder;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ShareholderCategory::class)
-     * @ORM\JoinColumn(nullable=false)
-     * @ORM\OrderBy({"letter" = "ASC"})
-     */
-    private $holderCategory;
-
-    /**
      * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
      */
     private $directOwnership;
@@ -83,18 +76,6 @@ class Shareholder
     public function setHolder(?Company $holder): self
     {
         $this->holder = $holder;
-
-        return $this;
-    }
-
-    public function getHolderCategory(): ?ShareholderCategory
-    {
-        return $this->holderCategory;
-    }
-
-    public function setHolderCategory(?ShareholderCategory $holderCategory): self
-    {
-        $this->holderCategory = $holderCategory;
 
         return $this;
     }
