@@ -24,21 +24,37 @@ class CompanyRepository extends ServiceEntityRepository
      * @return Company[] Returns an array of Company objects
      */
 
-    public function findCompanyGroup(Company $company)
+    public function getActiveMatriz($currentPage = 1, $limit = 5)
     {
-        return $this->createQueryBuilder('c')
-            ->leftJoin('c.ownedSubsidiaries', 's')
-            ->andWhere('s.company = :company')
+        $this->limit = $limit;
+        // Create our query
+        $query = $this->createQueryBuilder('c')
+            ->join('c.level', 'l')
+            ->orderBy('c.fullname', 'ASC')
             ->andWhere('c.active = :active')
-            ->andWhere('s.percent >= :percent')
-            ->setParameter('active', 1)
-            ->setParameter('company', $company)
-            ->setParameter('percent', 50)
-            ->orderBy('s.', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+            ->andWhere('l.level = :level')
+            ->setParameter('active', true)
+            ->setParameter('level', 'Matriz')
+            ->getQuery();
+
+        // No need to manually get get the result ($query->getResult())
+
+        return $this->paginate($query, $currentPage);
+    }
+
+    public function getActivePaginated($currentPage = 1, $limit = 5)
+    {
+        $this->limit = $limit;
+        // Create our query
+        $query = $this->createQueryBuilder('c')
+            ->orderBy('c.fullname', 'ASC')
+            ->andWhere('c.active = :active')
+            ->setParameter('active', true)
+            ->getQuery();
+
+        // No need to manually get get the result ($query->getResult())
+
+        return $this->paginate($query, $currentPage);
     }
 
     /**

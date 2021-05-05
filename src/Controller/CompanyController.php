@@ -61,12 +61,30 @@ class CompanyController extends AbstractController
      */
     public function index(CompanyRepository $repo, $page = 1): Response
     {
-        $limit = 20;
+        $limit = 40;
         // ... get posts from DB...
         // Controller Action
-        $paginator = $repo->getAllPaginated($page, $limit); // Returns 5 posts out of 20
+        $paginator = $repo->getActivePaginated($page, $limit); // Returns 5 posts out of 20
 
         return $this->render('company/index.html.twig', [
+            //'companies' => $companyRepository->getAllPaginated(),
+            'companies' => $paginator->getIterator(),
+            'maxPages' => ceil($paginator->count() / $limit),
+            'thisPage' => $page,
+        ]);
+    }
+
+    /**
+     * @Route("/matriz/{page}", name="index", methods={"GET"})
+     */
+    public function indexMatriz(CompanyRepository $repo, $page = 1): Response
+    {
+        $limit = 40;
+        // ... get posts from DB...
+        // Controller Action
+        $paginator = $repo->getActiveMatriz($page, $limit); // Returns 5 posts out of 20
+
+        return $this->render('company/matriz+participada.html.twig', [
             //'companies' => $companyRepository->getAllPaginated(),
             'companies' => $paginator->getIterator(),
             'maxPages' => ceil($paginator->count() / $limit),
@@ -371,18 +389,23 @@ class CompanyController extends AbstractController
                         if (!empty($fullname = str_replace('"', '', $keys[0]))) {
                             //dump($keys);
                             $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[3]));
-                            if (null == ($holder = $companyRepo->findOneBy(['fullname' => $fullname]))) {
-                                $holder = new Company();
-                                $holder->setFullname($fullname)
-                                ->setCountry(str_replace('"', '', $keys[2]))
-                                ->setActive(false)
-                                ->setLevel($level)
-                                ;
+                            $country = str_replace('"', '', $keys[2]);
+                            if ($category->getLetter() == 'H') {
+                                $holder = $parent;
+                            } else {
+                                if (null == ($holder = $companyRepo->findOneBy(['fullname' => $fullname, 'country' => $country]))) {
+                                    $holder = new Company();
+                                    $holder->setFullname($fullname)
+                                    ->setCountry($country)
+                                    ->setActive(false)
+                                    ->setLevel($level)
+                                    ;
+                                }
+                                $holder->setCategory($category);
+                                $em->persist($holder);
                             }
-                            $holder->setCategory($category);
-                            $em->persist($holder);
-                            //dump($holder);
-                            if (null == ($entity = $holderRepo->findOneBy(['holder' => $fullname]))) {
+                            dump($holder);
+                            if (null == ($entity = $holderRepo->findOneBy(['holder' => $holder, 'company' => $parent]))) {
                                 $entity = new Shareholder();
                                 $directOwnership = str_replace('"', '', $keys[4]);
                                 $totalOwnership = str_replace('"', '', $keys[5]);
@@ -392,8 +415,9 @@ class CompanyController extends AbstractController
                                 ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
                                 ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
                                 ;
+                                $em->persist($entity);
+                                $em->flush();
                             }
-                            $em->persist($entity);
                         }
                     }
                 }
@@ -485,7 +509,7 @@ class CompanyController extends AbstractController
                             $em->persist($owned);
                             //dump($owned);
                             $em->flush();
-                            if (null == ($entity = $subsidiaryRepo->findOneBy(['owned' => $owned]))) {
+                            if (null == ($entity = $subsidiaryRepo->findOneBy(['owned' => $owned, 'owner' => $parent]))) {
                                 $entity = new Subsidiary();
                                 $_direct = $direct = str_replace('"', '', $keys[3]);
                                 $_percent = $percent = str_replace('"', '', $keys[4]);
