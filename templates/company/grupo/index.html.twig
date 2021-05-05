@@ -1,14 +1,19 @@
-{% if groupparticipants|length > 0 %}
+{% set total = groupparticipants|length %}{% if total > 0 %}
     {# <h2>Grupo de empresa</h2> #}
+    <h4>Total: {{ total }} miembros del grupo</h4>
     <div class="row">
-        <div class="col-8 font-weight-bold">Participada</div>
+        <div class="col-8 font-weight-bold">Nombre filial</div>
         <div class="col font-weight-bold">País</div>
+        <div class="col font-weight-bold">Tipo</div>
+        <div class="col font-weight-bold">% Directo</div>
         <div class="col font-weight-bold">% Total</div>
     </div>
     {% for entity in groupparticipants %}
         <div class="row border">
             <div class="col-8 border-right">{{ entity.owned }}</div>
             <div class="col">{{ entity.owned.country }}</div>
+            <div class="col">{{ entity.owned.category.letter }}</div>
+            <div class="col">{{ entity.direct|number_format(2, '.', ',') }} %</div>
             <div class="col">{{ entity.percent|number_format(2, '.', ',') }} %</div>
         </div>
     {% endfor %}

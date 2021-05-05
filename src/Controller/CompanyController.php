@@ -42,16 +42,16 @@ class CompanyController extends AbstractController
             't' => 'Consejo de administración',
         ],
         [
-            'n' => 'participadas',
-            't' => 'Participadas',
-        ],
-        [
             'n' => 'shareholders',
             't' => 'Accionistas',
         ],
         [
+            'n' => 'participadas',
+            't' => 'Participadas',
+        ],
+        [
             'n' => 'grupo',
-            't' => 'Grupo de empresas',
+            't' => 'Grupo de empresa',
         ],
     ];
     const PREFIX = 'company_';
@@ -116,13 +116,16 @@ class CompanyController extends AbstractController
      */
     public function companyShow(Company $company, $activetab = 'incomings'): Response
     {
+        $em = $this->getDoctrine()->getManager();
+        $subRepository = $em->getRepository(Subsidiary::class);
         return $this->render('company/show.html.twig', [
             'parent' => $company,
             'tabs' => self::TABS,
             'prefix' => self::PREFIX,
             'activetab' => $activetab,
             'incomings' => $this->incomingFindExchange($company),
-            'groupparticipants' => $this->groupIndex($company)
+            'groupparticipants' => $this->groupIndex($company),
+            'subsidiaries' => $subRepository->findByCompanyOwner($company),
         ]);
     }
 
@@ -152,7 +155,7 @@ class CompanyController extends AbstractController
     public function groupIndex(Company $company, $page = 1)
     {
         return $this->getDoctrine()->getManager()->getRepository(Subsidiary::class)
-        ->findCompanyGroup($company);
+        ->findByCompanyGroup($company);
     }
 
     /**
@@ -461,53 +464,54 @@ class CompanyController extends AbstractController
             $categoryRepo = $em->getRepository(CompanyCategory::class);
             foreach ($params as $param) {
                 if (!empty($param['batch'])) {
-                    $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Participada']);
+                    $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Pendiente']);
                     $batch = true;
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
                         $keys = explode(",", $line);
                         if (!empty($fullname = str_replace('.', '', str_replace('"', '', $keys[0])))) {
                             $country = str_replace('"', '', $keys[1]);
-                            if ($country == 'ES') {
-                                $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[2]));
-                                if (null == ($owned = $companyRepo->findOneBy(['fullname' => $fullname]))) {
-                                    $owned = new Company();
-                                    $owned->setFullname($fullname)
-                                    ->setCountry($country)
-                                    ->setActive(false)
-                                    ;
-                                }
-                                $owned->setCategory($category)
-                                ->setLevel($level);
-                                $em->persist($owned);
-                                //dump($owned, $keys);
-                                if (null == ($entity = $subsidiaryRepo->findOneBy(['owned' => $owned]))) {
-                                    $entity = new Subsidiary();
-                                    $_direct = $direct = str_replace('"', '', $keys[3]);
-                                    $_percent = $percent = str_replace('"', '', $keys[4]);
-                                    if ($_direct == "MO" || $_direct == ">50") {
-                                        $direct = 50.01;
-                                    } elseif ($_direct == "WO") {
-                                        $direct = 100;
-                                    } elseif (!is_numeric($_direct)) {
-                                        $direct = 0;
-                                    }
-                                    if ($_percent == "MO" || $_percent == ">50") {
-                                        $percent = 50.01;
-                                    } elseif ($_percent == "WO") {
-                                        $percent = 100;
-                                    } elseif (!is_numeric($_percent)) {
-                                        $percent = 0;
-                                    }
-                                    $entity->setOwner($parent)
-                                    ->setOwned($owned)
-                                    ->setDirect($direct)
-                                    ->setPercent($percent)
-                                    ;
-                                    $em->persist($entity);
-                                    //dump($entity);
-                                }
-                                $em->flush();
+                            if ($country == 'n.d.') {
+                                $country = '--';
                             }
+                            $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[2]));
+                            if (null == ($owned = $companyRepo->findOneBy(['fullname' => $fullname, 'country' => $country]))) {
+                                $owned = new Company();
+                                $owned->setFullname($fullname)
+                                ->setCountry($country)
+                                ->setActive(false)
+                                ->setLevel($level);
+                            }
+                            $owned->setCategory($category);
+                            $em->persist($owned);
+                            //dump($owned);
+                            $em->flush();
+                            if (null == ($entity = $subsidiaryRepo->findOneBy(['owned' => $owned]))) {
+                                $entity = new Subsidiary();
+                                $_direct = $direct = str_replace('"', '', $keys[3]);
+                                $_percent = $percent = str_replace('"', '', $keys[4]);
+                                if ($_direct == "MO" || $_direct == ">50") {
+                                    $direct = 50.01;
+                                } elseif ($_direct == "WO") {
+                                    $direct = 100;
+                                } elseif (!is_numeric($_direct)) {
+                                    $direct = 0;
+                                }
+                                if ($_percent == "MO" || $_percent == ">50") {
+                                    $percent = 50.01;
+                                } elseif ($_percent == "WO") {
+                                    $percent = 100;
+                                } elseif (!is_numeric($_percent)) {
+                                    $percent = 0;
+                                }
+                                $entity->setOwner($parent)
+                                ->setOwned($owned)
+                                ->setDirect($direct)
+                                ->setPercent($percent)
+                                ;
+                                $em->persist($entity);
+                                //dump($entity);
+                            }
+                            $em->flush();
                         }
                     }
                 }

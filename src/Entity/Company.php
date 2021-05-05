@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=CompanyRepository::class)
  * @ORM\Table(name="company",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"fullname"})}
+ *   uniqueConstraints={@ORM\UniqueConstraint(columns={"fullname", "country"})}
  * )
  */
 class Company

@@ -56,7 +56,7 @@ class CompanyType extends AbstractType
                 'level',
                 null,
                 [
-                    self::LABEL => 'Nivel'
+                    self::LABEL => 'Rol'
                 ]
             )
             ->add(

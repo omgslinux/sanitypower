@@ -34,7 +34,7 @@
         <ul class="nav nav-tabs md-tabs" id="{{tabname}}" role="tablist">
             {% for tab in tabs %}
                 <li class="nav-item">
-                    <a class="nav-link{{ tab.n == activetab ? ' active" aria-selected="true' }}" id="{{ tab.n }}-tab" data-toggle="tab" href="#{{ tab.n }}" role="tab" aria-controls="{{ tab.n }}">{{ tab.t }}</a>
+                    <a class="nav-link{{ tab.n == activetab ? ' active" aria-selected="true' }}" id="{{ tab.n }}-tab" data-toggle="tab" href="#{{ tab.n }}" role="tab" aria-controls="{{ tab.n }}"><strong>{{ tab.t }}</strong></a>
                 </li>
             {% endfor %}
         </ul>
