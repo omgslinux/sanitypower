@@ -13,8 +13,8 @@
             <div class="col-8 border-right">{{ entity.owned }}</div>
             <div class="col">{{ entity.owned.country }}</div>
             <div class="col">{{ entity.owned.category.letter }}</div>
-            <div class="col">{{ entity.direct|number_format(2, '.', ',') }} %</div>
-            <div class="col">{{ entity.percent|number_format(2, '.', ',') }} %</div>
+            <div class="col">{{ entity.direct|number_format(2, '.', ',') }}</div>
+            <div class="col">{{ entity.percent|number_format(2, '.', ',') }}</div>
         </div>
     {% endfor %}
 {% else %}
