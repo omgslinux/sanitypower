@@ -404,7 +404,7 @@ class CompanyController extends AbstractController
                                 $holder->setCategory($category);
                                 $em->persist($holder);
                             }
-                            dump($holder);
+                            //dump($holder);
                             if (null == ($entity = $holderRepo->findOneBy(['holder' => $holder, 'company' => $parent]))) {
                                 $entity = new Shareholder();
                                 $directOwnership = str_replace('"', '', $keys[4]);
