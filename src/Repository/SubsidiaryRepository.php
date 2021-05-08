@@ -40,7 +40,8 @@ class SubsidiaryRepository extends ServiceEntityRepository
 
     public function findByCompanyGroup(Company $company)
     {
-        return $this->createQueryBuilder('s')
+        if ($company->getLevel()->getLevel()=='Matriz') {
+            $group['owned'] = $this->createQueryBuilder('s')
             ->leftJoin('s.owned', 'c')
             ->andWhere('s.owner = :company')
             //->andWhere('c.country = :country')
@@ -54,7 +55,34 @@ class SubsidiaryRepository extends ServiceEntityRepository
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
-        ;
+            ;
+        } else {
+            // Recuperamos primero la matriz
+            $parent = $this->findSubsidiaryOwner($company);
+            $groupmembers = $this->createQueryBuilder('s')
+            ->leftJoin('s.owned', 'c')
+            ->andWhere('s.owner = :company')
+            //->andWhere('c.country = :country')
+            ->andWhere('c.active = :active')
+            ->andWhere('s.percent >= :percent')
+            ->setParameter('active', 1)
+            ->setParameter('company', $parent->getOwner())
+            //->setParameter('country', 'ES')
+            ->setParameter('percent', 50)
+            ->orderBy('s.owned', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+            ;
+            $group = [
+                'owner' => $parent,
+                'owned' => [],
+            ];
+            foreach ($groupmembers as $member) {
+                $group['owned'][] = $member;
+            }
+        }
+        return $group;
     }
 
     public function findByCompanyOwner(Company $company)
@@ -73,6 +101,24 @@ class SubsidiaryRepository extends ServiceEntityRepository
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    public function findSubsidiaryOwner(Company $company)
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.owner', 'c')
+            ->andWhere('s.owned = :company')
+            ->andWhere('c.active = :active')
+            //->andWhere('s.percent >= :percent')
+            ->setParameter('active', 1)
+            ->setParameter('company', $company)
+            //->setParameter('country', 'ES')
+            //->setParameter('percent', 50)
+            //->orderBy('s.owned', 'ASC')
+            //->setMaxResults(10)
+            ->getQuery()
+            ->getSingleResult()
         ;
     }
 

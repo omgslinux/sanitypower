@@ -1,20 +1,35 @@
 {% set total = groupparticipants|length %}{% if total > 0 %}
     {# <h2>Grupo de empresa</h2> #}
-    <h4>Total: {{ total }} miembros del grupo</h4>
     <div class="row">
-        <div class="col-8 font-weight-bold">Nombre filial</div>
+        <div class="col-8 font-weight-bold">Nombre</div>
         <div class="col font-weight-bold">País</div>
         <div class="col font-weight-bold">Tipo</div>
         <div class="col font-weight-bold">% Directo</div>
         <div class="col font-weight-bold">% Total</div>
     </div>
-    {% for entity in groupparticipants %}
+    {% if groupparticipants.owner is defined %}
+        <div class="row bg-light primary">
+            <div class="col-12 font-weight-bold">Matriz</div>
+        </div>
+        {% set owner = groupparticipants.owner %}
         <div class="row border">
-            <div class="col-8 border-right">{{ entity.owned }}</div>
+            <div class="col-8 border-right">{{ owner.owner.fullname }}</div>
+            <div class="col">{{ owner.owner.country }}</div>
+            <div class="col">{{ owner.owner.category.letter }}</div>
+            <div class="col">{{ owner.direct == 0 ? '--': owner.direct == 50.01 ? ">50": owner.direct|number_format(2, '.', ',') }}</div>
+            <div class="col">{{ owner.percent == 0 ? 'n.d.': owner.percent == 50.01 ? ">50": owner.percent|number_format(2, '.', ',') }}</div>
+        </div>
+    {% endif %}
+        <div class="row bg-light primary">
+            <div class="col-12 font-weight-bold">Miembros del grupo ({{ groupparticipants.owned|length }})</div>
+        </div>
+    {% for entity in groupparticipants.owned %}
+        <div class="row border">
+            <div class="col-8 border-right">{{ entity.owned.fullname }}</div>
             <div class="col">{{ entity.owned.country }}</div>
             <div class="col">{{ entity.owned.category.letter }}</div>
-            <div class="col">{{ entity.direct|number_format(2, '.', ',') }}</div>
-            <div class="col">{{ entity.percent|number_format(2, '.', ',') }}</div>
+            <div class="col">{{ entity.direct == 0 ? '--': entity.direct == 50.01 ? ">50": entity.direct|number_format(2, '.', ',') }}</div>
+            <div class="col">{{ entity.percent == 0 ? 'n.d.': entity.percent == 50.01 ? ">50": entity.percent|number_format(2, '.', ',') }}</div>
         </div>
     {% endfor %}
 {% else %}
