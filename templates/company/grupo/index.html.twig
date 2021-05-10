@@ -13,7 +13,7 @@
         </div>
         {% set owner = groupparticipants.owner %}
         <div class="row border">
-            <div class="col-8 border-right"><a href="{{ path(prefix ~ "show",  {'id': owner.owner.id} )}}">{{ owner.owner.fullname }}</a></div>
+            <div class="col-8 border-right">{{ owner.owner.fullname }}&nbsp;<a href="{{ path(prefix ~ "show",  {'id': owner.owner.id} )}}" title="Ver la empresa matriz"><i class="fa fa-home"></i></a></div>
             <div class="col">{{ owner.owner.country }}</div>
             <div class="col" title="{{owner.owner.category.description }}">{{ owner.owner.category.letter }}</div>
             <div class="col">{{ owner.direct == 0 ? '--': owner.direct == 50.01 ? ">50": owner.direct|number_format(2, '.', ',') }}</div>
@@ -25,7 +25,7 @@
         </div>
     {% for entity in groupparticipants.owned %}
         <div class="row border">
-            <div class="col-8 border-right"><a href="{{ path(prefix ~ "show",  {'id': entity.owned.id} )}}">{{ entity.owned.fullname }}</a></div>
+            <div class="col-8 border-right">{{ entity.owned.fullname }}&nbsp;<a href="{{ path(prefix ~ "show",  {'id': entity.owned.id} )}}" title="Ver la empresa filial"><i class="fa fa-home"></i></a></div>
             <div class="col">{{ entity.owned.country }}</div>
             <div class="col" title="{{entity.owned.category.description }}">{{ entity.owned.category.letter }}</div>
             <div class="col">{{ entity.direct == 0 ? '--': entity.direct == 50.01 ? ">50": entity.direct|number_format(2, '.', ',') }}</div>

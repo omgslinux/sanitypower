@@ -75,19 +75,20 @@ class CompanyController extends AbstractController
     }
 
     /**
-     * @Route("/matriz/{page}", name="index", methods={"GET"})
+     * @Route("/matriz/{page}", name="matriz", methods={"GET"})
      */
     public function indexMatriz(CompanyRepository $repo, $page = 1): Response
     {
         $limit = 40;
         // ... get posts from DB...
         // Controller Action
-        $paginator = $repo->getActiveMatriz($page, $limit); // Returns 5 posts out of 20
+        $paginator = $repo->getActiveMatrizOLD($page, $limit); // Returns 5 posts out of 20
 
         return $this->render('company/matriz+participada.html.twig', [
-            //'companies' => $companyRepository->getAllPaginated(),
+            //'companies' => $repo->getAllPaginated(),
             'companies' => $paginator->getIterator(),
             'maxPages' => ceil($paginator->count() / $limit),
+            //'maxPages' => ceil(count($paginator) / $limit),
             'thisPage' => $page,
         ]);
     }

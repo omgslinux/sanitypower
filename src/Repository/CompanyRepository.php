@@ -28,6 +28,20 @@ class CompanyRepository extends ServiceEntityRepository
     {
         $this->limit = $limit;
         // Create our query
+        return $this->createQueryBuilder('c')
+            ->join('c.level', 'l')
+            ->orderBy('c.fullname', 'ASC')
+            ->andWhere('c.active = :active')
+            ->andWhere('l.level = :level')
+            ->setParameter('active', true)
+            ->setParameter('level', 'Matriz')
+            ->getQuery();
+    }
+
+    public function getActiveMatrizOLD($currentPage = 1, $limit = 5)
+    {
+        $this->limit = $limit;
+        // Create our query
         $query = $this->createQueryBuilder('c')
             ->join('c.level', 'l')
             ->orderBy('c.fullname', 'ASC')

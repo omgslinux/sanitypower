@@ -13,10 +13,12 @@
                     <div class="col-6">{{ company.ownedSubsidiaries|length }} participadas</div>
             </div>
             {% for owned in company.ownedSubsidiaries %}
+                {% if owned.owned.active and owned.owned.fullname != company.fullname %}
                 <div class="row">
                     <div class="col-6"></div>
                     <div class="col-6"><a href="{{ path('company_show', {'id': owned.owned.id}) }}">{{ owned.owned.fullname }}</a></div>
                 </div>
+                {% endif %}
             {% endfor %}
         {% else %}
             <p>no records found</p>
