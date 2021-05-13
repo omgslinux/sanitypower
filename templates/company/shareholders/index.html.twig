@@ -12,7 +12,7 @@
         <div class="row border">
             <div class="col-8 border-right"><a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}">{{ entity }}</a></div>
             <div class="col-1  text-center">{{ entity.holder.country }}</div>
-            <div class="col-1  text-center">{{ entity.holder.category.letter }}</div>
+            <div class="col-1  text-center" title="{{entity.holder.category.description }}">{{ entity.holder.category.letter }}</div>
             <div class="col-1 text-right">{{ entity.directOwnership != 0 ? entity.directOwnership|number_format(2, '.', ',') : '--' }}</div>
             <div class="col-1 text-right">{{ entity.totalOwnership != 0 ? entity.totalOwnership|number_format(2, '.', ',') : 'n.d.' }}</div>
         </div>
