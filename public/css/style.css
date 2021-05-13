@@ -1,0 +1,16 @@
+.nav-tabs,
+.nav-tabs > a:focus,
+.nav-tabs > a:hover {
+    margin-top: 10px;
+    margin-bottom: 20px;
+  background-color: lightgray;
+  color: white;
+    box-shadow: 0px 0px 10px #777;
+    webkit-transform: perspective(30) rotateX(10deg);
+}
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:focus,
+.nav-tabs > li.active > a:hover {
+  background-color: white;
+  color: black;
+}
