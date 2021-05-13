@@ -32,7 +32,7 @@ class Incoming
     private $amount;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", name="incoming_date")
      */
     private $year;
 
