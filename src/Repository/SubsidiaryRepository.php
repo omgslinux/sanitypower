@@ -61,31 +61,33 @@ class SubsidiaryRepository extends ServiceEntityRepository
     public function findByCompanyGroup(Company $company)
     {
         // Recuperamos primero la matriz
-        $parent = $this->findSubsidiaryOwner($company);
+        $owner = $this->findSubsidiaryOwner($company);
 
-        // Recuperamos primero la matriz
-        $parent = $this->findSubsidiaryOwner($company);
-        $groupmembers = $this->createQueryBuilder('s')
-        ->leftJoin('s.owned', 'c')
-        ->andWhere('s.owner = :company')
-        //->andWhere('c.country = :country')
-        ->andWhere('c.active = :active')
-        ->andWhere('s.percent >= :percent')
-        ->setParameter('active', 1)
-        ->setParameter('company', $parent->getOwner())
-        //->setParameter('country', 'ES')
-        ->setParameter('percent', 50)
-        ->orderBy('s.owned', 'ASC')
-        ->setMaxResults(10)
-        ->getQuery()
-        ->getResult()
-        ;
-        $group = [
-            'owner' => $parent,
-            'owned' => [],
-        ];
-        foreach ($groupmembers as $member) {
-            $group['owned'][] = $member;
+        if (null!==$owner) {
+            $groupmembers = $this->createQueryBuilder('s')
+            ->leftJoin('s.owned', 'c')
+            ->andWhere('s.owner = :company')
+            //->andWhere('c.country = :country')
+            ->andWhere('c.active = :active')
+            ->andWhere('s.percent >= :percent')
+            ->setParameter('active', 1)
+            ->setParameter('company', $owner->getOwner())
+            //->setParameter('country', 'ES')
+            ->setParameter('percent', 50)
+            ->orderBy('s.owned', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+            ;
+            $group = [
+                'owner' => $owner,
+                'owned' => [],
+            ];
+            foreach ($groupmembers as $member) {
+                $group['owned'][] = $member;
+            }
+        } else {
+            $group = [];
         }
 
         return $group;
@@ -124,7 +126,7 @@ class SubsidiaryRepository extends ServiceEntityRepository
             //->orderBy('s.owned', 'ASC')
             //->setMaxResults(10)
             ->getQuery()
-            ->getSingleResult()
+            ->getOneOrNullResult()
         ;
     }
 
