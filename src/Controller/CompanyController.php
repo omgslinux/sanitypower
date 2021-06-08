@@ -391,6 +391,9 @@ class CompanyController extends AbstractController
                             //dump($keys);
                             $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[3]));
                             $country = str_replace('"', '', $keys[2]);
+                            if ($country == 'n.d.') {
+                                $country = '--';
+                            }
                             if ($category->getLetter() == 'H') {
                                 $holder = $parent;
                             } else {
