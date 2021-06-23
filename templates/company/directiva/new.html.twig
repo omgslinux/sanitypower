@@ -6,6 +6,6 @@
 
     {{ include('company/directiva/_form.html.twig') }}
 
-    <a href="{{ path('company_show', { 'id': parent.id }) }}">Volver a {{ parent }}</a>
+    <a href="{{ path('company_show', { 'id': parent.id, 'activetab': activetab }) }}">Volver a {{ parent }}</a>
 
 {% endblock %}

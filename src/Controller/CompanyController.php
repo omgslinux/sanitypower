@@ -8,9 +8,11 @@ use App\Entity\StaffMembership;
 use App\Entity\CurrencyExchange;
 use App\Entity\CompanyCategory;
 use App\Entity\Subsidiary;
+use App\Entity\StaffTitle;
 use App\Entity\Shareholder;
 use App\Entity\CompanyEvent;
 use App\Entity\CompanyLevel;
+use App\Entity\StaffMembers;
 use App\Form\CompanyType;
 use App\Form\IncomingType;
 use App\Form\ShareholderType;
@@ -318,7 +320,58 @@ class CompanyController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            $em->persist($entity);
+
+            $params = $request->request->all();
+            $batch = false;
+            $staffMembersRepo = $em->getRepository(StaffMembers::class);
+            $staffTitleRepo = $em->getRepository(StaffTitle::class);
+            $staffMembershipRepo = $em->getRepository(StaffMembership::class);
+            foreach ($params as $param) {
+                if (!empty($param['batch'])) {
+                    $batch = true;
+                    foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
+                        $keys = explode(",", $line);
+                        if (!empty($surname = str_replace('"', '', $keys[0]))) {
+                            //dump($keys);
+
+                            // Verificamos si existe el cargo, para ver si interesa
+                            if (null != ($staffTitle=$staffTitleRepo->findOneByName(str_replace('"', '', $keys[2])))) {
+                                $name = str_replace('"', '', $keys[1]);
+                                if (null==($staffMember= $staffMembersRepo->findOneBy(
+                                    [
+                                        'surname' => $surname,
+                                        'name' => $name,
+                                    ]
+                                ))) {
+                                    $staffMember = new StaffMembers();
+                                    $staffMember->setSurname($surname)
+                                    ->setName($name);
+                                    $em->persist($staffMember);
+                                    $em->flush();
+                                }
+                                if (null==($staffMembership=$staffMembershipRepo->findOneBy(
+                                    [
+                                        'company' => $parent,
+                                        'title' => $staffTitle,
+                                        'staffMember' => $staffMember
+                                    ]
+                                ))) {
+                                    $staffMembership = new StaffMembership();
+                                    $staffMembership->setCompany($parent)
+                                    ->setTitle($staffTitle)
+                                    ->setStaffMember($staffMember);
+                                    $em->persist($staffMembership);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!$batch) {
+                $em->persist($entity);
+            }
+
             $em->flush();
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
@@ -332,6 +385,7 @@ class CompanyController extends AbstractController
         return $this->render('company/directiva/new.html.twig', [
             'parent' => $parent,
             'form' => $form->createView(),
+            'activetab' => 'directiva',
         ]);
     }
 
@@ -359,6 +413,7 @@ class CompanyController extends AbstractController
         return $this->render('company/directiva/edit.html.twig', [
             'entity' => $entity,
             'form' => $form->createView(),
+            'activetab' => 'directiva',
         ]);
     }
 
