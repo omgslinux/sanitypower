@@ -6,8 +6,13 @@
     <div class="container">
         <!-- Links -->
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="{{ path('company_matriz') }}">Empresas<span></span></a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">Empresas</a>
+                <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{{ path('company_index') }}">Ordenadas por nombre<span></span></a>
+                    <a class="dropdown-item" href="{{ path('company_matriz') }}">Ordenadas por matriz<span></span></a>
+                </div>
             </li>
               <!-- Dropdown -->
               <li class="nav-item dropdown">
