@@ -95,16 +95,33 @@ class CompanyRepository extends ServiceEntityRepository
         return $this->paginate($query, $currentPage);
     }
 
-    /*
-    public function findOneBySomeField($value): ?Company
+    public function getSearchPaginated($pattern, $currentPage = 1, $limit = 5)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $this->limit = $limit;
+        // Create our query
+        $query = $this->createQueryBuilder('c')
+            ->orderBy('c.fullname', 'ASC')
+            ->andWhere('c.active = :active')
+            ->andWhere('c.fullname LIKE :pattern')
+            ->setParameter('active', true)
+            ->setParameter('pattern', '%' . $pattern . '%')
+            ->getQuery();
+
+        // No need to manually get get the result ($query->getResult())
+
+        return $this->paginate($query, $currentPage);
     }
+
+    /*
+        public function findOneBySomeField($value): ?Company
+        {
+            return $this->createQueryBuilder('c')
+                ->andWhere('c.exampleField = :val')
+                ->setParameter('val', $value)
+                ->getQuery()
+                ->getOneOrNullResult()
+            ;
+        }
     */
 
     /**

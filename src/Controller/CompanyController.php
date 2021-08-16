@@ -14,16 +14,20 @@ use App\Entity\CompanyEvent;
 use App\Entity\CompanyLevel;
 use App\Entity\StaffMembers;
 use App\Form\CompanyType;
+use App\Form\CompanyEventType;
+use App\Form\CompanySearchType;
 use App\Form\IncomingType;
 use App\Form\ShareholderType;
 use App\Form\StaffMembershipType;
 use App\Form\SubsidiaryType;
-use App\Form\CompanyEventType;
 use App\Repository\CompanyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\SearchType;
 
 /**
  * @Route("/company", name="company_")
@@ -110,6 +114,27 @@ class CompanyController extends AbstractController
     }
 
     /**
+     * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
+     */
+    public function companyEdit(Request $request, Company $company): Response
+    {
+        $form = $this->createForm(CompanyType::class, $company);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->getDoctrine()->getManager()->flush();
+
+            return $this->redirectToRoute('company_show', ['id' => $company->getId()]);
+        }
+
+        return $this->render('company/edit.html.twig', [
+            'company' => $company,
+            'form' => $form->createView(),
+        ]);
+    }
+
+
+    /**
      * @Route("/new", name="new", methods={"GET","POST"})
      */
     public function companyNew(Request $request): Response
@@ -133,6 +158,57 @@ class CompanyController extends AbstractController
     }
 
     /**
+    * @Route("/search", name="search", methods={"GET","POST"})
+    */
+    public function companySearch(Request $request): Response
+    {
+        // Para dibujar el cuadro de búsqueda
+        $form = $this->createFormBuilder(null)
+            ->add(
+                'pattern',
+                SearchType::class,
+                [
+                    'attr' => [
+
+                        'placeholder' => 'Buscar...',
+                    ]
+                ]
+            )
+            ->setAction($this->generateUrl('company_searchResults'))
+            ->getForm();
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $pattern = $request->get('pattern');
+
+            return $this->redirectToRoute('company_searchResults', [$pattern]);
+        }
+
+        return $this->render('company/search.html.twig', [
+            'searchForm' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/searchResults/{page}", name="searchResults", methods={"GET", "POST"})
+     */
+    public function companySearchResults(Request $request, CompanyRepository $repo, $page = 1): Response
+    {
+        $pattern = $request->get('form')['pattern'];
+        $limit = 40;
+        // ... get posts from DB...
+        // Controller Action
+        $paginator = $repo->getSearchPaginated($pattern, $page, $limit); // Returns 5 posts out of 20
+
+        return $this->render('company/index.html.twig', [
+            //'companies' => $companyRepository->getAllPaginated(),
+            'companies' => $paginator->getIterator(),
+            'maxPages' => ceil($paginator->count() / $limit),
+            'thisPage' => $page,
+        ]);
+    }
+
+    /**
      * @Route("/show/{id}/{activetab}", name="show", methods={"GET"})
      */
     public function companyShow(Company $company, $activetab = 'incomings'): Response
@@ -150,25 +226,6 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
-     */
-    public function companyEdit(Request $request, Company $company): Response
-    {
-        $form = $this->createForm(CompanyType::class, $company);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('company_show', ['id' => $company->getId()]);
-        }
-
-        return $this->render('company/edit.html.twig', [
-            'company' => $company,
-            'form' => $form->createView(),
-        ]);
-    }
 
     /**
      * @Route("/group/index/{page}", name="group_index", methods={"GET"})
