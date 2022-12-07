@@ -38,7 +38,7 @@ class Company
     private $country;
 
     /**
-     * @ORM\OneToMany(targetEntity=Incoming::class, mappedBy="Company", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=CompanyIncoming::class, mappedBy="Company", orphanRemoval=true)
      * @ORM\OrderBy({"year" = "ASC"})
      */
     private $incomings;
@@ -72,11 +72,6 @@ class Company
     private $notes;
 
     /**
-     * @ORM\OneToMany(targetEntity=CompanyRelationship::class, mappedBy="parent", orphanRemoval=true)
-     */
-    private $companyRelationships;
-
-    /**
      * Empresas de las que la actual es accionista (posee)
      *
      * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="holder")
@@ -106,6 +101,21 @@ class Company
      */
     private $ownerSubsidiaries;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $inList;
+
+    /**
+     * @ORM\OneToMany(targetEntity=CompanyRelationship::class, mappedBy="parent")
+     */
+    private $parentRelationships;
+
+    /**
+     * @ORM\OneToMany(targetEntity=CompanyRelationship::class, mappedBy="child")
+     */
+    private $childRelationships;
+
     public function __construct()
     {
         $this->incomings = new ArrayCollection();
@@ -116,6 +126,9 @@ class Company
         $this->staffMemberships = new ArrayCollection();
         $this->ownerSubsidiaries = new ArrayCollection();
         $this->ownedSubsidiaries = new ArrayCollection();
+        $this->child = new ArrayCollection();
+        $this->parentRelationships = new ArrayCollection();
+        $this->childRelationships = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -255,35 +268,6 @@ class Company
         return $this;
     }
 
-    /**
-     * @return Collection|CompanyRelationship[]
-     */
-    public function getCompanyRelationships(): Collection
-    {
-        return $this->companyRelationships;
-    }
-
-    public function addCompanyRelationship(CompanyRelationship $companyRelationship): self
-    {
-        if (!$this->companyRelationships->contains($companyRelationship)) {
-            $this->companyRelationships[] = $companyRelationship;
-            $companyRelationship->setParent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCompanyRelationship(CompanyRelationship $companyRelationship): self
-    {
-        if ($this->companyRelationships->removeElement($companyRelationship)) {
-            // set the owning side to null (unless already changed)
-            if ($companyRelationship->getParent() === $this) {
-                $companyRelationship->setParent(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function __toString()
     {
@@ -451,4 +435,78 @@ class Company
 
         return $this;
     }
+
+    public function isInList(): ?bool
+    {
+        return $this->inList;
+    }
+
+    public function setInList(?bool $inList): self
+    {
+        $this->inList = $inList;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CompanyRelationship>
+     */
+    public function getParentRelationships(): Collection
+    {
+        return $this->parentRelationships;
+    }
+
+    public function addParentRelationship(CompanyRelationship $parentRelationship): self
+    {
+        if (!$this->parentRelationships->contains($parentRelationship)) {
+            $this->parentRelationships[] = $parentRelationship;
+            $parentRelationship->setParent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParentRelationship(CompanyRelationship $parentRelationship): self
+    {
+        if ($this->parentRelationships->removeElement($parentRelationship)) {
+            // set the owning side to null (unless already changed)
+            if ($parentRelationship->getParent() === $this) {
+                $parentRelationship->setParent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CompanyRelationship>
+     */
+    public function getChildRelationships(): Collection
+    {
+        return $this->childRelationships;
+    }
+
+    public function addChildRelationship(CompanyRelationship $childRelationship): self
+    {
+        if (!$this->childRelationships->contains($childRelationship)) {
+            $this->childRelationships[] = $childRelationship;
+            $childRelationship->setChild($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChildRelationship(CompanyRelationship $childRelationship): self
+    {
+        if ($this->childRelationships->removeElement($childRelationship)) {
+            // set the owning side to null (unless already changed)
+            if ($childRelationship->getChild() === $this) {
+                $childRelationship->setChild(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }

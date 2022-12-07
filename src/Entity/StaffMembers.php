@@ -38,7 +38,7 @@ class StaffMembers
     private $notes;
 
     /**
-     * @ORM\OneToMany(targetEntity=StaffMembers::class, mappedBy="staffMember")
+     * @ORM\OneToMany(targetEntity=StaffMembership::class, mappedBy="staffMember")
      */
     private $staffMemberships;
 

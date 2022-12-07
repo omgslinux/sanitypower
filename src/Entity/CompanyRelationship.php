@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=CompanyRelationshipRepository::class)
+ * @ORM\Table(name="company_relationships")
  */
 class CompanyRelationship
 {
@@ -23,21 +24,21 @@ class CompanyRelationship
     private $date;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="companyRelationships")
+     * @ORM\Column(type="text")
+     */
+    private $notes;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="parentRelationships")
      * @ORM\JoinColumn(nullable=false)
      */
     private $parent;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="companyRelationships")
+     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="childRelationships")
      * @ORM\JoinColumn(nullable=false)
      */
     private $child;
-
-    /**
-     * @ORM\Column(type="text")
-     */
-    private $notes;
 
     public function getId(): ?int
     {
@@ -52,6 +53,18 @@ class CompanyRelationship
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(string $notes): self
+    {
+        $this->notes = $notes;
 
         return $this;
     }
@@ -80,15 +93,5 @@ class CompanyRelationship
         return $this;
     }
 
-    public function getNotes(): ?string
-    {
-        return $this->notes;
-    }
 
-    public function setNotes(string $notes): self
-    {
-        $this->notes = $notes;
-
-        return $this;
-    }
 }

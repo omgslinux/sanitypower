@@ -40,7 +40,7 @@ class Currency
     private $currencyExchanges;
 
     /**
-     * @ORM\OneToMany(targetEntity=Incoming::class, mappedBy="currency")
+     * @ORM\OneToMany(targetEntity=CompanyIncoming::class, mappedBy="currency")
      */
     private $incomings;
 
@@ -129,7 +129,7 @@ class Currency
         return $this->incomings;
     }
 
-    public function addIncoming(Incoming $incoming): self
+    public function addIncoming(CompanyIncoming $incoming): self
     {
         if (!$this->incomings->contains($incoming)) {
             $this->incomings[] = $incoming;
@@ -139,7 +139,7 @@ class Currency
         return $this;
     }
 
-    public function removeIncoming(Incoming $incoming): self
+    public function removeIncoming(CompanyIncoming $incoming): self
     {
         if ($this->incomings->removeElement($incoming)) {
             // set the owning side to null (unless already changed)
