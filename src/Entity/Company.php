@@ -41,7 +41,7 @@ class Company
      * @ORM\OneToMany(targetEntity=CompanyIncoming::class, mappedBy="Company", orphanRemoval=true)
      * @ORM\OrderBy({"year" = "ASC"})
      */
-    private $incomings;
+    private $companyIncomings;
 
     /**
      * @ORM\OneToMany(targetEntity=CompanyEvent::class, mappedBy="company")
@@ -173,14 +173,14 @@ class Company
     }
 
     /**
-     * @return Collection|Incoming[]
+     * @return Collection|CompanyIncoming[]
      */
-    public function getIncomings(): Collection
+    public function getCompanyIncomings(): Collection
     {
-        return $this->incomings;
+        return $this->companyIncomings;
     }
 
-    public function addIncoming(Incoming $incoming): self
+    public function addCompanyIncoming(CompanyIncoming $incoming): self
     {
         if (!$this->incomings->contains($incoming)) {
             $this->incomings[] = $incoming;
@@ -190,7 +190,7 @@ class Company
         return $this;
     }
 
-    public function removeIncoming(Incoming $incoming): self
+    public function removeCompanyIncoming(CompanyIncoming $incoming): self
     {
         if ($this->incomings->removeElement($incoming)) {
             // set the owning side to null (unless already changed)

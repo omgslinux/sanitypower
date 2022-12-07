@@ -21,7 +21,7 @@ class CompanyIncoming
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="incomings")
+     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="companyIncomings")
      * @ORM\JoinColumn(nullable=false)
      */
     private $Company;

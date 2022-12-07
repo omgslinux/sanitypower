@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class IncomingType extends AbstractType
+class CompanyIncomingType extends AbstractType
 {
     const LABEL = 'label';
 

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Company;
-use App\Entity\CompanyIncoming as Incoming;
+use App\Entity\CompanyIncoming;
 use App\Entity\StaffMembership;
 use App\Entity\CurrencyExchange;
 use App\Entity\CompanyCategory;
@@ -20,7 +20,16 @@ use App\Form\CompanyIncomingType;
 use App\Form\ShareholderType;
 use App\Form\StaffMembershipType;
 use App\Form\SubsidiaryType;
-use App\Repository\CompanyRepository;
+use App\Repository\CompanyRepository as REPO;
+use App\Repository\SubsidiaryRepository;
+use App\Repository\StaffTitleRepository;
+use App\Repository\CompanyEventRepository;
+use App\Repository\ShareholderRepository;
+use App\Repository\StaffMembersRepository;
+use App\Repository\CompanyLevelRepository;
+use App\Repository\StaffMembershipRepository;
+use App\Repository\CompanyCategoryRepository;
+use App\Repository\CurrencyExchangeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -62,15 +71,22 @@ class CompanyController extends AbstractController
     ];
     const PREFIX = 'company_';
 
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
+
+
     /**
      * @Route("/index/{page}", name="index", methods={"GET"})
      */
-    public function index(CompanyRepository $repo, $page = 1): Response
+    public function index($page = 1): Response
     {
         $limit = 40;
         // ... get posts from DB...
         // Controller Action
-        $paginator = $repo->getActivePaginated($page, $limit); // Returns 5 posts out of 20
+        $paginator = $this->repo->getActivePaginated($page, $limit); // Returns 5 posts out of 20
 
         return $this->render('company/index.html.twig', [
             //'companies' => $companyRepository->getAllPaginated(),
@@ -105,9 +121,7 @@ class CompanyController extends AbstractController
     public function companyDelete(Request $request, Company $company): Response
     {
         if ($this->isCsrfTokenValid('delete'.$company->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($company);
-            $entityManager->flush();
+            $this->repo->remove($company, true);
         }
 
         return $this->redirectToRoute(self::PREFIX . 'index');
@@ -122,7 +136,7 @@ class CompanyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->repo->flush();
 
             return $this->redirectToRoute('company_show', ['id' => $company->getId()]);
         }
@@ -144,9 +158,7 @@ class CompanyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($company);
-            $entityManager->flush();
+            $this->repo->add($company, true);
 
             return $this->redirectToRoute('company_index');
         }
@@ -192,13 +204,13 @@ class CompanyController extends AbstractController
     /**
      * @Route("/searchResults/{page}", name="searchResults", methods={"GET", "POST"})
      */
-    public function companySearchResults(Request $request, CompanyRepository $repo, $page = 1): Response
+    public function companySearchResults(Request $request, $page = 1): Response
     {
         $pattern = $request->get('form')['pattern'];
         $limit = 40;
         // ... get posts from DB...
         // Controller Action
-        $paginator = $repo->getSearchPaginated($pattern, $page, $limit); // Returns 5 posts out of 20
+        $paginator = $this->repo->getSearchPaginated($pattern, $page, $limit); // Returns 5 posts out of 20
 
         return $this->render('company/index.html.twig', [
             //'companies' => $companyRepository->getAllPaginated(),
@@ -211,18 +223,20 @@ class CompanyController extends AbstractController
     /**
      * @Route("/show/{id}/{activetab}", name="show", methods={"GET"})
      */
-    public function companyShow(Company $company, $activetab = 'incomings'): Response
-    {
-        $em = $this->getDoctrine()->getManager();
-        $subRepository = $em->getRepository(Subsidiary::class);
+    public function companyShow(
+        Company $company,
+        CurrencyExchangeRepository $cexRepo,
+        SubsidiaryRepository $subrepo,
+        $activetab = 'incomings'
+    ): Response {
         return $this->render('company/show.html.twig', [
             'parent' => $company,
             'tabs' => self::TABS,
             'prefix' => self::PREFIX,
             'activetab' => $activetab,
-            'incomings' => $this->incomingFindExchange($company),
-            'groupparticipants' => $this->groupIndex($company),
-            'subsidiaries' => $subRepository->findByCompanyOwner($company),
+            'incomings' => $this->incomingFindExchange($company, $cexRepo),
+            'groupparticipants' => $this->groupIndex($company, $subrepo),
+            'subsidiaries' => $subrepo->findByCompanyOwner($company),
         ]);
     }
 
@@ -230,10 +244,9 @@ class CompanyController extends AbstractController
     /**
      * @Route("/group/index/{page}", name="group_index", methods={"GET"})
      */
-    public function groupIndex(Company $company, $page = 1)
+    public function groupIndex(Company $company, SubsidiaryRepository $subrepo, $page = 1)
     {
-        return $this->getDoctrine()->getManager()->getRepository(Subsidiary::class)
-        ->findByCompanyGroup($company);
+        return $subrepo->findByCompanyGroup($company);
     }
 
     /**
@@ -247,9 +260,11 @@ class CompanyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            /*$em = $this->getDoctrine()->getManager();
             $em->persist($child);
-            $em->flush();
+            $em->flush(); */
+            $company->addCompanyEvent($child);
+            $this->repo->add($company, true);
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -268,15 +283,16 @@ class CompanyController extends AbstractController
     /**
      * @Route("/history/edit/{id}", name="event_edit", methods={"GET","POST"})
      */
-    public function historyEdit(Request $request, CompanyEvent $entity): Response
+    public function historyEdit(Request $request, CompanyEventRepository $ceRepo, CompanyEvent $entity): Response
     {
         $form = $this->createForm(CompanyEventType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            /*$em = $this->getDoctrine()->getManager();
             $em->persist($entity);
-            $em->flush();
+            $em->flush();*/
+            $ceRepo->add($entity, true);
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -297,15 +313,17 @@ class CompanyController extends AbstractController
      */
     public function incomingsAdd(Request $request, Company $parent): Response
     {
-        $entity = new Incoming();
+        $entity = new CompanyIncoming();
         $entity->setCompany($parent);
         $form = $this->createForm(CompanyIncomingType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            /*$em = $this->getDoctrine()->getManager();
             $em->persist($entity);
-            $em->flush();
+            $em->flush();*/
+            $parent->addCompanyIncoming($entity);
+            $this->repo->add($parent, true);
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -324,15 +342,17 @@ class CompanyController extends AbstractController
     /**
      * @Route("/incomings/edit/{id}", name="incoming_edit", methods={"GET","POST"})
      */
-    public function incomingEdit(Request $request, Incoming $entity): Response
+    public function incomingEdit(Request $request, CompanyEventRepository $ceRepo, CompanyIncoming $entity): Response
     {
         $form = $this->createForm(CompanyIncomingType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            /*$em = $this->getDoctrine()->getManager();
             $em->persist($entity);
-            $em->flush();
+            $em->flush();*/
+            $ceRepo->add($entity, true);
+
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -348,14 +368,14 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    public function incomingFindExchange(Company $parent)
+    public function incomingFindExchange(Company $parent, CurrencyExchangeRepository $cuRepo)
     {
-        $em = $this->getDoctrine()->getManager();
-        $allIncomings = $parent->getIncomings();
-        $currencyExchangeRepo = $em->getRepository(CurrencyExchange::class);
+        //$em = $this->getDoctrine()->getManager();
+        $allIncomings = $parent->getCompanyIncomings();
+        //$currencyExchangeRepo = $em->getRepository(CurrencyExchange::class);
         $converted = [];
         foreach ($allIncomings as $incoming) {
-            $exchange = $currencyExchangeRepo->getExchange($incoming);
+            $exchange = $cuRepo->getExchange($incoming);
             $converted [] = [
                 'incoming' => $incoming,
                 'exchange' => $exchange[0],
@@ -368,21 +388,26 @@ class CompanyController extends AbstractController
     /**
      * @Route("/membership/new/{id}", name="membership_new", methods={"GET","POST"})
      */
-    public function membershipAdd(Request $request, Company $parent): Response
-    {
+    public function membershipAdd(
+        Request $request,
+        Company $parent,
+        StaffMembersRepository $staffMembersRepo,
+        StaffTitleRepository $staffTitleRepo,
+        StaffMembershipRepository $staffMembershipRepo
+    ): Response {
         $entity = new StaffMembership();
         $entity->setCompany($parent);
         $form = $this->createForm(StaffMembershipType::class, $entity, [ 'batch' => true ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            //$em = $this->getDoctrine()->getManager();
 
             $params = $request->request->all();
             $batch = false;
-            $staffMembersRepo = $em->getRepository(StaffMembers::class);
-            $staffTitleRepo = $em->getRepository(StaffTitle::class);
-            $staffMembershipRepo = $em->getRepository(StaffMembership::class);
+            //$staffMembersRepo = $em->getRepository(StaffMembers::class);
+            //$staffTitleRepo = $em->getRepository(StaffTitle::class);
+            //$staffMembershipRepo = $em->getRepository(StaffMembership::class);
             foreach ($params as $param) {
                 if (!empty($param['batch'])) {
                     $batch = true;
@@ -403,8 +428,8 @@ class CompanyController extends AbstractController
                                     $staffMember = new StaffMembers();
                                     $staffMember->setSurname($surname)
                                     ->setName($name);
-                                    $em->persist($staffMember);
-                                    $em->flush();
+                                    /*$em->persist($staffMember);
+                                    $em->flush();*/
                                 }
                                 if (null==($staffMembership=$staffMembershipRepo->findOneBy(
                                     [
@@ -417,8 +442,9 @@ class CompanyController extends AbstractController
                                     $staffMembership->setCompany($parent)
                                     ->setTitle($staffTitle)
                                     ->setStaffMember($staffMember);
-                                    $em->persist($staffMembership);
+                                    //$em->persist($staffMembership);
                                 }
+                                $parent->addStaffMembership($staffMembership);
                             }
                         }
                     }
@@ -426,10 +452,11 @@ class CompanyController extends AbstractController
             }
 
             if (!$batch) {
-                $em->persist($entity);
+                $this->repo->add($parent);
+                //$em->persist($entity);
             }
 
-            $em->flush();
+            $this->repo->flush();
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -449,15 +476,16 @@ class CompanyController extends AbstractController
     /**
      * @Route("/membership/edit/{id}", name="membership_edit", methods={"GET","POST"})
      */
-    public function membershipEdit(Request $request, StaffMembership $entity): Response
+    public function membershipEdit(Request $request, StaffMembersRepository $smRepo, StaffMembership $entity): Response
     {
         $form = $this->createForm(StaffMembershipType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            /*$em = $this->getDoctrine()->getManager();
             $em->persist($entity);
-            $em->flush();
+            $em->flush();*/
+            $smRepo->add($entity, true);
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -478,8 +506,13 @@ class CompanyController extends AbstractController
     /**
      * @Route("/shareholder/new/{id}", name="shareholder_new", methods={"GET","POST"})
      */
-    public function shareholderAdd(Request $request, Company $parent): Response
-    {
+    public function shareholderAdd(
+        Request $request,
+        Company $parent,
+        ShareholderRepository $holderRepo,
+        CompanyCategoryRepository $categoryRepo,
+        CompanyLevelRepository $companyLevelRepo
+    ): Response {
         $entity = new Shareholder();
         $entity->setCompany($parent);
         $form = $this->createForm(ShareholderType::class, $entity, [ 'batch' => true ]);
@@ -489,12 +522,13 @@ class CompanyController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $params = $request->request->all();
             $batch = false;
-            $companyRepo = $em->getRepository(Company::class);
-            $holderRepo = $em->getRepository(Shareholder::class);
-            $categoryRepo = $em->getRepository(CompanyCategory::class);
+            //$companyRepo = $em->getRepository(Company::class);
+            //$holderRepo = $em->getRepository(Shareholder::class);
+            //$categoryRepo = $em->getRepository(CompanyCategory::class);
             foreach ($params as $param) {
                 if (!empty($param['batch'])) {
-                    $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Sin identificar']);
+                    //$level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Sin identificar']);
+                    $level = $companyLevelRepo->findOneBy(['level' => 'Sin identificar']);
 
                     $batch = true;
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
@@ -509,7 +543,7 @@ class CompanyController extends AbstractController
                             if ($category->getLetter() == 'H') {
                                 $holder = $parent;
                             } else {
-                                if (null == ($holder = $companyRepo->findOneBy(
+                                if (null == ($holder = $this->repo->findOneBy(
                                     [
                                         'fullname' => $fullname,
                                         'country' => $country,
@@ -523,7 +557,8 @@ class CompanyController extends AbstractController
                                     ;
                                 }
                                 $holder->setCategory($category);
-                                $em->persist($holder);
+                                //$em->persist($holder);
+                                $this->repo->add($holder);
                             }
                             //dump($holder);
                             if (null == ($entity = $holderRepo->findOneBy(
@@ -541,8 +576,10 @@ class CompanyController extends AbstractController
                                 ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
                                 ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
                                 ;
-                                $em->persist($entity);
-                                $em->flush();
+                                //$em->persist($entity);
+                                //$em->flush();
+                                $parent->addCompanyHolder($entity);
+                                $this->repo->add($parent, true);
                             }
                         }
                     }
@@ -550,9 +587,11 @@ class CompanyController extends AbstractController
             }
 
             if (!$batch) {
-                $em->persist($entity);
+                //$em->persist($entity);
+                $parent->addCompanyHolder($entity);
             }
-            $em->flush();
+            //$em->flush();
+            $this->repo->add($parent, true);
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -571,15 +610,16 @@ class CompanyController extends AbstractController
     /**
      * @Route("/shareholder/edit/{id}", name="shareholder_edit", methods={"GET","POST"})
      */
-    public function shareholderEdit(Request $request, Shareholder $entity): Response
+    public function shareholderEdit(Request $request, ShareholderRepository $sRepo, Shareholder $entity): Response
     {
         $form = $this->createForm(ShareholderType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            /*$em = $this->getDoctrine()->getManager();
             $em->persist($entity);
-            $em->flush();
+            $em->flush();*/
+            $sRepo->add($entity, true);
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -598,23 +638,29 @@ class CompanyController extends AbstractController
     /**
      * @Route("/subsidiary/new/{id}", name="subsidiary_new", methods={"GET","POST"})
      */
-    public function subsidiaryAdd(Request $request, Company $parent): Response
-    {
+    public function subsidiaryAdd(
+        Request $request,
+        Company $parent,
+        SubsidiaryRepository $subsidiaryRepo,
+        CompanyCategoryRepository $categoryRepo,
+        CompanyLevelRepository $companyLevelRepo
+    ): Response {
         $entity = new Subsidiary();
         $entity->setOwner($parent);
         $form = $this->createForm(SubsidiaryType::class, $entity, [ 'batch' => true ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            //$em = $this->getDoctrine()->getManager();
             $params = $request->request->all();
             $batch = false;
-            $companyRepo = $em->getRepository(Company::class);
-            $subsidiaryRepo = $em->getRepository(Subsidiary::class);
-            $categoryRepo = $em->getRepository(CompanyCategory::class);
+            //$companyRepo = $em->getRepository(Company::class);
+            //$subsidiaryRepo = $em->getRepository(Subsidiary::class);
+            //$categoryRepo = $em->getRepository(CompanyCategory::class);
             foreach ($params as $param) {
                 if (!empty($param['batch'])) {
-                    $level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Pendiente']);
+                    //$level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Pendiente']);
+                    $level = $companyLevelRepo->findOneBy(['level' => 'Pendiente']);
                     $batch = true;
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
                         $keys = explode(",", $line);
@@ -624,7 +670,7 @@ class CompanyController extends AbstractController
                                 $country = '--';
                             }
                             $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[2]));
-                            if (null == ($owned = $companyRepo->findOneBy(
+                            if (null == ($owned = $this->repo->findOneBy(
                                 [
                                     'fullname' => $fullname,
                                     'country' => $country,
@@ -637,9 +683,10 @@ class CompanyController extends AbstractController
                                 ->setLevel($level);
                             }
                             $owned->setCategory($category);
-                            $em->persist($owned);
+                            //$em->persist($owned);
                             //dump($owned);
-                            $em->flush();
+                            //$em->flush();
+                            $this->repo->add($owned, true);
                             if (null == ($entity = $subsidiaryRepo->findOneBy(
                                 [
                                     'owned' => $owned,
@@ -668,19 +715,24 @@ class CompanyController extends AbstractController
                                 ->setDirect($direct)
                                 ->setPercent($percent)
                                 ;
-                                $em->persist($entity);
+                                //$em->persist($entity);
+                                $subsidiaryRepo->add($entity);
                                 //dump($entity);
                             }
-                            $em->flush();
+                            //$em->flush();
+                            $this->repo->flush();
                         }
                     }
                 }
             }
 
             if (!$batch) {
-                $em->persist($entity);
+                //$em->persist($entity);
+                $subsidiaryRepo->add($entity);
             }
-            $em->flush();
+            //$em->flush();
+            $this->repo->flush();
+
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
@@ -699,15 +751,17 @@ class CompanyController extends AbstractController
     /**
      * @Route("/subsidiary/edit/{id}", name="subsidiary_edit", methods={"GET","POST"})
      */
-    public function subsidiaryEdit(Request $request, Subsidiary $entity): Response
+    public function subsidiaryEdit(Request $request, SubsidiaryRepository $sRepo, Subsidiary $entity): Response
     {
         $form = $this->createForm(SubsidiaryType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            /*$em = $this->getDoctrine()->getManager();
             $em->persist($entity);
-            $em->flush();
+            $em->flush();*/
+            $sRepo->add($entity, true);
+
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [

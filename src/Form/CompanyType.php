@@ -66,6 +66,7 @@ class CompanyType extends AbstractType
                     self::LABEL => 'Tipo'
                 ]
             )
+            ->add('inList')
         ;
     }
 
