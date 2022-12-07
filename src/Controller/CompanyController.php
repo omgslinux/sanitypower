@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Company;
-use App\Entity\Incoming;
+use App\Entity\CompanyIncoming as Incoming;
 use App\Entity\StaffMembership;
 use App\Entity\CurrencyExchange;
 use App\Entity\CompanyCategory;
@@ -16,7 +16,7 @@ use App\Entity\StaffMembers;
 use App\Form\CompanyType;
 use App\Form\CompanyEventType;
 use App\Form\CompanySearchType;
-use App\Form\IncomingType;
+use App\Form\CompanyIncomingType;
 use App\Form\ShareholderType;
 use App\Form\StaffMembershipType;
 use App\Form\SubsidiaryType;
@@ -299,7 +299,7 @@ class CompanyController extends AbstractController
     {
         $entity = new Incoming();
         $entity->setCompany($parent);
-        $form = $this->createForm(IncomingType::class, $entity);
+        $form = $this->createForm(CompanyIncomingType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -326,7 +326,7 @@ class CompanyController extends AbstractController
      */
     public function incomingEdit(Request $request, Incoming $entity): Response
     {
-        $form = $this->createForm(IncomingType::class, $entity);
+        $form = $this->createForm(CompanyIncomingType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -509,7 +509,12 @@ class CompanyController extends AbstractController
                             if ($category->getLetter() == 'H') {
                                 $holder = $parent;
                             } else {
-                                if (null == ($holder = $companyRepo->findOneBy(['fullname' => $fullname, 'country' => $country]))) {
+                                if (null == ($holder = $companyRepo->findOneBy(
+                                    [
+                                        'fullname' => $fullname,
+                                        'country' => $country,
+                                    ]
+                                ))) {
                                     $holder = new Company();
                                     $holder->setFullname($fullname)
                                     ->setCountry($country)
@@ -521,7 +526,12 @@ class CompanyController extends AbstractController
                                 $em->persist($holder);
                             }
                             //dump($holder);
-                            if (null == ($entity = $holderRepo->findOneBy(['holder' => $holder, 'company' => $parent]))) {
+                            if (null == ($entity = $holderRepo->findOneBy(
+                                [
+                                    'holder' => $holder,
+                                    'company' => $parent,
+                                ]
+                            ))) {
                                 $entity = new Shareholder();
                                 $directOwnership = str_replace('"', '', $keys[4]);
                                 $totalOwnership = str_replace('"', '', $keys[5]);
@@ -614,7 +624,12 @@ class CompanyController extends AbstractController
                                 $country = '--';
                             }
                             $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[2]));
-                            if (null == ($owned = $companyRepo->findOneBy(['fullname' => $fullname, 'country' => $country]))) {
+                            if (null == ($owned = $companyRepo->findOneBy(
+                                [
+                                    'fullname' => $fullname,
+                                    'country' => $country,
+                                ]
+                            ))) {
                                 $owned = new Company();
                                 $owned->setFullname($fullname)
                                 ->setCountry($country)
@@ -625,7 +640,12 @@ class CompanyController extends AbstractController
                             $em->persist($owned);
                             //dump($owned);
                             $em->flush();
-                            if (null == ($entity = $subsidiaryRepo->findOneBy(['owned' => $owned, 'owner' => $parent]))) {
+                            if (null == ($entity = $subsidiaryRepo->findOneBy(
+                                [
+                                    'owned' => $owned,
+                                    'owner' => $parent,
+                                ]
+                            ))) {
                                 $entity = new Subsidiary();
                                 $_direct = $direct = str_replace('"', '', $keys[3]);
                                 $_percent = $percent = str_replace('"', '', $keys[4]);

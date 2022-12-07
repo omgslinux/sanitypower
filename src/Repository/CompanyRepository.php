@@ -2,12 +2,14 @@
 
 namespace App\Repository;
 
-use App\Entity\Company;
+use App\Entity\Company as Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
+ * @extends ServiceEntityRepository<BookOld>
+ *
  * @method Company|null find($id, $lockMode = null, $lockVersion = null)
  * @method Company|null findOneBy(array $criteria, array $orderBy = null)
  * @method Company[]    findAll()
@@ -17,7 +19,30 @@ class CompanyRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Company::class);
+        parent::__construct($registry, Entity::class);
+    }
+
+    public function add(Entity $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
+    public function remove(Entity $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->flush();
+        }
     }
 
     /**
