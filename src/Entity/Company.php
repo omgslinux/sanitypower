@@ -38,7 +38,7 @@ class Company
     private $country;
 
     /**
-     * @ORM\OneToMany(targetEntity=CompanyIncoming::class, mappedBy="Company", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=CompanyIncoming::class, mappedBy="Company", orphanRemoval=true, cascade={"persist"})
      * @ORM\OrderBy({"year" = "ASC"})
      */
     private $companyIncomings;
@@ -81,7 +81,7 @@ class Company
     /**
      * Empresas que son propietarias de la actual
      *
-     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="company")
+     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="company", cascade={"persist"})
      */
     private $companyHolders;
 
@@ -118,7 +118,7 @@ class Company
 
     public function __construct()
     {
-        $this->incomings = new ArrayCollection();
+        $this->companyIncomings = new ArrayCollection();
         $this->companyEvents = new ArrayCollection();
         $this->companyRelationships = new ArrayCollection();
         $this->heldCompanys = new ArrayCollection();
@@ -182,8 +182,8 @@ class Company
 
     public function addCompanyIncoming(CompanyIncoming $incoming): self
     {
-        if (!$this->incomings->contains($incoming)) {
-            $this->incomings[] = $incoming;
+        if (!$this->companyIncomings->contains($incoming)) {
+            $this->companyIncomings[] = $incoming;
             $incoming->setCompany($this);
         }
 

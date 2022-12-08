@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
-use App\Entity\Incoming;
-use App\Entity\CurrencyExchange;
+use App\Entity\CompanyIncoming;
+use App\Entity\CurrencyExchange as Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,14 +17,37 @@ class CurrencyExchangeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, CurrencyExchange::class);
+        parent::__construct($registry, Entity::class);
+    }
+
+    public function add(Entity $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
+    public function remove(Entity $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->flush();
+        }
     }
 
     // /**
     //  * @return CurrencyExchange[] Returns an array of CurrencyExchange objects
     //  */
 
-    public function getExchange(Incoming $incoming)
+    public function getExchange(CompanyIncoming $incoming)
     {
         /* SELECT ce.amount,i.amount,(i.amount * ce.amount) AS result FROM sanitypower.currency_exchange ce
             JOIN sanitypower.incomings i USING(currency_id)-- ON ce.currency_id = i.currency_id
@@ -33,11 +56,10 @@ class CurrencyExchangeRepository extends ServiceEntityRepository
         LIMIT 1; */
         /*
             $query = $em->createQuery("SELECT u FROM CmsUser u LEFT JOIN u.articles a WITH a.topic LIKE :foo");
-            $query = $em->createQuery('SELECT u, a, p, c FROM CmsUser u JOIN u.articles a JOIN u.phonenumbers p JOIN a.comments c');
         */
         $query = $this->getEntityManager()->createQuery(
             'SELECT ce.amount FROM App:CurrencyExchange ce
-            JOIN App:Incoming i
+            JOIN App:CompanyIncoming i
             WHERE ce.currency = i.currency
             AND ce.year <= i.year
             AND i = :incoming

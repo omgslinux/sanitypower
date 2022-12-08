@@ -29,6 +29,7 @@ use App\Repository\StaffMembersRepository;
 use App\Repository\CompanyLevelRepository;
 use App\Repository\StaffMembershipRepository;
 use App\Repository\CompanyCategoryRepository;
+use App\Repository\CompanyIncomingRepository;
 use App\Repository\CurrencyExchangeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -99,12 +100,12 @@ class CompanyController extends AbstractController
     /**
      * @Route("/matriz/{page}", name="matriz", methods={"GET"})
      */
-    public function indexMatriz(CompanyRepository $repo, $page = 1): Response
+    public function indexMatriz($page = 1): Response
     {
         $limit = 40;
         // ... get posts from DB...
         // Controller Action
-        $paginator = $repo->getActiveMatrizOLD($page, $limit); // Returns 5 posts out of 20
+        $paginator = $this->repo->getActiveMatrizOLD($page, $limit); // Returns 5 posts out of 20
 
         return $this->render('company/matriz+participada.html.twig', [
             //'companies' => $repo->getAllPaginated(),
@@ -342,7 +343,7 @@ class CompanyController extends AbstractController
     /**
      * @Route("/incomings/edit/{id}", name="incoming_edit", methods={"GET","POST"})
      */
-    public function incomingEdit(Request $request, CompanyEventRepository $ceRepo, CompanyIncoming $entity): Response
+    public function incomingEdit(Request $request, CompanyIncomingRepository $ciRepo, CompanyIncoming $entity): Response
     {
         $form = $this->createForm(CompanyIncomingType::class, $entity);
         $form->handleRequest($request);
@@ -351,7 +352,7 @@ class CompanyController extends AbstractController
             /*$em = $this->getDoctrine()->getManager();
             $em->persist($entity);
             $em->flush();*/
-            $ceRepo->add($entity, true);
+            $ciRepo->add($entity, true);
 
             return $this->redirectToRoute(
                 self::PREFIX . 'show',

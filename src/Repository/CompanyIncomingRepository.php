@@ -19,6 +19,29 @@ class CompanyIncomingRepository extends ServiceEntityRepository
         parent::__construct($registry, Entity::class);
     }
 
+    public function add(Entity $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
+    public function remove(Entity $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
     // /**
     //  * @return Incoming[] Returns an array of Incoming objects
     //  */
