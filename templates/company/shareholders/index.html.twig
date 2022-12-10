@@ -1,9 +1,9 @@
 {% set total = parent.companyHolders|length %}
 {% set lastCompanyIncomings = 0 %}
 {% for i in parent.companyIncomings %}{% set lastCompanyIncomings = i.amount %}{% endfor %}
-{%- if total > 0 %}{{ dump(lastCompanyIncomings) }}
+{%- if total > 0 %}
     {# <h2>Accionistas</h2> #}
-    <h4>Total: {{ total }} accionistas</h4>
+    <h4>Ingresos: {{ lastCompanyIncomings|number_format(2, '.', ',') }}€, Total: {{ total }} accionistas</h4>
     <div class="row">
         <div class="col-6 font-weight-bold">Nombre del accionista</div>
         <div class="col-1 font-weight-bold text-center">País</div>
@@ -16,7 +16,10 @@
     {% set participacion = entity.totalOwnership * lastCompanyIncomings / 100 %}
     {% set totalParticipacion = totalParticipacion + participacion %}
         <div class="row border">
-            <div class="col-6 border-right"><a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}">{{ entity }}</a></div>
+            <div class="col-6 border-right">
+                <a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}">{{ entity }}</a>
+            {% if entity.holder.inlist %}<i class="fa-solid fa-star"></i>{% endif %}
+            </div>
             <div class="col-1 text-center">{{ entity.holder.country }}</div>
             <div class="col-1 text-center" title="{{entity.holder.category.description }}">{{ entity.holder.category.letter }}</div>
             <div class="col-1 text-right">{{ entity.directOwnership != 0 ? entity.directOwnership|number_format(2, '.', ',') : '--' }}</div>
