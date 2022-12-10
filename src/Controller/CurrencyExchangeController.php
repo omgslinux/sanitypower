@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\CurrencyExchange;
 use App\Form\CurrencyExchangeType;
-use App\Repository\CurrencyExchangeRepository;
+use App\Repository\CurrencyExchangeRepository as REPO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,13 +15,22 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CurrencyExchangeController extends AbstractController
 {
+    const PREFIX = 'currency_exchange_';
+    const TDIR = 'currency_exchange';
+
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
+
     /**
      * @Route("/", name="index", methods={"GET"})
      */
-    public function index(CurrencyExchangeRepository $currencyExchangeRepository): Response
+    public function index(): Response
     {
         return $this->render('currency_exchange/index.html.twig', [
-            'currency_exchanges' => $currencyExchangeRepository->findAll(),
+            'currency_exchanges' => $this->repo->findAll(),
         ]);
     }
 
@@ -35,11 +44,9 @@ class CurrencyExchangeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($currencyExchange);
-            $entityManager->flush();
+            $this->repo->add($entity, true);
 
-            return $this->redirectToRoute('currency_exchange_index');
+            return $this->redirectToRoute(self::PREFIX . 'index');
         }
 
         return $this->render('currency_exchange/new.html.twig', [
@@ -67,9 +74,9 @@ class CurrencyExchangeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->repo->add($entity, true);
 
-            return $this->redirectToRoute('currency_exchange_index');
+            return $this->redirectToRoute(self::PREFIX . 'index');
         }
 
         return $this->render('currency_exchange/edit.html.twig', [
@@ -84,11 +91,9 @@ class CurrencyExchangeController extends AbstractController
     public function delete(Request $request, CurrencyExchange $currencyExchange): Response
     {
         if ($this->isCsrfTokenValid('delete'.$currencyExchange->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($currencyExchange);
-            $entityManager->flush();
-        }
+            $this->repo->remove($entity, true);
 
-        return $this->redirectToRoute('currency_exchange_index');
+            return $this->redirectToRoute(self::PREFIX . 'index');
+        }
     }
 }

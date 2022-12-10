@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\CompanyLevel;
 use App\Form\CompanyLevelType;
-use App\Repository\CompanyLevelRepository;
+use App\Repository\CompanyLevelRepository as REPO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,13 +15,22 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CompanyLevelController extends AbstractController
 {
+    const PREFIX = 'company_level_';
+    const TDIR = 'company_level';
+
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
+
     /**
      * @Route("/", name="index", methods={"GET"})
      */
-    public function index(CompanyLevelRepository $companyLevelRepository): Response
+    public function index(): Response
     {
         return $this->render('company_level/index.html.twig', [
-            'company_levels' => $companyLevelRepository->findAll(),
+            'company_levels' => $this->repo->findAll(),
         ]);
     }
 
@@ -30,16 +39,14 @@ class CompanyLevelController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        $companyLevel = new CompanyLevel();
+        $entity = new CompanyLevel();
         $form = $this->createForm(CompanyLevelType::class, $companyLevel);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($companyLevel);
-            $entityManager->flush();
+            $this->repo->add($entity, true);
 
-            return $this->redirectToRoute('company_level_index');
+            return $this->redirectToRoute(self::PREFIX . 'index');
         }
 
         return $this->render('company_level/new.html.twig', [
@@ -61,15 +68,15 @@ class CompanyLevelController extends AbstractController
     /**
      * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, CompanyLevel $companyLevel): Response
+    public function edit(Request $request, CompanyLevel $entity): Response
     {
         $form = $this->createForm(CompanyLevelType::class, $companyLevel);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->repo->add($entity, true);
 
-            return $this->redirectToRoute('company_level_index');
+            return $this->redirectToRoute(self::PREFIX . 'index');
         }
 
         return $this->render('company_level/edit.html.twig', [
@@ -81,14 +88,12 @@ class CompanyLevelController extends AbstractController
     /**
      * @Route("/{id}", name="delete", methods={"POST"})
      */
-    public function delete(Request $request, CompanyLevel $companyLevel): Response
+    public function delete(Request $request, CompanyLevel $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$companyLevel->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($companyLevel);
-            $entityManager->flush();
+            $this->repo->remove($entity, true);
         }
 
-        return $this->redirectToRoute('company_level_index');
+        return $this->redirectToRoute(self::PREFIX . 'index');
     }
 }

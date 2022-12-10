@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\CompanyCategory;
 use App\Form\CompanyCategoryType;
-use App\Repository\CompanyCategoryRepository;
+use App\Repository\CompanyCategoryRepository as REPO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,13 +19,19 @@ class CompanyCategoryController extends AbstractController
     const PREFIX = 'company_category_';
     const TDIR = 'company_category';
 
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
+
     /**
      * @Route("/", name="index", methods={"GET"})
      */
-    public function index(CompanyCategoryRepository $CompanyCategoryRepository): Response
+    public function index(): Response
     {
         return $this->render(self::TDIR . '/index.html.twig', [
-            'categories' => $CompanyCategoryRepository->findAll(),
+            'categories' => $this->repo->findAll(),
             'prefix' => self::PREFIX,
         ]);
     }
@@ -40,9 +46,7 @@ class CompanyCategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($entity);
-            $entityManager->flush();
+            $this->repo->add($entity, true);
 
             return $this->redirectToRoute(self::PREFIX . 'index');
         }
@@ -74,7 +78,7 @@ class CompanyCategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->repo->add($entity, true);
 
             return $this->redirectToRoute(self::PREFIX . 'index');
         }
@@ -92,9 +96,7 @@ class CompanyCategoryController extends AbstractController
     public function delete(Request $request, CompanyCategory $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($entity);
-            $entityManager->flush();
+            $this->repo->remove($entity, true);
         }
 
         return $this->redirectToRoute(self::PREFIX . 'index');

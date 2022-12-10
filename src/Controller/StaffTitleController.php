@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\StaffTitle;
 use App\Form\StaffTitleType;
-use App\Repository\StaffTitleRepository;
+use App\Repository\StaffTitleRepository as REPO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,13 +17,20 @@ class StaffTitleController extends AbstractController
 {
     const PREFIX = 'staff_title_';
     const TDIR = 'staff_title';
+
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
+
     /**
      * @Route("/", name="index", methods={"GET"})
      */
-    public function index(StaffTitleRepository $StaffTitleRepository): Response
+    public function index(): Response
     {
         return $this->render(self::TDIR . '/index.html.twig', [
-            'entities' => $StaffTitleRepository->findAll(),
+            'entities' => $this->repo->findAll(),
             'prefix' => self::PREFIX,
         ]);
     }
@@ -38,9 +45,7 @@ class StaffTitleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($StaffTitle);
-            $entityManager->flush();
+            $this->repo->add($entity, true);
 
             return $this->redirectToRoute(self::PREFIX . 'index');
         }
@@ -73,7 +78,7 @@ class StaffTitleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->repo->add($entity, true);
 
             return $this->redirectToRoute(self::PREFIX . 'index');
         }
@@ -92,9 +97,7 @@ class StaffTitleController extends AbstractController
     public function delete(Request $request, StaffTitle $StaffTitle): Response
     {
         if ($this->isCsrfTokenValid('delete'.$StaffTitle->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($StaffTitle);
-            $entityManager->flush();
+            $this->repo->remove($entity, true);
         }
 
         return $this->redirectToRoute(self::PREFIX . 'index');

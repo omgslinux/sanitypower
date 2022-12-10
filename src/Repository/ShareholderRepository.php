@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Shareholder;
+use App\Entity\Shareholder as Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,7 +16,30 @@ class ShareholderRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Shareholder::class);
+        parent::__construct($registry, Entity::class);
+    }
+
+    public function add(Entity $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->flush();
+        }
+    }
+
+    public function flush(): void
+    {
+        $this->getEntityManager()->flush();
+    }
+
+    public function remove(Entity $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->flush();
+        }
     }
 
     // /**

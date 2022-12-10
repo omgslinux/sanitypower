@@ -375,12 +375,17 @@ class CompanyController extends AbstractController
         $allIncomings = $parent->getCompanyIncomings();
         //$currencyExchangeRepo = $em->getRepository(CurrencyExchange::class);
         $converted = [];
-        foreach ($allIncomings as $incoming) {
-            $exchange = $cuRepo->getExchange($incoming);
-            $converted [] = [
-                'incoming' => $incoming,
-                'exchange' => $exchange[0],
-            ];
+        //dump($allIncomings);
+        if (count($allIncomings)) {
+            foreach ($allIncomings as $incoming) {
+                $exchange = $cuRepo->getExchange($incoming);
+                if (count($exchange)) {
+                    $converted [] = [
+                        'incoming' => $incoming,
+                        'exchange' => $exchange[0],
+                    ];
+                }
+            }
         }
 
         return $converted;
@@ -646,6 +651,7 @@ class CompanyController extends AbstractController
         CompanyCategoryRepository $categoryRepo,
         CompanyLevelRepository $companyLevelRepo
     ): Response {
+        set_time_limit(100);
         $entity = new Subsidiary();
         $entity->setOwner($parent);
         $form = $this->createForm(SubsidiaryType::class, $entity, [ 'batch' => true ]);

@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\StaffMembers;
 use App\Form\StaffMembersType;
-use App\Repository\StaffMembersRepository;
+use App\Repository\StaffMembersRepository as REPO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,13 +16,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class StaffMembersController extends AbstractController
 {
     const PREFIX = 'staff_members_';
+    const TDIR = 'members';
+
+    private $repo;
+    public function __construct(REPO $repo)
+    {
+        $this->repo = $repo;
+    }
+
     /**
      * @Route("/", name="index", methods={"GET"})
      */
-    public function index(StaffMembersRepository $membersRepository): Response
+    public function index(): Response
     {
         return $this->render('members/index.html.twig', [
-            'members' => $membersRepository->findAll(),
+            'members' => $this->repo->findAll(),
             'prefix' => self::PREFIX,
         ]);
     }
@@ -37,11 +45,9 @@ class StaffMembersController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($member);
-            $entityManager->flush();
+            $this->repo->add($entity, true);
 
-            return $this->redirectToRoute(self::PREFIX.'index');
+            return $this->redirectToRoute(self::PREFIX . 'index');
         }
 
         return $this->render('members/new.html.twig', [
@@ -71,7 +77,7 @@ class StaffMembersController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $this->repo->add($entity, true);
 
             return $this->redirectToRoute(self::PREFIX . 'index');
         }
@@ -89,9 +95,7 @@ class StaffMembersController extends AbstractController
     public function delete(Request $request, Members $member): Response
     {
         if ($this->isCsrfTokenValid('delete'.$member->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($member);
-            $entityManager->flush();
+            $this->repo->remove($entity, true);
         }
 
         return $this->redirectToRoute(self::PREFIX . 'index');
