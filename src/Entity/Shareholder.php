@@ -51,6 +51,11 @@ class Shareholder
      */
     private $via = false;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $skip;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,5 +124,17 @@ class Shareholder
     public function __toString()
     {
         return $this->getHolder() . ($this->getVia() !=0 ? ' (via its funds)':'');
+    }
+
+    public function isSkip(): ?bool
+    {
+        return $this->skip;
+    }
+
+    public function setSkip(?bool $skip): self
+    {
+        $this->skip = $skip;
+
+        return $this;
     }
 }

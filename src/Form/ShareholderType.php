@@ -45,6 +45,13 @@ class ShareholderType extends AbstractType
                     self::LABEL => '% total'
                 ]
             )
+            ->add(
+                'skip',
+                null,
+                [
+                    self::LABEL => 'Omitir',
+                ]
+            )
         ;
         if (!$options['child']) {
             $builder

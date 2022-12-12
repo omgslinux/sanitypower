@@ -3,7 +3,7 @@
 {% for i in parent.companyIncomings %}{% set lastCompanyIncomings = i.amount %}{% endfor %}
 {%- if total > 0 %}
     {# <h2>Accionistas</h2> #}
-    <h4>Ingresos: {{ lastCompanyIncomings|number_format(2, '.', ',') }}€, Total: {{ total }} accionistas</h4>
+    <h4 id="holderSummary"></h4>{# Aqui dentro va a ir contenido en js #}
     <div class="row">
         <div class="col-6 font-weight-bold">Nombre del accionista</div>
         <div class="col-1 font-weight-bold text-center">País</div>
@@ -11,11 +11,16 @@
         <div class="col-1 font-weight-bold text-right">% directo</div>
         <div class="col-1 font-weight-bold text-right">% total</div>
         <div class="col-2 font-weight-bold text-right">Valor</div>
-    </div>{% set totalParticipacion = 0 %}
+    </div>{% set totalParticipacion = 0 %}{% set skipped = 0 %}
     {% for entity in parent.companyHolders %}
     {% set participacion = entity.totalOwnership * lastCompanyIncomings / 100 %}
-    {% set totalParticipacion = totalParticipacion + participacion %}
-        <div class="row border">
+    {%- if entity.skip -%}{% set showHideClasslist = " table-danger d-none" %}
+        {% set skipped = skipped + 1 %}
+    {% else %}
+        {% set showHideClasslist = '' %}
+        {% set totalParticipacion = totalParticipacion + participacion %}
+    {% endif -%}
+        <div class="row border{{ showHideClasslist }}">
             <div class="col-6 border-right">
                 <a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}">{{ entity }}</a>
             {% if entity.holder.inlist %}<i class="fa-solid fa-star"></i>{% endif %}
@@ -30,6 +35,34 @@
     <div class="row">
         <div class="col text-right">Total: {{ totalParticipacion|number_format(2, '.', ',') }} €</div>
     </div>
+    <script>
+        const holderSummary = document.getElementById('holderSummary');
+        let summaryText = 'Ingresos: {{ lastCompanyIncomings|number_format(2, '.', ',') }}€, Total: {{ total }} accionistas';
+        {% if skipped %}
+            const extraDiv = document.createElement('span');
+            extraDiv.innerHTML = ' ({{ skipped }} omitidos <a id="showSkipped" href="#">Mostrar</a>)';
+            holderSummary.innerHTML = summaryText;
+            holderSummary.appendChild(extraDiv);
+            const showSkipped = document.getElementById('showSkipped');
+            showSkipped.addEventListener('click', function(e) {
+                e.preventDefault();
+                const skippedItems = document.querySelectorAll('.table-danger');
+                const displayed = document.querySelectorAll('.d-none');
+                if (skippedItems.length == displayed.length) {
+                    showSkipped.innerText = 'Ocultar';
+                } else {
+                    showSkipped.innerText = 'Mostrar';
+                }
+                skippedItems.forEach(function(skippedItem) {
+                    skippedItem.classList.toggle('d-none');
+                    }
+                );
+            }
+            );
+        {% else %}
+            holderSummary.innerText = summaryText;
+        {% endif %}
+    </script>
 {% else %}
     <p>No hay accionistas para esta empresa</p>
 {% endif %}
