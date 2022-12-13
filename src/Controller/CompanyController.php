@@ -581,6 +581,7 @@ class CompanyController extends AbstractController
                                 ->setVia(!empty(str_replace('"', '', $keys[1])))
                                 ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
                                 ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
+                                ->setSkip(!($entity->getDirectOwnership()+$entity->getTotalOwnership())>0)
                                 ;
                                 //$em->persist($entity);
                                 //$em->flush();
