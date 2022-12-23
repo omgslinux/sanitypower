@@ -12,8 +12,9 @@ use App\Entity\Company;
 use App\Entity\Shareholder;
 use App\Repository\CompanyRepository;
 use App\Repository\ShareholderRepository;
+use App\Repository\ShareholderCategoryRepository;
 use App\Repository\CompanyLevelRepository;
-use App\Repository\CompanyCategoryRepository;
+use App\Repository\CompanyActivityCategoryRepository;
 
 class ShareholdersDumpCommand extends Command
 {
@@ -21,20 +22,23 @@ class ShareholdersDumpCommand extends Command
     protected static $defaultDescription = 'Massive dump for shareholders';
 
     private $HR;
-    private $CR;
+    private $CCR;
     private $CLR;
     private $repo;
+    private $SCR;
 
     public function __construct(
         ShareholderRepository $holderRepo,
-        CompanyCategoryRepository $categoryRepo,
+        CompanyActivityCategoryRepository $companycatRepo,
         CompanyLevelRepository $companyLevelRepo,
-        CompanyRepository $repo
+        CompanyRepository $repo,
+        ShareholderCategoryRepository $holdercatRepo
     ) {
         $this->HR = $holderRepo;
-        $this->CR = $categoryRepo;
+        $this->CCR = $companycatRepo;
         $this->CLR = $companyLevelRepo;
         $this->repo = $repo;
+        $this->SCR = $holdercatRepo;
         parent::__construct();
     }
 
@@ -61,11 +65,15 @@ class ShareholdersDumpCommand extends Command
             }
             $prev = null;
             $level = $this->CLR->findOneBy(['level' => 'Sin identificar']);
+            // Asignamos por defecto el tipo 'C' a las empresas
+            $companyCategory = $this->CCR->findOneByLetter('C');
+            $lineNumber = $skipped = 0;
             while (($keys = fgetcsv($handle, 1000, ",")) !== false) {
                 //"3M COMPANY","VANGUARD GROUP INC","","US","F","8.94","n.d."
                 //"3M COMPANY","STATE STREET CORPORATION","VIA ITS FUNDS","US","B","-","7.36"
                 //$io->note(sprintf('Contenido: %s', $contents));
                 //$keys = explode(",", $line);
+                $lineNumber++;
                 if (!empty($parentname = str_replace('"', '', $keys[0]))) {
                     if ($prev != $parentname) {
                         if (null!=$prev) {
@@ -78,12 +86,12 @@ class ShareholdersDumpCommand extends Command
                         $prev=$parent->getFullname();
                     }
                     if (!empty($fullname = str_replace('"', '', $keys[1])) && (strtolower($fullname)!='nan')) {
-                        $category = $this->CR->findOneByLetter(str_replace('"', '', $keys[4]));
+                        $holderCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[4]));
                         $country = str_replace('"', '', $keys[3]);
                         if ($country == 'n.d.') {
                             $country = '--';
                         }
-                        if ($category->getLetter() == 'H') {
+                        if ($holderCategory->getLetter() == 'H') {
                             $holder = $parent;
                         } else {
                             if (null == ($holder = $this->repo->findOneBy(
@@ -97,10 +105,9 @@ class ShareholdersDumpCommand extends Command
                                 ->setCountry($country)
                                 ->setActive(false)
                                 ->setLevel($level)
+                                ->setCategory($companyCategory);
                                 ;
                             }
-                            $holder->setCategory($category);
-                            //$em->persist($holder);
                             $this->repo->add($holder);
                         }
                         //dump($holder);
@@ -119,15 +126,37 @@ class ShareholdersDumpCommand extends Command
                             ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
                             ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
                             ->setSkip(!($entity->getDirectOwnership()+$entity->getTotalOwnership())>0)
+                            ->setHolderCategory($holderCategory)
                             ;
                             $parent->addCompanyHolder($entity);
-                            $io->note(sprintf('Company: %s, Accionista: %s', $parent->getFullname(), $holder->getFullname()));
+                            $io->info(
+                                sprintf(
+                                    '(%d omitidos de %d), Company: %s, Accionista: %s',
+                                    $skipped,
+                                    $lineNumber,
+                                    $parent->getFullname(),
+                                    $holder->getFullname()
+                                )
+                            );
                             $this->repo->add($parent, true);
+                        } else {
+                            $skipped++;
                         }
                     }
                 }
             }
             $this->repo->flush();
+            $io->success(
+                sprintf(
+                    '¡Se terminó de volcar el fichero %s con %d accionistas.',
+                    $file,
+                    $lineNumber
+                )
+            );
+            return Command::SUCCESS;
+        } else {
+            $io->error('¡Ha ocurrido un error con el fichero de accionistas $file.');
+            return Command::FAILURE;
         }
 /*
         if ($input->getOption('option1')) {
@@ -135,7 +164,5 @@ class ShareholdersDumpCommand extends Command
         }
 
         $io->success('You have a new command! Now make it your own! Pass --help to see your options.'); */
-
-        return Command::SUCCESS;
     }
 }
