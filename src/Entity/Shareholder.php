@@ -56,6 +56,12 @@ class Shareholder
      */
     private $skip;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=ShareholderCategory::class, inversedBy="shareholders")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $holderCategory;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,6 +140,18 @@ class Shareholder
     public function setSkip(?bool $skip): self
     {
         $this->skip = $skip;
+
+        return $this;
+    }
+
+    public function getHolderCategory(): ?ShareholderCategory
+    {
+        return $this->holderCategory;
+    }
+
+    public function setHolderCategory(?ShareholderCategory $holderCategory): self
+    {
+        $this->holderCategory = $holderCategory;
 
         return $this;
     }

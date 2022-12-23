@@ -35,7 +35,7 @@ class CompanyType extends AbstractType
                 [
                     self::LABEL => 'País',
                     'choice_translation_locale' => 'es',
-                    'data' => 'ES'
+                    //'data' => 'ES'
                 ]
             )
             ->add(

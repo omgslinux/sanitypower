@@ -6,7 +6,6 @@ use App\Entity\Company;
 use App\Entity\CompanyIncoming;
 use App\Entity\StaffMembership;
 use App\Entity\CurrencyExchange;
-use App\Entity\CompanyCategory;
 use App\Entity\Subsidiary;
 use App\Entity\StaffTitle;
 use App\Entity\Shareholder;
@@ -25,10 +24,11 @@ use App\Repository\SubsidiaryRepository;
 use App\Repository\StaffTitleRepository;
 use App\Repository\CompanyEventRepository;
 use App\Repository\ShareholderRepository;
+use App\Repository\ShareholderCategoryRepository;
 use App\Repository\StaffMembersRepository;
 use App\Repository\CompanyLevelRepository;
 use App\Repository\StaffMembershipRepository;
-use App\Repository\CompanyCategoryRepository;
+use App\Repository\CompanyActivityCategoryRepository;
 use App\Repository\CompanyIncomingRepository;
 use App\Repository\CurrencyExchangeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -84,7 +84,7 @@ class CompanyController extends AbstractController
      */
     public function index($page = 1): Response
     {
-        $limit = 40;
+        $limit = 50;
         // ... get posts from DB...
         // Controller Action
         $paginator = $this->repo->getActivePaginated($page, $limit); // Returns 5 posts out of 20
@@ -516,8 +516,9 @@ class CompanyController extends AbstractController
         Request $request,
         Company $parent,
         ShareholderRepository $holderRepo,
-        CompanyCategoryRepository $categoryRepo,
-        CompanyLevelRepository $companyLevelRepo
+        CompanyActivityCategoryRepository $categoryRepo,
+        CompanyLevelRepository $companyLevelRepo,
+        ShareholderCategoryRepository $holdercatRepo
     ): Response {
         $entity = new Shareholder();
         $entity->setCompany($parent);
@@ -535,18 +536,19 @@ class CompanyController extends AbstractController
                 if (!empty($param['batch'])) {
                     //$level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Sin identificar']);
                     $level = $companyLevelRepo->findOneBy(['level' => 'Sin identificar']);
+                    $companyCategory = $categoryRepo->findOneByLetter('C');
 
                     $batch = true;
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
                         $keys = explode(",", $line);
                         if (!empty($fullname = str_replace('"', '', $keys[0]))) {
                             //dump($keys);
-                            $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[3]));
+                            $holderCategory = $holdercatRepo->findOneByLetter(str_replace('"', '', $keys[3]));
                             $country = str_replace('"', '', $keys[2]);
                             if ($country == 'n.d.') {
                                 $country = '--';
                             }
-                            if ($category->getLetter() == 'H') {
+                            if ($holderCategory->getLetter() == 'H') {
                                 $holder = $parent;
                             } else {
                                 if (null == ($holder = $this->repo->findOneBy(
@@ -562,7 +564,7 @@ class CompanyController extends AbstractController
                                     ->setLevel($level)
                                     ;
                                 }
-                                $holder->setCategory($category);
+                                $holder->setCategory($companyCategory);
                                 //$em->persist($holder);
                                 $this->repo->add($holder);
                             }
@@ -582,6 +584,7 @@ class CompanyController extends AbstractController
                                 ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
                                 ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
                                 ->setSkip(!($entity->getDirectOwnership()+$entity->getTotalOwnership())>0)
+                                ->setHolderCategory($holderCategory)
                                 ;
                                 //$em->persist($entity);
                                 //$em->flush();
@@ -649,7 +652,7 @@ class CompanyController extends AbstractController
         Request $request,
         Company $parent,
         SubsidiaryRepository $subsidiaryRepo,
-        CompanyCategoryRepository $categoryRepo,
+        CompanyActivityCategoryRepository $categoryRepo,
         CompanyLevelRepository $companyLevelRepo
     ): Response {
         set_time_limit(100);

@@ -2,22 +2,22 @@
 
 namespace App\Controller;
 
-use App\Entity\CompanyCategory;
-use App\Form\CompanyCategoryType;
-use App\Repository\CompanyCategoryRepository as REPO;
+use App\Entity\CompanyActivityCategory;
+use App\Form\CompanyActivityCategoryType;
+use App\Repository\CompanyActivityCategoryRepository as REPO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/CompanyCategory", name="company_category_")
+ * @Route("/CompanyActivity", name="company_activity_")
  */
-class CompanyCategoryController extends AbstractController
+class CompanyActivityCategoryController extends AbstractController
 {
     const ENTITY = 'entity';
-    const PREFIX = 'company_category_';
-    const TDIR = 'company_category';
+    const PREFIX = 'company_activity_';
+    const TDIR = 'company_activity';
 
     private $repo;
     public function __construct(REPO $repo)
@@ -41,8 +41,8 @@ class CompanyCategoryController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        $entity = new CompanyCategory();
-        $form = $this->createForm(CompanyCategoryType::class, $entity);
+        $entity = new CompanyActivityCategory();
+        $form = $this->createForm(CompanyActivityCategoryType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -61,7 +61,7 @@ class CompanyCategoryController extends AbstractController
     /**
      * @Route("/show/{id}", name="show", methods={"GET"})
      */
-    public function show(CompanyCategory $entity): Response
+    public function show(CompanyActivityCategory $entity): Response
     {
         return $this->render(self::TDIR . '/show.html.twig', [
             self::ENTITY => $entity,
@@ -72,9 +72,9 @@ class CompanyCategoryController extends AbstractController
     /**
      * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, CompanyCategory $entity): Response
+    public function edit(Request $request, CompanyActivityCategory $entity): Response
     {
-        $form = $this->createForm(CompanyCategoryType::class, $entity);
+        $form = $this->createForm(CompanyActivityCategoryType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -93,7 +93,7 @@ class CompanyCategoryController extends AbstractController
     /**
      * @Route("/delete/{id}", name="delete", methods={"POST"})
      */
-    public function delete(Request $request, CompanyCategory $entity): Response
+    public function delete(Request $request, CompanyActivityCategory $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
             $this->repo->remove($entity, true);

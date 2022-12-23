@@ -61,7 +61,7 @@ class Company
     private $active;
 
     /**
-    * @ORM\ManyToOne(targetEntity=CompanyCategory::class, inversedBy="companies")
+    * @ORM\ManyToOne(targetEntity=CompanyActivityCategory::class, inversedBy="companies")
     * @ORM\JoinColumn(nullable=true)
     */
     private $category;
@@ -424,12 +424,12 @@ class Company
         return $this;
     }
 
-    public function getCategory(): ?CompanyCategory
+    public function getCategory(): ?CompanyActivityCategory
     {
         return $this->category;
     }
 
-    public function setCategory(?CompanyCategory $category): self
+    public function setCategory(?CompanyActivityCategory $category): self
     {
         $this->category = $category;
 
@@ -507,6 +507,4 @@ class Company
 
         return $this;
     }
-
-
 }

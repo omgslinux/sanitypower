@@ -52,6 +52,7 @@ class ShareholderType extends AbstractType
                     self::LABEL => 'Omitir',
                 ]
             )
+            ->add('holderCategory')
         ;
         if (!$options['child']) {
             $builder

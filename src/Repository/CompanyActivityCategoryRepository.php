@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\CompanyCategory as Entity;
+use App\Entity\CompanyActivityCategory as Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -12,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method CompanyCategory[]    findAll()
  * @method CompanyCategory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class CompanyCategoryRepository extends ServiceEntityRepository
+class CompanyActivityCategoryRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

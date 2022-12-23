@@ -8,12 +8,12 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=CompanyCategoryRepository::class)
- * @ORM\Table(name="company_types",
+ * @ORM\Entity(repositoryClass=CompanyActivityCategoryRepository::class)
+ * @ORM\Table(name="company_activity_categories",
  *   uniqueConstraints={@ORM\UniqueConstraint(columns={"letter"})}
  * )
  */
-class CompanyCategory
+class CompanyActivityCategory
 {
     /**
      * @ORM\Id
@@ -28,7 +28,7 @@ class CompanyCategory
     private $letter;
 
     /**
-     * @ORM\Column(type="string", length=64)
+     * @ORM\Column(type="string", length=128)
      */
     private $description;
 
