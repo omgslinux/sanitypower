@@ -26,7 +26,7 @@
             {% if entity.holder.inlist %}<i class="fa-solid fa-star"></i>{% endif %}
             </div>
             <div class="col-1 text-center">{{ entity.holder.country }}</div>
-            <div class="col-1 text-center" title="{{entity.holder.category.description }}">{{ entity.holder.category.letter }}</div>
+            <div class="col-1 text-center" title="{{entity.holderCategory.description }}">{{ entity.holderCategory.letter }}</div>
             <div class="col-1 text-right">{{ entity.directOwnership != 0 ? entity.directOwnership|number_format(2, '.', ',') : '--' }}</div>
             <div class="col-1 text-right">{{ entity.totalOwnership != 0 ? entity.totalOwnership|number_format(2, '.', ',') : 'n.d.' }}</div>
             <div class="col-2 text-right">{{ participacion|number_format(2, '.', ',') }} €</div>
@@ -40,18 +40,17 @@
         let summaryText = 'Ingresos: {{ lastCompanyIncomings|number_format(2, '.', ',') }}€, Total: {{ total }} accionistas';
         {% if skipped %}
             const extraDiv = document.createElement('span');
-            extraDiv.innerHTML = ' ({{ skipped }} omitidos <a id="showSkipped" href="#">Mostrar</a>)';
+            extraDiv.innerHTML = ' ({{ skipped }} omitidos <a id="showSkippedHolders" href="#">Mostrar</a>)';
             holderSummary.innerHTML = summaryText;
             holderSummary.appendChild(extraDiv);
-            const showSkipped = document.getElementById('showSkipped');
-            showSkipped.addEventListener('click', function(e) {
+            const showSkippedHolders = extraDiv.querySelector('#showSkippedHolders');
+            showSkippedHolders.addEventListener('click', function(e) {
                 e.preventDefault();
-                const skippedItems = document.querySelectorAll('.table-danger');
-                const displayed = document.querySelectorAll('.d-none');
-                if (skippedItems.length == displayed.length) {
-                    showSkipped.innerText = 'Ocultar';
+                const skippedItems = holderSummary.parentElement.querySelectorAll('.table-danger');
+                if (skippedItems[0].classList.contains('d-none')) {
+                    showSkippedHolders.innerText = 'Ocultar';
                 } else {
-                    showSkipped.innerText = 'Mostrar';
+                    showSkippedHolders.innerText = 'Mostrar';
                 }
                 skippedItems.forEach(function(skippedItem) {
                     skippedItem.classList.toggle('d-none');

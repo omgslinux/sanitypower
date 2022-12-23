@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit ShareholderCategory{% endblock %}
+
+{% block body %}
+    <h1>Edit ShareholderCategory</h1>
+
+    {{ include('shareholder_category/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_shareholder_category_index') }}">back to list</a>
+
+    {{ include('shareholder_category/_delete_form.html.twig') }}
+{% endblock %}

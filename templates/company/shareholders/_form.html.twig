@@ -14,9 +14,14 @@
         {{ form_row(form.totalOwnership) }}
         </div>
     </div>
-    <div class="row">    
+    <div class="row">
         <div class="col-1">
         {{ form_row(form.skip) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+        {{ form_row(form.holderCategory, {'label': 'Categoría del accionista'}) }}
         </div>
     </div>
     {% if parent is defined %}
