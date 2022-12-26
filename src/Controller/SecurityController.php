@@ -14,6 +14,9 @@ namespace App\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use App\Repository\CompanyRepository;
+use App\Repository\SubsidiaryRepository;
+use App\Repository\ShareholderRepository;
 
 /**
  * Controller used to manage the application security.
@@ -27,10 +30,20 @@ class SecurityController extends AbstractController
     /**
      * @Route("/", name="homepage")
      */
-    public function homepage()
+    public function homepage(CompanyRepository $CR, ShareholderRepository $HR, SubsidiaryRepository $SR)
     {
-        return $this->redirectToRoute('company_index');
+        $totalCompanies = $CR->getAllPaginated(1, 5000);
+        $totalHolders = $HR->findAll();
+        $totalSubsidiaries = $SR->findAll();
+
+        //return $this->redirectToRoute('company_index');
+        return $this->render('security/homepage.html.twig', [
+            'companies' => $totalCompanies,
+            'holders' => $totalHolders,
+            'subsidiaries' => $totalSubsidiaries
+        ]);
     }
+
     /**
      * @Route("/login", name="security_login")
      */

@@ -113,6 +113,8 @@ class CompanyRepository extends ServiceEntityRepository
         // Create our query
         $query = $this->createQueryBuilder('c')
             ->orderBy('c.fullname', 'ASC')
+            ->andWhere('c.inList = :active')
+            ->setParameter('active', true)
             ->getQuery();
 
         // No need to manually get get the result ($query->getResult())
