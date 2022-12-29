@@ -40,7 +40,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
 
 /**
- * @Route("/company", name="company_")
+ * @Route("/manage/company", name="company_")
  */
 class CompanyController extends AbstractController
 {

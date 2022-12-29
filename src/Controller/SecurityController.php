@@ -45,7 +45,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/login", name="security_login")
+     * @Route("/login", name="app_login")
      */
     public function loginAction(AuthenticationUtils $helper)
     {
@@ -63,7 +63,7 @@ class SecurityController extends AbstractController
      * But, this will never be executed. Symfony will intercept this first
      * and handle the logout automatically. See logout in app/config/security.yml
      *
-     * @Route("/logout", name="security_logout")
+     * @Route("/logout", name="app_logout")
      */
     public function logoutAction()
     {

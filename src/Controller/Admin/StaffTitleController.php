@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
-use App\Entity\CompanyActivityCategory;
-use App\Form\CompanyActivityCategoryType;
-use App\Repository\CompanyActivityCategoryRepository as REPO;
+use App\Entity\StaffTitle;
+use App\Form\StaffTitleType;
+use App\Repository\StaffTitleRepository as REPO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/CompanyActivity", name="company_activity_")
+ * @Route("/admin/staff/title", name="admin_staff_title_")
  */
-class CompanyActivityCategoryController extends AbstractController
+class StaffTitleController extends AbstractController
 {
-    const ENTITY = 'entity';
-    const PREFIX = 'company_activity_';
-    const TDIR = 'company_activity';
+    const PREFIX = 'admin_staff_title_';
+    const TDIR = 'staff_title';
 
     private $repo;
     public function __construct(REPO $repo)
@@ -31,7 +30,7 @@ class CompanyActivityCategoryController extends AbstractController
     public function index(): Response
     {
         return $this->render(self::TDIR . '/index.html.twig', [
-            'categories' => $this->repo->findAll(),
+            'entities' => $this->repo->findAll(),
             'prefix' => self::PREFIX,
         ]);
     }
@@ -41,8 +40,8 @@ class CompanyActivityCategoryController extends AbstractController
      */
     public function new(Request $request): Response
     {
-        $entity = new CompanyActivityCategory();
-        $form = $this->createForm(CompanyActivityCategoryType::class, $entity);
+        $StaffTitle = new StaffTitle();
+        $form = $this->createForm(StaffTitleType::class, $StaffTitle);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -52,29 +51,30 @@ class CompanyActivityCategoryController extends AbstractController
         }
 
         return $this->render(self::TDIR . '/new.html.twig', [
-            self::ENTITY => $entity,
+            'entity' => $StaffTitle,
             'form' => $form->createView(),
             'prefix' => self::PREFIX,
+            'tdir' => self::TDIR,
         ]);
     }
 
     /**
-     * @Route("/show/{id}", name="show", methods={"GET"})
+     * @Route("/{id}", name="show", methods={"GET"})
      */
-    public function show(CompanyActivityCategory $entity): Response
+    public function show(StaffTitle $StaffTitle): Response
     {
         return $this->render(self::TDIR . '/show.html.twig', [
-            self::ENTITY => $entity,
+            'entity' => $StaffTitle,
             'prefix' => self::PREFIX,
         ]);
     }
 
     /**
-     * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
+     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, CompanyActivityCategory $entity): Response
+    public function edit(Request $request, StaffTitle $StaffTitle): Response
     {
-        $form = $this->createForm(CompanyActivityCategoryType::class, $entity);
+        $form = $this->createForm(StaffTitleType::class, $StaffTitle);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -84,18 +84,19 @@ class CompanyActivityCategoryController extends AbstractController
         }
 
         return $this->render(self::TDIR . '/edit.html.twig', [
-            self::ENTITY => $entity,
+            'entity' => $StaffTitle,
             'form' => $form->createView(),
             'prefix' => self::PREFIX,
+            'tdir' => self::TDIR,
         ]);
     }
 
     /**
-     * @Route("/delete/{id}", name="delete", methods={"POST"})
+     * @Route("/{id}", name="delete", methods={"POST"})
      */
-    public function delete(Request $request, CompanyActivityCategory $entity): Response
+    public function delete(Request $request, StaffTitle $StaffTitle): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$StaffTitle->getId(), $request->request->get('_token'))) {
             $this->repo->remove($entity, true);
         }
 

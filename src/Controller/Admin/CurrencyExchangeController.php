@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Entity\CurrencyExchange;
 use App\Form\CurrencyExchangeType;
@@ -11,11 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/currencyexchange", name="currency_exchange_")
+ * @Route("/admin/currencyexchange", name="admin_currency_exchange_")
  */
 class CurrencyExchangeController extends AbstractController
 {
-    const PREFIX = 'currency_exchange_';
+    const PREFIX = 'admin_currency_exchange_';
     const TDIR = 'currency_exchange';
 
     private $repo;
@@ -31,6 +31,7 @@ class CurrencyExchangeController extends AbstractController
     {
         return $this->render('currency_exchange/index.html.twig', [
             'currency_exchanges' => $this->repo->findAll(),
+            'PREFIX' => self::PREFIX,
         ]);
     }
 
@@ -52,6 +53,7 @@ class CurrencyExchangeController extends AbstractController
         return $this->render('currency_exchange/new.html.twig', [
             'currency_exchange' => $currencyExchange,
             'form' => $form->createView(),
+            'PREFIX' => self::PREFIX,
         ]);
     }
 
@@ -62,6 +64,7 @@ class CurrencyExchangeController extends AbstractController
     {
         return $this->render('currency_exchange/show.html.twig', [
             'currency_exchange' => $currencyExchange,
+            'PREFIX' => self::PREFIX,
         ]);
     }
 
@@ -82,6 +85,7 @@ class CurrencyExchangeController extends AbstractController
         return $this->render('currency_exchange/edit.html.twig', [
             'currency_exchange' => $currencyExchange,
             'form' => $form->createView(),
+            'PREFIX' => self::PREFIX,
         ]);
     }
 

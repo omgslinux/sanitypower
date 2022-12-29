@@ -4,20 +4,36 @@
 
 {% block pagination %}
 {% if maxPages > 1 %}
-<ul class="pagination pg-blue">
+<ul class="pagination pg-blue" id="companypagination">
     {# `«` arrow  #}
+    {% set numPages = 5 %}
+    {% set minPage = thisPage - numPages <1 ? 1 : thisPage - numPages %}
+    {% set maxPage = thisPage + numPages > maxPages ? maxPages : thisPage + numPages %}
     <li class="page-item{{ thisPage == 1 ? ' disabled' }}">
-        <a class="page-link" href="{{ path(indexURL, {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
+        <a class="page-link" title="Primera página" href="{{ path(indexURL, {page: 1 }) }}">«</a>
     </li>
 
     {# Render each page number #}
-    {% for i in 1..maxPages %}
-        <li class="page-item{{ thisPage == i ? ' active' }}"><a class="page-link" href="{{ path(indexURL, {page: i}) }}">{{ i }}</a></li>
-    {% endfor %}
-
+    {% if thisPage > 1%}
+        <li class="page-item">
+            <a class="page-link" title="Página anterior" href="{{ path(indexURL, {page: thisPage-1 }) }}">&lt;</a>
+        </li>
+        {% for i in minPage..thisPage-1 %}
+            <li class="page-item"><a class="page-link" href="{{ path(indexURL, {page: i}) }}">{{ i }}</a></li>
+        {% endfor %}
+    {% endif %}
+        <li class="page-item active"><span class="page-link">{{ thisPage }}</span></li>
+    {% if thisPage < maxPages %}
+        {% for i in thisPage+1..maxPage %}
+            <li class="page-item"><a class="page-link" href="{{ path(indexURL, {page: i}) }}">{{ i }}</a></li>
+        {% endfor %}
+        <li class="page-item">
+            <a class="page-link" title="Página siguiente" href="{{ path(indexURL, {page: thisPage+1 }) }}">&gt;</a>
+        </li>
+    {% endif %}
     {# `»` arrow #}
     <li class="page-item{{ thisPage == maxPages ? ' disabled' }}">
-        <a class="page-link" href="{{ path(indexURL, {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
+        <a class="page-link" title="Última página" href="{{ path(indexURL, {page: maxPages }) }}">»</a>
     </li>
 </ul>
 {% endif %}

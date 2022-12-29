@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Entity\ShareholderCategory;
 use App\Form\ShareholderCategoryType;
@@ -11,11 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/shareholdercategory", name="app_shareholder_category_")
+ * @Route("/admin/shareholdercategory", name="admin_shareholder_category_")
  */
 class ShareholderCategoryController extends AbstractController
 {
-    const PREFIX = 'company_';
+    const PREFIX = 'admin_shareholder_category_';
 
     private $repo;
     public function __construct(REPO $repo)

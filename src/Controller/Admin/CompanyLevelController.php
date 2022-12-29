@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Entity\CompanyLevel;
 use App\Form\CompanyLevelType;
@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/companylevel", name="company_level_")
+ * @Route("/admin/companylevel", name="admin_company_level_")
  */
 class CompanyLevelController extends AbstractController
 {
@@ -31,6 +31,7 @@ class CompanyLevelController extends AbstractController
     {
         return $this->render('company_level/index.html.twig', [
             'company_levels' => $this->repo->findAll(),
+            'PREFIX' => self::PREFIX,
         ]);
     }
 
@@ -52,6 +53,7 @@ class CompanyLevelController extends AbstractController
         return $this->render('company_level/new.html.twig', [
             'company_level' => $companyLevel,
             'form' => $form->createView(),
+            'PREFIX' => self::PREFIX,
         ]);
     }
 
@@ -82,6 +84,7 @@ class CompanyLevelController extends AbstractController
         return $this->render('company_level/edit.html.twig', [
             'company_level' => $companyLevel,
             'form' => $form->createView(),
+            'PREFIX' => self::PREFIX,
         ]);
     }
 
