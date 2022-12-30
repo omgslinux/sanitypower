@@ -65,5 +65,5 @@
     </table>
     <br>
     {{ block('pagination') }}
-    <a href="{{ path('company_new') }}">Create new</a>
+    {% if is_granted('ROLE_ADMIN') %}<a href="{{ path('company_new') }}">Create new</a>{% endif %}
 {% endblock %}

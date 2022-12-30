@@ -1,0 +1,30 @@
+{{ form_start(form) }}
+
+    <div class="row">
+      <div class="col-md-2">
+        {{ form_row(form.username) }}
+      </div>
+      <div class="col-md-1">
+        {{ form_widget(form.admin) }}
+      </div>
+      <div class="col-md-1">
+        {{ form_widget(form.active) }}
+      </div>
+      <div class="col-md-2">
+        {{ form_widget(form.startDate) }}
+      </div>
+      <div class="col-md-2">
+        {{ form_widget(form.endDate) }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        {{ form_widget(form.plainPassword) }}
+      </div>
+    </div>
+    <div class="row">
+
+    </div>
+    {{ form_widget(form) }}
+    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

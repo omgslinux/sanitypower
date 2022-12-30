@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User index{% endblock %}
+
+{% block body %}
+    <h1>User index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Admin</th>
+                <th>StartDate</th>
+                <th>EndDate</th>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td><a href="{{ path(VARS.PREFIX ~ 'show', {'id': user.id}) }}">{{ user.username }}</a></td>
+                <td>{{ user.admin ? 'Sí' : 'No' }}</td>
+                <td>{{ user.startDate ? user.startDate|date('d-m-Y') : '' }}</td>
+                <td>{{ user.endDate ? user.endDate|date('d-m-Y') : '' }}</td>
+                <td>{{ user.active ? 'Sí' : 'No' }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path(VARS.PREFIX ~ 'new') }}">Create new</a>
+{% endblock %}
