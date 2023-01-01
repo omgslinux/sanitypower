@@ -33,6 +33,7 @@ class CompanyActivityCategoryController extends AbstractController
         return $this->render(self::TDIR . '/index.html.twig', [
             'categories' => $this->repo->findAll(),
             'prefix' => self::PREFIX,
+            'tdir' => self::TDIR,
         ]);
     }
 
@@ -55,6 +56,7 @@ class CompanyActivityCategoryController extends AbstractController
             self::ENTITY => $entity,
             'form' => $form->createView(),
             'prefix' => self::PREFIX,
+            'tdir' => self::TDIR,
         ]);
     }
 
@@ -66,6 +68,7 @@ class CompanyActivityCategoryController extends AbstractController
         return $this->render(self::TDIR . '/show.html.twig', [
             self::ENTITY => $entity,
             'prefix' => self::PREFIX,
+            'tdir' => self::TDIR,
         ]);
     }
 
@@ -87,6 +90,7 @@ class CompanyActivityCategoryController extends AbstractController
             self::ENTITY => $entity,
             'form' => $form->createView(),
             'prefix' => self::PREFIX,
+            'tdir' => self::TDIR,
         ]);
     }
 

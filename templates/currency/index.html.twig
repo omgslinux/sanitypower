@@ -17,11 +17,11 @@
         <tbody>
         {% for currency in currencies %}
             <tr>
-                <td><a href="{{ path('currency_show', {'id': currency.id}) }}">{{ currency.name }}</a></td>
+                <td><a href="{{ path(PREFIX ~ 'show', {'id': currency.id}) }}">{{ currency.name }}</a></td>
                 <td>{{ currency.code }}</td>
                 <td>{{ currency.symbol }}</td>
                 <td>
-                    <a href="{{ path('currency_edit', {'id': currency.id}) }}">edit</a>
+                    <a href="{{ path(PREFIX ~ 'edit', {'id': currency.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -32,5 +32,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('currency_new') }}">Create new</a>
+    <a href="{{ path(PREFIX ~ 'new') }}">Create new</a>
 {% endblock %}

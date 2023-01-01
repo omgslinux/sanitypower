@@ -19,8 +19,8 @@
                 <td>{{ currency_exchange.year ? currency_exchange.year|date('d/m/Y') : '' }}</td>
                 <td>{{ currency_exchange.amount }} {{ currency_exchange.currency.name }}s es 1 €</td>
                 <td>
-                    <a href="{{ path('currency_exchange_show', {'id': currency_exchange.id}) }}">show</a>
-                    <a href="{{ path('currency_exchange_edit', {'id': currency_exchange.id}) }}">edit</a>
+                    <a href="{{ path(PREFIX ~ 'show', {'id': currency_exchange.id}) }}">show</a>
+                    <a href="{{ path(PREFIX ~ 'edit', {'id': currency_exchange.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -31,5 +31,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('currency_exchange_new') }}">Create new</a>
+    <a href="{{ path(PREFIX ~ 'new') }}">Create new</a>
 {% endblock %}

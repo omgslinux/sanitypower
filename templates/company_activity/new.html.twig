@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Create new Company Category</h1>
 
-    {{ include('company_category/_form.html.twig') }}
+    {{ include(tdir ~ '/_form.html.twig') }}
 
     <a href="{{ path(prefix ~ 'index') }}">back to list</a>
 {% endblock %}

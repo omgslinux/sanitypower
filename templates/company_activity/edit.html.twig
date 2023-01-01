@@ -5,9 +5,9 @@
 {% block body %}
     <h1>Editar tipo de empresa</h1>
 
-    {{ include('company_category/_form.html.twig', {'button_label': 'Guardar'}) }}
+    {{ include(tdir ~ '/_form.html.twig', {'button_label': 'Guardar'}) }}
 
     <a href="{{ path(prefix ~ 'index') }}">volver</a>
 
-    {{ include('company_category/_delete_form.html.twig') }}
+    {{ include(tdir ~ '/_delete_form.html.twig') }}
 {% endblock %}

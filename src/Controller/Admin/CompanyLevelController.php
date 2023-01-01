@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CompanyLevelController extends AbstractController
 {
-    const PREFIX = 'company_level_';
+    const PREFIX = 'admin_company_level_';
     const TDIR = 'company_level';
 
     private $repo;
@@ -41,7 +41,7 @@ class CompanyLevelController extends AbstractController
     public function new(Request $request): Response
     {
         $entity = new CompanyLevel();
-        $form = $this->createForm(CompanyLevelType::class, $companyLevel);
+        $form = $this->createForm(CompanyLevelType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -51,7 +51,7 @@ class CompanyLevelController extends AbstractController
         }
 
         return $this->render('company_level/new.html.twig', [
-            'company_level' => $companyLevel,
+            'company_level' => $entity,
             'form' => $form->createView(),
             'PREFIX' => self::PREFIX,
         ]);
@@ -60,10 +60,11 @@ class CompanyLevelController extends AbstractController
     /**
      * @Route("/{id}", name="show", methods={"GET"})
      */
-    public function show(CompanyLevel $companyLevel): Response
+    public function show(CompanyLevel $entity): Response
     {
         return $this->render('company_level/show.html.twig', [
-            'company_level' => $companyLevel,
+            'company_level' => $entity,
+            'PREFIX' => self::PREFIX,
         ]);
     }
 
@@ -72,7 +73,7 @@ class CompanyLevelController extends AbstractController
      */
     public function edit(Request $request, CompanyLevel $entity): Response
     {
-        $form = $this->createForm(CompanyLevelType::class, $companyLevel);
+        $form = $this->createForm(CompanyLevelType::class, $entity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -82,7 +83,7 @@ class CompanyLevelController extends AbstractController
         }
 
         return $this->render('company_level/edit.html.twig', [
-            'company_level' => $companyLevel,
+            'company_level' => $entity,
             'form' => $form->createView(),
             'PREFIX' => self::PREFIX,
         ]);
@@ -93,7 +94,7 @@ class CompanyLevelController extends AbstractController
      */
     public function delete(Request $request, CompanyLevel $entity): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$companyLevel->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {
             $this->repo->remove($entity, true);
         }
 

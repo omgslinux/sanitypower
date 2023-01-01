@@ -19,8 +19,8 @@
                 <td>{{ company_level.id }}</td>
                 <td>{{ company_level.level }}</td>
                 <td>
-                    <a href="{{ path('company_level_show', {'id': company_level.id}) }}">show</a>
-                    <a href="{{ path('company_level_edit', {'id': company_level.id}) }}">edit</a>
+                    <a href="{{ path(PREFIX ~ 'show', {'id': company_level.id}) }}">show</a>
+                    <a href="{{ path(PREFIX ~ 'edit', {'id': company_level.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -31,5 +31,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('company_level_new') }}">Create new</a>
+    <a href="{{ path(PREFIX ~ 'new') }}">Create new</a>
 {% endblock %}
