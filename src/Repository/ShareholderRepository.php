@@ -42,6 +42,14 @@ class ShareholderRepository extends ServiceEntityRepository
         }
     }
 
+    public function getFullCount()
+    {
+        // Número de registros para ahorrar memoria
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->getQuery()->getSingleScalarResult();
+    }
+
     // /**
     //  * @return Shareholder[] Returns an array of Shareholder objects
     //  */

@@ -8,15 +8,15 @@
 <hr>
     <div class="row mt-10">
         <div class="col-3">Número de empresas en la red:</div>
-        <div class="col-1 text-right">{{ companies|length }}</div>
+        <div class="col-1 text-right">{{ companiesNumber|default(4) }}</div>
     </div>
     <div class="row">
         <div class="col-3">Número de accionistas:</div>
-        <div class="col-1 text-right">{{ holders|length }}</div>
+        <div class="col-1 text-right">{{ holders }}</div>
     </div>
     <div class="row">
         <div class="col-3">Número de participadas:</div>
-        <div class="col-1 text-right">{{ subsidiaries|length }}</div>
+        <div class="col-1 text-right">{{ subsidiaries }}</div>
     </div>
 
     {% if not is_granted('ROLE_USER')%}

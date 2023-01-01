@@ -32,13 +32,13 @@ class SecurityController extends AbstractController
      */
     public function homepage(CompanyRepository $CR, ShareholderRepository $HR, SubsidiaryRepository $SR)
     {
-        $totalCompanies = $CR->getAllPaginated(1, 5000);
-        $totalHolders = $HR->findAll();
-        $totalSubsidiaries = $SR->findAll();
+        $totalCompanies = $CR->getInlistCount();
+        $totalHolders = $HR->getFullCount();
+        $totalSubsidiaries = $SR->getFullCount();
 
         //return $this->redirectToRoute('company_index');
         return $this->render('security/homepage.html.twig', [
-            'companies' => $totalCompanies,
+            'companiesNumber' => $totalCompanies,
             'holders' => $totalHolders,
             'subsidiaries' => $totalSubsidiaries
         ]);

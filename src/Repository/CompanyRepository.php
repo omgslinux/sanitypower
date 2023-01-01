@@ -63,6 +63,18 @@ class CompanyRepository extends ServiceEntityRepository
             ->getQuery();
     }
 
+    public function getInlistCount()
+    {
+        // Número de empresas para ahorrar memoria
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->andWhere('c.active = :active')
+            ->andWhere('c.inList = :inlist')
+            ->setParameter('active', true)
+            ->setParameter('inlist', true)
+            ->getQuery()->getSingleScalarResult();
+    }
+
     public function getActiveMatrizOLD($currentPage = 1, $limit = 5)
     {
         $this->limit = $limit;

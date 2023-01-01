@@ -60,6 +60,14 @@ class SubsidiaryRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function getFullCount()
+    {
+        // Número de registros para ahorrar memoria
+        return $this->createQueryBuilder('c')
+            ->select('count(c.id)')
+            ->getQuery()->getSingleScalarResult();
+    }
+
     public function findOwnedSubsidiaries(Company $owner)
     {
         $owned = $this->createQueryBuilder('s')
