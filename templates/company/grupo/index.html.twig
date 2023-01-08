@@ -14,7 +14,7 @@
         {% set owner = groupparticipants.owner %}
         <div class="row border">
             <div class="col-8 border-right">{{ owner.owner.fullname }}&nbsp;<a href="{{ path(prefix ~ "show",  {'id': owner.owner.id} )}}" title="Ver la empresa matriz"><i class="fa fa-home"></i></a></div>
-            <div class="col">{{ owner.owner.country }}</div>
+            <div class="col" title="{{ owner.owner.country|country_name('es') }}">{{ owner.owner.country }}</div>
             <div class="col" title="{{owner.owner.category.description }}">{{ owner.owner.category.letter }}</div>
             <div class="col">{{ owner.direct == 0 ? '--': owner.direct == 50.01 ? ">50": owner.direct|number_format(2, '.', ',') }}</div>
             <div class="col">{{ owner.percent == 0 ? 'n.d.': owner.percent == 50.01 ? ">50": owner.percent|number_format(2, '.', ',') }}</div>
@@ -26,7 +26,7 @@
     {% for entity in groupparticipants.owned %}
         <div class="row border">
             <div class="col-8 border-right">{{ entity.owned.fullname }}&nbsp;<a href="{{ path(prefix ~ "show",  {'id': entity.owned.id} )}}" title="Ver la empresa filial"><i class="fa fa-home"></i></a></div>
-            <div class="col">{{ entity.owned.country }}</div>
+            <div class="col" title="{{ entity.owned.country|country_name('es') }}">{{ entity.owned.country }}</div>
             <div class="col" title="{{entity.owned.category.description }}">{{ entity.owned.category.letter }}</div>
             <div class="col">{{ entity.direct == 0 ? '--': entity.direct == 50.01 ? ">50": entity.direct|number_format(2, '.', ',') }}</div>
             <div class="col">{{ entity.percent == 0 ? 'n.d.': entity.percent == 50.01 ? ">50": entity.percent|number_format(2, '.', ',') }}</div>
