@@ -14,29 +14,6 @@ class SubsidiaryType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add(
-                'direct',
-                null,
-                [
-                    self::LABEL => 'Porcentaje directo'
-                ]
-            )
-            ->add(
-                'percent',
-                null,
-                [
-                    self::LABEL => 'Porcentaje total'
-                ]
-            )
-            ->add(
-                'owned',
-                null,
-                [
-                    self::LABEL => 'Participada'
-                ]
-            )
-        ;
         if (!$options['child']) {
             $builder
             ->add('owner');
@@ -51,6 +28,32 @@ class SubsidiaryType extends AbstractType
                     'mapped' => false,
                 ]
             );
+        } else {
+            $builder
+            ->add(
+                'owned',
+                null,
+                [
+                    self::LABEL => 'Participada'
+                ]
+            )
+            ;
+            $builder
+            ->add(
+                'direct',
+                null,
+                [
+                    self::LABEL => 'Porcentaje directo'
+                ]
+            )
+            ->add(
+                'percent',
+                null,
+                [
+                    self::LABEL => 'Porcentaje total'
+                ]
+            )
+            ;
         }
     }
 

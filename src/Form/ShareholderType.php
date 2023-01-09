@@ -16,6 +16,24 @@ class ShareholderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('holderCategory')
+        ;
+        if (!$options['child']) {
+            $builder
+            ->add('company');
+        }
+        if ($options['batch']) {
+            $builder
+            ->add(
+                'batch',
+                TextareaType::class,
+                [
+                    self::LABEL => 'Carga masiva',
+                    'mapped' => false,
+                ]
+            );
+        } else {
+            $builder
             ->add(
                 'holder',
                 null,
@@ -52,22 +70,7 @@ class ShareholderType extends AbstractType
                     self::LABEL => 'Omitir',
                 ]
             )
-            ->add('holderCategory')
-        ;
-        if (!$options['child']) {
-            $builder
-            ->add('company');
-        }
-        if ($options['batch']) {
-            $builder
-            ->add(
-                'batch',
-                TextareaType::class,
-                [
-                    self::LABEL => 'Carga masiva',
-                    'mapped' => false,
-                ]
-            );
+            ;
         }
     }
 

@@ -1,16 +1,18 @@
 {{ form_start(form) }}
     <div class="row">&nbsp;</div>
-    <div class="row">
-        <div class="col-6">
-        {{ form_row(form.owned) }}
+    {% if form.owned is defined %}
+        <div class="row">
+            <div class="col-6">
+            {{ form_row(form.owned) }}
+            </div>
+            <div class="col-3">
+            {{ form_row(form.direct) }} %
+            </div>
+            <div class="col-3">
+            {{ form_row(form.percent) }} %
+            </div>
         </div>
-        <div class="col-3">
-        {{ form_row(form.direct) }} %
-        </div>
-        <div class="col-3">
-        {{ form_row(form.percent) }} %
-        </div>
-    </div>
+    {% endif %}
     {% if parent is defined %}
     <div class="row">
         <div class="col-12">

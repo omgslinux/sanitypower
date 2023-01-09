@@ -1,24 +1,26 @@
 {{ form_start(form) }}
     <div class="row">&nbsp;</div>
-    <div class="row">
-        <div class="col-4">
-        {{ form_row(form.holder) }}
+    {% if form.holder is defined %}
+        <div class="row">
+            <div class="col-4">
+            {{ form_row(form.holder) }}
+            </div>
+            <div class="col-1">
+            {{ form_row(form.via) }}
+            </div>
+            <div class="col-2">
+            {{ form_row(form.directOwnership) }}
+            </div>
+            <div class="col-2">
+            {{ form_row(form.totalOwnership) }}
+            </div>
         </div>
-        <div class="col-1">
-        {{ form_row(form.via) }}
+        <div class="row">
+            <div class="col-1">
+            {{ form_row(form.skip) }}
+            </div>
         </div>
-        <div class="col-2">
-        {{ form_row(form.directOwnership) }}
-        </div>
-        <div class="col-2">
-        {{ form_row(form.totalOwnership) }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-1">
-        {{ form_row(form.skip) }}
-        </div>
-    </div>
+    {% endif %}
     <div class="row">
         <div class="col">
         {{ form_row(form.holderCategory, {'label': 'Categoría del accionista'}) }}
