@@ -46,7 +46,7 @@
     {{ block('pagination') }}
             <div class="row">
                 <div class="col-7 table-bordered p-1 font-weight-bold">Nombre (País)</div>
-                <div class="col-1 table-bordered p-1 font-weight-bold">Nivel</div>
+                <div class="col-2 table-bordered p-1 font-weight-bold">Nivel</div>
                 <div class="col-1 table-bordered p-1 font-weight-bold">Accionistas</div>
                 <div class="col-1 table-bordered p-1 font-weight-bold">Participadas</div>
                 <div class="col-1 table-bordered p-1 font-weight-bold">Activa</div>
@@ -54,7 +54,7 @@
         {% for company in companies %}
             <div class="row">
                 <div class="col-7 table-bordered p-1"><a href="{{ path('company_show', {'id': company.id}) }}">{{ company.fullname }} ({{ company.country }})</a></div>
-                <div class="col-1 table-bordered p-1">{{ company.level }}</div>
+                <div class="col-2 table-bordered p-1">{{ company.level }}</div>
                 <div class="col-1 table-bordered p-1 text-right">{{ company.companyHolders|length }}</div>
                 <div class="col-1 table-bordered p-1 text-right">{{ company.ownedSubsidiaries|length }}</div>
                 <div class="col-1 table-bordered p-1">{{ company.active ? 'Yes' : 'No' }}</div>
