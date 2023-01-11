@@ -33,14 +33,17 @@ class ShareholderType extends AbstractType
                 ]
             );
         } else {
+            if ($options['load_holder']) {
+                $builder
+                ->add(
+                    'holder',
+                    null,
+                    [
+                        self::LABEL => 'Accionista'
+                    ]
+                );
+            }
             $builder
-            ->add(
-                'holder',
-                null,
-                [
-                    self::LABEL => 'Accionista'
-                ]
-            )
             ->add(
                 'via',
                 null,
@@ -80,6 +83,7 @@ class ShareholderType extends AbstractType
             'data_class' => Shareholder::class,
             'child' => true,
             'batch' => false,
+            'load_holder' => false,
         ]);
     }
 }

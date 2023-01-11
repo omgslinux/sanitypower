@@ -29,15 +29,17 @@ class SubsidiaryType extends AbstractType
                 ]
             );
         } else {
-            $builder
-            ->add(
-                'owned',
-                null,
-                [
-                    self::LABEL => 'Participada'
-                ]
-            )
-            ;
+            if ($options['load_owned']) {
+                $builder
+                ->add(
+                    'owned',
+                    null,
+                    [
+                        self::LABEL => 'Participada'
+                    ]
+                )
+                ;
+            }
             $builder
             ->add(
                 'direct',
@@ -63,6 +65,7 @@ class SubsidiaryType extends AbstractType
             'data_class' => Subsidiary::class,
             'child' => true,
             'batch' => false,
+            'load_owned' => false,
         ]);
     }
 }
