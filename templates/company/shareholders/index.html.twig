@@ -23,7 +23,7 @@
         <div class="row border{{ showHideClasslist }}">
             <div class="col-6 border-right">
                 <a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}">{{ entity }}</a>
-            {% if entity.holder.inlist %}<i class="fa-solid fa-star"></i>{% endif %}
+            {% if entity.holder.inlist %}<i class="fa-solid fa-star" title="Forma parte de la red"></i>{% endif %}
             </div>
             <div class="col-1 text-center"title="{{entity.holder.country|country_name('es') }}">{{ entity.holder.country }}</div>
             <div class="col-1 text-center" title="{{entity.holderCategory.description }}">{{ entity.holderCategory.letter }}</div>
