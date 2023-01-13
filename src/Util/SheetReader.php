@@ -429,7 +429,7 @@ class SheetReader
 
     public function openResultsFiles()
     {
-        $this->handlers['summary'] = fopen($this->outdir . 'resultados_' . $this->prefix, 'w');
+        $this->handlers['summary'] = fopen($this->outdir . '__resultados_' . $this->prefix, 'w');
         $this->handlers['detailShareholders'] = fopen($this->outdir . 'detalles_ACCIONISTAS_' . $this->prefix, 'w');
         $this->handlers['detailSubsidiaries'] = fopen($this->outdir . 'detalles_PARTICIPADAS_' . $this->prefix, 'w');
     }
@@ -437,14 +437,14 @@ class SheetReader
     public function openShareholdersDetail($outputpattern)
     {
         $pattern = $this->getShareholdersFilePattern($outputpattern);
-        $filenameFullPath = 'detalles_' . $pattern;
+        $filenameFullPath = '__detalles_' . $pattern;
         return fopen($this->outdir . $pattern, 'w');
     }
 
     public function openSubsidiariesDetail($outputpattern)
     {
         $pattern = $this->getSubsidiariesFilePattern($outputpattern);
-        $filenameFullPath = 'detalles_' . $pattern;
+        $filenameFullPath = '__detalles_' . $pattern;
         return fopen($this->outdir . $pattern, 'w');
     }
 
