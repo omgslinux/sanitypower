@@ -23,6 +23,7 @@
         <div class="row border{{ showHideClasslist }}">
             <div class="col-6 border-right">
                 <a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}">{{ entity }}</a>
+                <a href="{{ path(prefix ~ "show",  {'id': entity.holder.id} )}}" title="Ver la empresa"><i class="fa fa-home"></i></a>
             {% if entity.holder.inlist %}<i class="fa-solid fa-star" title="Forma parte de la red"></i>{% endif %}
             </div>
             <div class="col-1 text-center"title="{{entity.holder.country|country_name('es') }}">{{ entity.holder.country }}</div>
