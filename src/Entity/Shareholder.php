@@ -62,6 +62,11 @@ class Shareholder
      */
     private $holderCategory;
 
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $data = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -152,6 +157,18 @@ class Shareholder
     public function setHolderCategory(?ShareholderCategory $holderCategory): self
     {
         $this->holderCategory = $holderCategory;
+
+        return $this;
+    }
+
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
+
+    public function setData(?array $data): self
+    {
+        $this->data = $data;
 
         return $this;
     }

@@ -39,6 +39,11 @@ class Subsidiary
      */
     private $direct;
 
+    /**
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $data = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -88,6 +93,18 @@ class Subsidiary
     public function setDirect(?string $direct): self
     {
         $this->direct = $direct;
+
+        return $this;
+    }
+
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
+
+    public function setData(?array $data): self
+    {
+        $this->data = $data;
 
         return $this;
     }

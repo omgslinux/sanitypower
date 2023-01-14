@@ -89,7 +89,7 @@ class SubsidiariesDumpCommand extends Command
                     }
                     if (!empty($fullname = str_replace('"', '', $keys[1])) && (strtolower($fullname)!='nan')) {
                         $holderCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[3]));
-                        $country = str_replace('"', '', $keys[2]);
+                        $_country = $country = str_replace('"', '', $keys[2]);
                         if ($country == 'n.d.') {
                             $country = '--';
                         }
@@ -97,7 +97,7 @@ class SubsidiariesDumpCommand extends Command
                             $io->error(sprintf('Error en el pais(%s), participada %s', $country, $fullname));
                         }
                         $_direct = $direct = str_replace('"', '', $keys[4]);
-                        $_percent = $percent = str_replace('"', '', $keys[5]);
+                        $_total = $total = str_replace('"', '', $keys[5]);
                         if (null == ($owned = $this->repo->findOneBy(
                             [
                                 'fullname' => $fullname,
@@ -117,7 +117,7 @@ class SubsidiariesDumpCommand extends Command
                             $fullname,
                             $country,
                             $_direct,
-                            $_percent
+                            $_total
                         ));
                         //$em->persist($owned);
                         //dump($owned);
@@ -130,6 +130,15 @@ class SubsidiariesDumpCommand extends Command
                                 'owner' => $parent,
                             ]
                         ))) {
+                            //$via = (str_replace('"', '', $keys[2]));
+                            $data = [
+                                'country' => $_country,
+                                'name' => $fullname,
+                                'active' => false,
+                            //    'via' => $via,
+                                'direct' => $_direct,
+                                'total' => $_total
+                            ];
                             $entity = new Subsidiary();
                             if ($_direct == "MO" || $_direct == ">50") {
                                 $direct = 50.01;
@@ -138,17 +147,18 @@ class SubsidiariesDumpCommand extends Command
                             } elseif (!is_numeric($_direct)) {
                                 $direct = 0;
                             }
-                            if ($_percent == "MO" || $_percent == ">50") {
-                                $percent = 50.01;
-                            } elseif ($_percent == "WO") {
-                                $percent = 100;
-                            } elseif (!is_numeric($_percent)) {
-                                $percent = 0;
+                            if ($_total == "MO" || $_total == ">50") {
+                                $total = 50.01;
+                            } elseif ($_total == "WO") {
+                                $total = 100;
+                            } elseif (!is_numeric($_total)) {
+                                $total = 0;
                             }
                             $entity->setOwner($parent)
                             ->setOwned($owned)
                             ->setDirect($direct)
-                            ->setPercent($percent)
+                            ->setPercent($total)
+                            ->setData($data)
                             ;
                             //$em->persist($entity);
                             $io->info(

@@ -544,7 +544,7 @@ class CompanyController extends AbstractController
                         if (!empty($fullname = str_replace('"', '', $keys[0]))) {
                             //dump($keys);
                             $holderCategory = $holdercatRepo->findOneByLetter(str_replace('"', '', $keys[3]));
-                            $country = str_replace('"', '', $keys[2]);
+                            $_country = $country = str_replace('"', '', $keys[2]);
                             if ($country == 'n.d.') {
                                 $country = '--';
                             }
@@ -575,19 +575,27 @@ class CompanyController extends AbstractController
                                     'company' => $parent,
                                 ]
                             ))) {
-                                $entity = new Shareholder();
+                                $via = (str_replace('"', '', $keys[1]));
                                 $directOwnership = str_replace('"', '', $keys[4]);
                                 $totalOwnership = str_replace('"', '', $keys[5]);
+                                $data = [
+                                    'country' => $_country,
+                                    'name' => $fullname,
+                                    'active' => false,
+                                    'via' => $via,
+                                    'direct' => $directOwnership,
+                                    'total' => $totalOwnership
+                                ];
+                                $entity = new Shareholder();
                                 $entity->setCompany($parent)
                                 ->setHolder($holder)
-                                ->setVia(!empty(str_replace('"', '', $keys[1])))
+                                ->setVia(!empty($via))
                                 ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
                                 ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
                                 ->setSkip(!($entity->getDirectOwnership()+$entity->getTotalOwnership())>0)
                                 ->setHolderCategory($holderCategory)
+                                ->setData(json_encode($data))
                                 ;
-                                //$em->persist($entity);
-                                //$em->flush();
                                 $parent->addCompanyHolder($entity);
                                 $this->repo->add($parent, true);
                             }
@@ -676,7 +684,7 @@ class CompanyController extends AbstractController
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
                         $keys = explode(",", $line);
                         if (!empty($fullname = str_replace('.', '', str_replace('"', '', $keys[0])))) {
-                            $country = str_replace('"', '', $keys[1]);
+                            $_country = $country = str_replace('"', '', $keys[1]);
                             if ($country == 'n.d.') {
                                 $country = '--';
                             }
@@ -704,9 +712,18 @@ class CompanyController extends AbstractController
                                     'owner' => $parent,
                                 ]
                             ))) {
-                                $entity = new Subsidiary();
                                 $_direct = $direct = str_replace('"', '', $keys[3]);
                                 $_percent = $percent = str_replace('"', '', $keys[4]);
+                                $data =
+                                [
+                                    'country' => $_country,
+                                    'name' => $fullname,
+                                    'active' => false,
+                                //    'via' => $via,
+                                    'direct' => $_direct,
+                                    'total' => $_percent
+                                ];
+                                $entity = new Subsidiary();
                                 if ($_direct == "MO" || $_direct == ">50") {
                                     $direct = 50.01;
                                 } elseif ($_direct == "WO") {
@@ -725,7 +742,9 @@ class CompanyController extends AbstractController
                                 ->setOwned($owned)
                                 ->setDirect($direct)
                                 ->setPercent($percent)
+                                ->setData($data)
                                 ;
+                                //dump($data); die();
                                 //$em->persist($entity);
                                 $subsidiaryRepo->add($entity);
                                 //dump($entity);

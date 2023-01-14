@@ -87,7 +87,7 @@ class ShareholdersDumpCommand extends Command
                     }
                     if (!empty($fullname = str_replace('"', '', $keys[1])) && (strtolower($fullname)!='nan')) {
                         $holderCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[4]));
-                        $country = str_replace('"', '', $keys[3]);
+                        $_country = $country = str_replace('"', '', $keys[3]);
                         if ($country == 'n.d.') {
                             $country = '--';
                         }
@@ -117,16 +117,26 @@ class ShareholdersDumpCommand extends Command
                                 'company' => $parent,
                             ]
                         ))) {
-                            $entity = new Shareholder();
+                            $via = (str_replace('"', '', $keys[2]));
                             $directOwnership = str_replace('"', '', $keys[5]);
                             $totalOwnership = str_replace('"', '', $keys[6]);
+                            $data = [
+                                'country' => $_country,
+                                'name' => $fullname,
+                                'active' => false,
+                                'via' => $via,
+                                'direct' => $directOwnership,
+                                'total' => $totalOwnership
+                            ];
+                            $entity = new Shareholder();
                             $entity->setCompany($parent)
                             ->setHolder($holder)
-                            ->setVia(!empty(str_replace('"', '', $keys[2])))
+                            ->setVia(!empty($via))
                             ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
                             ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
                             ->setSkip(!($entity->getDirectOwnership()+$entity->getTotalOwnership())>0)
                             ->setHolderCategory($holderCategory)
+                            ->setData($data)
                             ;
                             $parent->addCompanyHolder($entity);
                             $io->info(
