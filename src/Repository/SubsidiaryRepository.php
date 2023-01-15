@@ -23,6 +23,15 @@ class SubsidiaryRepository extends ServiceEntityRepository
 
     public function add(Entity $entity, bool $flush = false): void
     {
+        if (!count($entity->getData())) {
+            $data = [
+                'country' => $entity->getOwned()->getCountry(),
+                'name' => $entity->getOwned()->getFullname(),
+                'direct' => $entity->getDirect(),
+                'total' => $entity->getPercent()
+            ];
+            $entity->setData($data);
+        }
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
