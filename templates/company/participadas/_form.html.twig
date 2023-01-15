@@ -5,11 +5,15 @@
             <div class="col-6">
             {{ form_row(form.owned) }}
             </div>
+        </div>
+    {% endif %}
+    {% if form.direct is defined %}
+        <div class="row">
             <div class="col-3">
-            {{ form_row(form.direct) }} %
+            {{ form_row(form.direct, {'label': '% directo' }) }}
             </div>
             <div class="col-3">
-            {{ form_row(form.percent) }} %
+            {{ form_row(form.percent, {'label': '% total' }) }}
             </div>
         </div>
     {% endif %}
@@ -22,8 +26,11 @@
     {% endif %}
     {% if form.textowned is defined %}
     <div class="row">
-        <div class="col-12">
-        {{ form_row(form.textowned) }}
+        <div class="col-6">
+        {{ form_row(form.textowned, {'label': 'Nombre de la participada' }) }}
+        </div>
+        <div class="col-1">
+        {{ form_row(form.textcountry, {'label': 'País' }) }}
         </div>
     </div>
     {% endif %}

@@ -28,7 +28,20 @@ class SubsidiaryType extends AbstractType
                     'mapped' => false,
                     'required' => true,
                 ]
-            );
+            )
+            ->add(
+                'textcountry',
+                TextType::class,
+                [
+                    'mapped' => false,
+                    'required' => true,
+                    'attr' =>
+                    [
+                        'size' => 2
+                    ]
+                ]
+            )
+            ;
         } else {
             if ($options['batch']) {
                 $builder
@@ -53,20 +66,8 @@ class SubsidiaryType extends AbstractType
                     ;
                 }
                 $builder
-                ->add(
-                    'direct',
-                    null,
-                    [
-                        self::LABEL => 'Porcentaje directo'
-                    ]
-                )
-                ->add(
-                    'percent',
-                    null,
-                    [
-                        self::LABEL => 'Porcentaje total'
-                    ]
-                )
+                ->add('direct')
+                ->add('percent')
                 ;
             }
         }

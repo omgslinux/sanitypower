@@ -679,16 +679,17 @@ class CompanyController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //if (!empty($form->get('textowned'))) {
             if ($form->has('textowned')) {
                 $textowned = $form->get('textowned')->getData();
-                //dump($textowned);
+                $country = $form->get('textcountry')->getData();
                 $owned = $this->repo->findBy(
                     [
-                        'fullname' => $textowned
+                        'fullname' => $textowned,
+                        'country' => $country
                     ]
                 );
-                //dump($owned[0]);
+                //dump($textowned, $owned);
+                //die();
                 if (count($owned)==1) {
                     $entity->setOwned($owned[0]);
                     $subsidiaryRepo->add($entity, true);
