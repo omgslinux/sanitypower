@@ -16,8 +16,8 @@
             </div>
             <div class="col">{{ entity.owned.country }}</div>
             <div class="col" title="{{entity.owned.category.description }}">{{ entity.owned.category.letter }}</div>
-            <div class="col">{{ entity.direct == 0 ? '--': entity.direct == 50.01 ? ">50": entity.direct|number_format(2, '.', ',') }}</div>
-            <div class="col">{{ entity.percent == 0 ? 'n.d.': entity.percent == 50.01 ? ">50": entity.percent|number_format(2, '.', ',') }}</div>
+            <div class="col">{{ entity.direct == 0 ? '--' : entity.direct == 50.01 ? ">50": entity.direct|number_format(2, '.', ',') }}</div>
+            <div class="col">{{ entity.percent == 0 ? '--': entity.percent == 50.01 ? ">50": entity.percent|number_format(2, '.', ',') }}</div>
         </div>
     {% endfor %}
 {% else %}

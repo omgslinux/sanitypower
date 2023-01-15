@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Subsidiary;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,44 +19,56 @@ class SubsidiaryType extends AbstractType
             $builder
             ->add('owner');
         }
-        if ($options['batch']) {
+        if (!$options['inlist']) {
             $builder
             ->add(
-                'batch',
-                TextareaType::class,
+                'textowned',
+                TextType::class,
                 [
-                    self::LABEL => 'Carga masiva',
                     'mapped' => false,
+                    'required' => true,
                 ]
             );
         } else {
-            if ($options['load_owned']) {
+            if ($options['batch']) {
                 $builder
                 ->add(
-                    'owned',
+                    'batch',
+                    TextareaType::class,
+                    [
+                        self::LABEL => 'Carga masiva',
+                        'mapped' => false,
+                    ]
+                );
+            } else {
+                if ($options['load_owned']) {
+                    $builder
+                    ->add(
+                        'owned',
+                        null,
+                        [
+                            self::LABEL => 'Participada'
+                        ]
+                    )
+                    ;
+                }
+                $builder
+                ->add(
+                    'direct',
                     null,
                     [
-                        self::LABEL => 'Participada'
+                        self::LABEL => 'Porcentaje directo'
+                    ]
+                )
+                ->add(
+                    'percent',
+                    null,
+                    [
+                        self::LABEL => 'Porcentaje total'
                     ]
                 )
                 ;
             }
-            $builder
-            ->add(
-                'direct',
-                null,
-                [
-                    self::LABEL => 'Porcentaje directo'
-                ]
-            )
-            ->add(
-                'percent',
-                null,
-                [
-                    self::LABEL => 'Porcentaje total'
-                ]
-            )
-            ;
         }
     }
 
@@ -66,6 +79,7 @@ class SubsidiaryType extends AbstractType
             'child' => true,
             'batch' => false,
             'load_owned' => false,
+            'inlist' => false
         ]);
     }
 }

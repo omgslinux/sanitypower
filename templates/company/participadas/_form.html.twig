@@ -13,10 +13,17 @@
             </div>
         </div>
     {% endif %}
-    {% if parent is defined %}
+    {% if form.batch is defined %}
     <div class="row">
         <div class="col-12">
         {{ form_row(form.batch) }}
+        </div>
+    </div>
+    {% endif %}
+    {% if form.textowned is defined %}
+    <div class="row">
+        <div class="col-12">
+        {{ form_row(form.textowned) }}
         </div>
     </div>
     {% endif %}
