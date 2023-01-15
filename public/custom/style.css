@@ -36,3 +36,7 @@ body {
 .company-not-inlist {
     background: yellow;
 }
+
+.company-self-owned {
+    background: orange;
+}
