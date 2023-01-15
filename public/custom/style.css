@@ -28,3 +28,11 @@ body {
     font-family: "Roboto",sans-serif;
     font-weight: 300;
 }
+
+.company-inlist {
+    background: lightgreen;
+}
+
+.company-not-inlist {
+    background: yellow;
+}

@@ -31,6 +31,7 @@
 
         <!-- Tabs navs -->
         {% set tabname = 'myTabList' %}{% if activetab is not defined %}{% set activetab = 'incomings' %}{% endif %}
+        {% set companyStyle = parent.inlist?'company-inlist':'company-not-inlist' %}
         <ul class="nav nav-tabs md-tabs" id="{{tabname}}" role="tablist">
             {% for tab in tabs %}
                 <li class="nav-item">
@@ -41,7 +42,7 @@
         <!-- Tabs navs -->
 
         <!-- Tabs content -->
-        <div class="tab-content p-4" id="{{tabname}}-content">
+        <div class="tab-content {{ companyStyle }} p-4" id="{{tabname}}-content">
             {% for tab in tabs %}
                 <!-- Tab {{ tab.n }} -->
                 <div class="tab-pane fade{{ tab.n == activetab ? ' active show' }}" id="{{ tab.n }}" role="tabpanel" aria-labelledby="{{ tab.n }}-tab">
