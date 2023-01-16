@@ -218,6 +218,7 @@ class CompanyController extends AbstractController
             'companies' => $paginator->getIterator(),
             'maxPages' => ceil($paginator->count() / $limit),
             'thisPage' => $page,
+            'search' => $pattern,
         ]);
     }
 
