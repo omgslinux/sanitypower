@@ -39,7 +39,7 @@
     </div>
     <script>
         const heldSummary = document.getElementById('heldSummary');
-        let summaryText = 'Ingresos: {{ lastCompanyIncomings|number_format(0, '.', ',') }}€, Total: {{ total }} participaciones';
+        let summaryText = 'Valor: {{ totalParticipacion|number_format(0, '.', ',') }}€, Total: {{ total }} participaciones';
         {% if skipped %}
             const extraDiv = document.createElement('span');
             extraDiv.innerHTML = ' ({{ skipped }} omitidos <a id="showSkippedHeld" href="#">Mostrar</a>)';
