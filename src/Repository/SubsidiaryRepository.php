@@ -158,20 +158,21 @@ class SubsidiaryRepository extends ServiceEntityRepository
 
     public function findSubsidiaryOwner(Company $company)
     {
-        return $this->createQueryBuilder('s')
+        $qb = $this->createQueryBuilder('s')
             ->leftJoin('s.owner', 'c')
             ->andWhere('s.owned = :company')
             ->andWhere('c.active = :active')
-            //->andWhere('s.percent >= :percent')
             ->setParameter('active', 1)
             ->setParameter('company', $company)
             //->setParameter('country', 'ES')
-            //->setParameter('percent', 50)
-            //->orderBy('s.owned', 'ASC')
             //->setMaxResults(10)
             ->getQuery()
-            ->getOneOrNullResult()
+            ->getResult();
+            //dump($qb);
+            //$qb = $qb->getOneOrNullResult()
         ;
+
+        return (count($qb)?$qb[0]:null);
     }
 
     /*
