@@ -42,11 +42,11 @@
         let heldsummaryText = 'Valor: {{ totalParticipacion|number_format(0, '.', ',') }}€, Total: {{ total }} participaciones';
         heldSummary.innerText = heldsummaryText;
         {% if skipped %}
-            const extraDiv = document.createElement('span');
-            extraDiv.innerHTML = ' ({{ skipped }} omitidos <a id="showSkippedHeld" href="#">Mostrar</a>)';
+            const heldextraDiv = document.createElement('span');
+            heldextraDiv.innerHTML = ' ({{ skipped }} omitidos <a id="showSkippedHeld" href="#">Mostrar</a>)';
             heldSummary.innerHTML = heldsummaryText;
-            heldSummary.appendChild(extraDiv);
-            const showSkippedHeld = extraDiv.querySelector('#showSkippedHeld');
+            heldSummary.appendChild(heldextraDiv);
+            const showSkippedHeld = heldextraDiv.querySelector('#showSkippedHeld');
             showSkippedHeld.addEventListener('click', function(e) {
                 e.preventDefault();
                 const skippedItems = heldSummary.parentElement.querySelectorAll('.table-danger');
