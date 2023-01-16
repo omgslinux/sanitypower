@@ -1,0 +1,69 @@
+{% set total = parent.heldCompanys|length %}
+{%- if total > 0 %}
+    {# <h2>Accionistas</h2> #}
+    <h4 id="heldSummary"></h4>{# Aqui dentro va a ir contenido en js #}
+    <div class="row">
+        <div class="col-7 font-weight-bold">Nombre de la participada</div>
+        <div class="col-1 font-weight-bold text-center">País</div>
+        <div class="col-1 font-weight-bold text-center">Tipo</div>
+        {#<div class="col-1 font-weight-bold text-right">% directo</div>#}
+        <div class="col-1 font-weight-bold text-right">% part.</div>
+        <div class="col-2 font-weight-bold text-right">Valor</div>
+    </div>{% set totalParticipacion = 0 %}{% set skipped = 0 %}
+        {% set lastCompanyIncomings = 0 %}
+    {% for entity in parent.heldCompanys %}
+        {% set lastCompanyIncomings = 0 %}
+        {% for i in entity.company.companyIncomings %}{% set lastCompanyIncomings = i.amount %}{% endfor %}
+        {% set participacion = (entity.totalOwnership>0?entity.totalOwnership:entity.directOwnership) * lastCompanyIncomings / 100 %}
+        {%- if entity.skip -%}{% set showHideClasslist = " table-danger d-none" %}
+            {% set skipped = skipped + 1 %}
+        {% else %}
+            {% set showHideClasslist = '' %}
+            {% set totalParticipacion = totalParticipacion + participacion %}
+        {% endif -%}
+        <div class="row border{{ showHideClasslist ~ (entity.holderCategory.letter == 'H'?" company-self-owned":"") }}">
+            <div class="col-7 border-right">
+                <a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}">{{ entity.company }}</a>
+                <a href="{{ path(prefix ~ "show",  {'id': entity.company.id} )}}" title="Ver la empresa"><i class="fa fa-home"></i></a>
+            {% if entity.company.inlist %}<i class="fa-solid fa-star" title="Forma parte de la red"></i>{% endif %}
+            </div>
+            <div class="col-1 text-center"title="{{entity.company.country|country_name('es') }}">{{ entity.company.country }}</div>
+            <div class="col-1 text-center" title="{{entity.holderCategory.description }}">{{ entity.holderCategory.letter }}</div>
+            {# <div class="col-1 text-right">{{ entity.directOwnership > 0 ? entity.directOwnership|number_format(2, '.', ',') : '--' }}</div> #}
+            <div class="col-1 text-right">{{ (entity.totalOwnership > 0?entity.totalOwnership:entity.directOwnership)|number_format(2, '.', ',') }}</div>
+            <div class="col-2 text-right">{{ participacion|number_format(0, '.', ',') }} €</div>
+        </div>
+    {% endfor %}
+    <div class="row">
+        <div class="col text-right">Total: {{ totalParticipacion|number_format(0, '.', ',') }} €</div>
+    </div>
+    <script>
+        const heldSummary = document.getElementById('heldSummary');
+        let summaryText = 'Ingresos: {{ lastCompanyIncomings|number_format(0, '.', ',') }}€, Total: {{ total }} participaciones';
+        {% if skipped %}
+            const extraDiv = document.createElement('span');
+            extraDiv.innerHTML = ' ({{ skipped }} omitidos <a id="showSkippedHeld" href="#">Mostrar</a>)';
+            heldSummary.innerHTML = summaryText;
+            heldSummary.appendChild(extraDiv);
+            const showSkippedHeld = extraDiv.querySelector('#showSkippedHeld');
+            showSkippedHeld.addEventListener('click', function(e) {
+                e.preventDefault();
+                const skippedItems = heldSummary.parentElement.querySelectorAll('.table-danger');
+                if (skippedItems[0].classList.contains('d-none')) {
+                    showSkippedHolders.innerText = 'Ocultar';
+                } else {
+                    showSkippedHolders.innerText = 'Mostrar';
+                }
+                skippedItems.forEach(function(skippedItem) {
+                    skippedItem.classList.toggle('d-none');
+                    }
+                );
+            }
+            );
+        {% else %}
+            heldSummary.innerText = summaryText;
+        {% endif %}
+    </script>
+{% else %}
+    <p>No hay participaciones para esta empresa</p>
+{% endif %}
