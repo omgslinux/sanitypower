@@ -55,10 +55,10 @@ class SheetProcessCommand extends Command
             };
             $process->openResultsFiles();
             if (is_dir($filedir) && ($dh = opendir($filedir))) {
-                dump(getcwd(), $dh);
+                dump(getcwd());
                 $sortedFiles = [];
                 while (($file = readdir($dh)) !== false) {
-                    if ($file != '.' && $file != '..') {
+                    if ($file != '.' && $file != '..' && !stripos($file, '#')) {
                         $sortedFiles [] = $file;
                     }
                 }

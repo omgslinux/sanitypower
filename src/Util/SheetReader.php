@@ -229,41 +229,44 @@ class SheetReader
     {
         $managers = [];
         $contents = $this->contents;
-        $rowIndex = $contents['M'];
-        $limit = $contents['A'];
+        if (!empty($contents['M'])) {
+            $rowIndex = $contents['M'];
+            $limit = $contents['A'];
 
-        //dump($rowIndex);
-        while ($rowIndex<$limit) {
-            $line = [];
-            if (!empty($contents[$rowIndex]['G'])) {
-                $datos = $contents[$rowIndex]['G'];
-            }
-            //if ($class=='ORBIS') {
-            $end = false;
-            if (!empty($contents[$rowIndex]['A'])) {
-                if ($contents[$rowIndex]['A'] == 'Leyenda') {
-                    $rowIndex = $limit;
-                    $end = true;
-                }
-            }
-            if (!$end) {
+            //dump($rowIndex);
+            while ($rowIndex<$limit) {
+                $line = [];
                 if (!empty($contents[$rowIndex]['G'])) {
-                    $cell = $contents[$rowIndex]['G'];
-                    $datos = explode("\n", $cell);
-                    $line = [
-                        'datos' => $cell,
-                        'Nombre' => $datos[0],
-                        'Fecha' => $datos[1],
-                        'Cargo' => $datos[2],
-                        'row' => $rowIndex
-                    ];
+                    $datos = $contents[$rowIndex]['G'];
                 }
+                //if ($class=='ORBIS') {
+                $end = false;
+                if (!empty($contents[$rowIndex]['A'])) {
+                    if ($contents[$rowIndex]['A'] == 'Leyenda') {
+                        $rowIndex = $limit;
+                        $end = true;
+                    }
+                }
+                if (!$end) {
+                    if (!empty($contents[$rowIndex]['G'])) {
+                        $cell = $contents[$rowIndex]['G'];
+                        $datos = explode("\n", $cell);
+                        $cargo = $datos[count($datos)-1];
+                        $line = [
+                            'datos' => $cell,
+                            'Nombre' => $datos[0]??null,
+                            'Fecha' => $datos[1]??null,
+                            'Cargo' => $datos[2]??null,
+                            'row' => $rowIndex
+                        ];
+                    }
+                }
+                //}
+                if (count($line)) {
+                    $managers[] = $line;
+                }
+                $rowIndex++;
             }
-            //}
-            if (count($line)) {
-                $managers[] = $line;
-            }
-            $rowIndex++;
         }
         //dump($managers);
         return $managers;
