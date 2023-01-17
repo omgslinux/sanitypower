@@ -2,7 +2,6 @@
 {% set lastCompanyIncomings = 0 %}
 {% for i in parent.companyIncomings %}{% set lastCompanyIncomings = i.amount %}{% endfor %}
 {%- if total > 0 %}
-    {# <h2>Accionistas</h2> #}
     <h4 id="holderSummary"></h4>{# Aqui dentro va a ir contenido en js #}
     <div class="row">
         <div class="col-6 font-weight-bold">Nombre del accionista</div>
@@ -11,7 +10,8 @@
         {#<div class="col-1 font-weight-bold text-right">% directo</div>#}
         <div class="col-2 font-weight-bold text-right">% participación</div>
         <div class="col-2 font-weight-bold text-right">Valor</div>
-    </div>{% set totalParticipacion = 0 %}{% set skipped = 0 %}
+    </div><div class="listtop"></div>
+    {% set totalParticipacion = 0 %}{% set skipped = 0 %}
     {% for entity in parent.companyHolders %}
     {% set participacion = (entity.totalOwnership>0?entity.totalOwnership:entity.directOwnership) * lastCompanyIncomings / 100 %}
     {%- if entity.skip -%}{% set showHideClasslist = " table-danger d-none" %}
@@ -62,6 +62,11 @@
         {% else %}
             holderSummary.innerText = summaryText;
         {% endif %}
+        const holderlisttop = holderSummary.parentElement.querySelector('.listtop')
+        const companySelfOwned = holderSummary.parentElement.querySelector('.company-self-owned')
+        if (companySelfOwned) {
+            holderlisttop.appendChild(companySelfOwned)
+        }
     </script>
 {% else %}
     <p>No hay accionistas para esta empresa</p>
