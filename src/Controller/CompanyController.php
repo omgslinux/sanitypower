@@ -70,8 +70,8 @@ class CompanyController extends AbstractController
             't' => 'Control',
         ],
         [
-            'n' => 'participaciones',
-            't' => 'Participaciones',
+            'n' => 'propiedades',
+            't' => 'Propiedades',
         ],
         [
             'n' => 'grupo',
