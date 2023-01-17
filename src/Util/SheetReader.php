@@ -44,12 +44,19 @@ class SheetReader
         'class' => 'SABI'
     ];
 
+    const SECTALL = "0";
+    const SECTMANAGERS = "M";
+    const SECTHOLDERS = "A";
+    const SECTOWNED = "P";
+
     private $class; // Para el tipo de fichero, SABI u ORBIS
     private $company;
     private $contents=[];
     private $outdir;
     private $prefix; // Prefijo para guardar ficheros de datos
+    private $section = "0"; // Section: "0"(all), "M"anagers, "A"ccionistas, "P"articipadas
     private $handlers = [
+        'detailManagers' => null,
         'detailShareholders' => null,
         'detailSubsidiaries' => null,
         'summary' => null,
@@ -97,6 +104,18 @@ class SheetReader
         return $this;
     }
 
+    public function setSection($value): self
+    {
+        if ($value == self::SECTALL ||
+            $value == self::SECTHOLDERS ||
+            $value == self::SECTOWNED ||
+            $value == self::SECTMANAGERS) {
+            $this->section = $value;
+        }
+
+        return $this;
+    }
+
     public function setWrite(bool $value): self
     {
         $this->write = $value;
@@ -112,6 +131,11 @@ class SheetReader
         $empresa = str_replace($search, $replace, strtoupper($company));
 
         return $empresa;
+    }
+
+    private function getManagersFilePattern($outputpattern): string
+    {
+        return $outputpattern . '_@@MANAGERS@@';
     }
 
     private function getShareholdersFilePattern($outputpattern): string
@@ -169,6 +193,12 @@ class SheetReader
             foreach ($row as $col => $value) {
                 if (null!=$value) {
                     $line[$col] = $value;
+                    if ($value == 'Directores y gerentes actuales') {
+                        if (empty($contents['M'])) {
+                            $contents['M'] = $rowIndex;
+                            $store = true;
+                        }
+                    }
                     if ($value == 'Accionistas actuales') {
                         if (empty($contents['A'])) {
                             $contents['A'] = $rowIndex;
@@ -193,6 +223,50 @@ class SheetReader
         $this->contents = $contents;
 
         return $_empresa;
+    }
+
+    public function generateManagers($write = false)
+    {
+        $managers = [];
+        $contents = $this->contents;
+        $rowIndex = $contents['M'];
+        $limit = $contents['A'];
+
+        //dump($rowIndex);
+        while ($rowIndex<$limit) {
+            $line = [];
+            if (!empty($contents[$rowIndex]['G'])) {
+                $datos = $contents[$rowIndex]['G'];
+            }
+            //if ($class=='ORBIS') {
+            $end = false;
+            if (!empty($contents[$rowIndex]['A'])) {
+                if ($contents[$rowIndex]['A'] == 'Leyenda') {
+                    $rowIndex = $limit;
+                    $end = true;
+                }
+            }
+            if (!$end) {
+                if (!empty($contents[$rowIndex]['G'])) {
+                    $cell = $contents[$rowIndex]['G'];
+                    $datos = explode("\n", $cell);
+                    $line = [
+                        'datos' => $cell,
+                        'Nombre' => $datos[0],
+                        'Fecha' => $datos[1],
+                        'Cargo' => $datos[2],
+                        'row' => $rowIndex
+                    ];
+                }
+            }
+            //}
+            if (count($line)) {
+                $managers[] = $line;
+            }
+            $rowIndex++;
+        }
+        //dump($managers);
+        return $managers;
     }
 
     public function generateShareholders($write = false)
@@ -429,9 +503,25 @@ class SheetReader
 
     public function openResultsFiles()
     {
-        $this->handlers['summary'] = fopen($this->outdir . '__resultados_' . $this->prefix, 'w');
-        $this->handlers['detailShareholders'] = fopen($this->outdir . 'detalles_ACCIONISTAS_' . $this->prefix, 'w');
-        $this->handlers['detailSubsidiaries'] = fopen($this->outdir . 'detalles_PARTICIPADAS_' . $this->prefix, 'w');
+        if ($this->section == self::SECTALL) {
+            $this->handlers['summary'] = fopen($this->outdir . '__resultados_' . $this->prefix, 'w');
+        }
+        if ($this->section == self::SECTALL || $this->section == self::SECTMANAGERS) {
+            $this->handlers['detailManagers'] = fopen($this->outdir . 'detalles_MANAGERS_' . $this->prefix, 'w');
+        }
+        if ($this->section == self::SECTALL || $this->section == self::SECTHOLDERS) {
+            $this->handlers['detailShareholders'] = fopen($this->outdir . 'detalles_ACCIONISTAS_' . $this->prefix, 'w');
+        }
+        if ($this->section == self::SECTALL || $this->section == self::SECTOWNED) {
+            $this->handlers['detailSubsidiaries'] = fopen($this->outdir . 'detalles_PARTICIPADAS_'.$this->prefix, 'w');
+        }
+    }
+
+    public function openManagersDetail($outputpattern)
+    {
+        $pattern = $this->getManagersFilePattern($outputpattern);
+        $filenameFullPath = '__detalles_' . $pattern;
+        return fopen($this->outdir . $pattern, 'w');
     }
 
     public function openShareholdersDetail($outputpattern)
@@ -449,6 +539,84 @@ class SheetReader
     }
 
     public function processFile($inputFileName, $write = false)
+    {
+        $this->setWrite($write);
+        $outputfile = $this->loadFile($inputFileName);
+
+        if ($this->section == self::SECTALL || $this->section == self::SECTHOLDERS) {
+            $shares = $this->generateShareholders($write);
+            if ($write) {
+                $fp = $this->openShareholdersDetail($outputfile);
+
+                // Escribimos los accionistas
+                foreach ($shares as $line) {
+                    $array = [
+                        $line['Nombre'],
+                        $line['via'],
+                        $line['Pais'],
+                        $line['Tipo'],
+                        $line['Direct'],
+                        $line['Total'],
+                    ];
+                    fputcsv($fp, $array);
+                    fputcsv(
+                        $this->handlers['detailShareholders'],
+                        array_merge([$this->company], $array)
+                    );
+                }
+                fclose($fp);
+            }
+        }
+
+        if ($this->section == self::SECTALL || $this->section == self::SECTOWNED) {
+            $subs = $this->generateSubsidiaries($write);
+            $fp = $this->openSubsidiariesDetail($outputfile);
+            // Escribimos las participadas
+            foreach ($subs as $line) {
+                $array = [
+                        $line['Nombre'],
+                        $line['Pais'],
+                        $line['Tipo'],
+                        $line['Direct'],
+                        $line['Total'],
+                ];
+                fputcsv($fp, $array);
+                fputcsv(
+                    $this->handlers['detailSubsidiaries'],
+                    array_merge([$this->company], $array)
+                );
+            }
+            fclose($fp);
+        }
+
+        // Escribimos el resumen
+        if (!empty($shares) && !empty($subs)) {
+            fputcsv($this->handlers['summary'], [$this->company, count($shares), count($subs)]);
+        }
+
+        if ($this->section == self::SECTALL || $this->section == self::SECTMANAGERS) {
+            $managers = $this->generateManagers($write);
+            //return fopen($this->outdir . $pattern, 'w');
+            $fp = $this->openManagersDetail($outputfile);
+            //$fp = fopen($this->outdir . $pattern, 'w');
+            // Escribimos las participadas
+            foreach ($managers as $line) {
+                $array = [
+                        $line['Nombre'],
+                        $line['Fecha'],
+                        $line['Cargo'],
+                ];
+                fputcsv($fp, $array);
+                fputcsv(
+                    $this->handlers['detailManagers'],
+                    array_merge([$this->company], $array)
+                );
+            }
+            fclose($fp);
+        }
+    }
+
+    public function processFileOLD($inputFileName, $write = false)
     {
         $this->setWrite($write);
         $outputfile = $this->loadFile($inputFileName);
