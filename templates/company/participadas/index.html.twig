@@ -1,6 +1,6 @@
 {% set total = subsidiaries|length %}{% if total > 0 %}
     {# <h2>Participadas</h2> #}
-    <h4>Total: {{ total }} participadas</h4>
+    <h4>Participadas en España: {{ total }}. Total participadas: {{ parent.ownedSubsidiaries|length }}</h4>
     <div class="row">
         <div class="col-8 font-weight-bold">Participada</div>
         <div class="col font-weight-bold">País</div>

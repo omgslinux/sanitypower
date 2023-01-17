@@ -70,8 +70,12 @@ class CompanyController extends AbstractController
             't' => 'Control',
         ],
         [
+            'n' => 'participaciones',
+            't' => 'Participaciones',
+        ],
+        [
             'n' => 'grupo',
-            't' => 'Grupo de empresa',
+            't' => 'Grupo',
         ],
     ];
     const PREFIX = 'company_';

@@ -1,10 +1,9 @@
 {% set total = parent.heldCompanys|length %}
 {%- if total > 0 %}
-    {# <h2>Accionistas</h2> #}
     <h4 id="heldSummary"></h4>{# Aqui dentro va a ir contenido en js #}
     <div class="row">
-        <div class="col-7 font-weight-bold">Nombre de la participada</div>
-        <div class="col-1 font-weight-bold text-center">País</div>
+        <div class="col-6 font-weight-bold">Nombre de la participada</div>
+        <div class="col-2 font-weight-bold text-center">Ingresos</div>
         <div class="col-1 font-weight-bold text-center">Tipo</div>
         {#<div class="col-1 font-weight-bold text-right">% directo</div>#}
         <div class="col-1 font-weight-bold text-right">% part.</div>
@@ -22,12 +21,12 @@
             {% set totalParticipacion = totalParticipacion + participacion %}
         {% endif -%}
         <div class="row border{{ showHideClasslist ~ (entity.holderCategory.letter == 'H'?" company-self-owned":"") }}">
-            <div class="col-7 border-right">
-                <a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}">{{ entity.company }}</a>
+            <div class="col-6 border-right">
+                {{ entity.company }} <span title="{{entity.company.country|country_name('es') }}">({{ entity.company.country }})</span>
                 <a href="{{ path(prefix ~ "show",  {'id': entity.company.id} )}}" title="Ver la empresa"><i class="fa fa-home"></i></a>
             {% if entity.company.inlist %}<i class="fa-solid fa-star" title="Forma parte de la red"></i>{% endif %}
             </div>
-            <div class="col-1 text-center"title="{{entity.company.country|country_name('es') }}">{{ entity.company.country }}</div>
+            <div class="col-2 text-right">{{ lastCompanyIncomings|number_format(0, '.', ',') }} €</div>
             <div class="col-1 text-center" title="{{entity.holderCategory.description }}">{{ entity.holderCategory.letter }}</div>
             {# <div class="col-1 text-right">{{ entity.directOwnership > 0 ? entity.directOwnership|number_format(2, '.', ',') : '--' }}</div> #}
             <div class="col-1 text-right">{{ (entity.totalOwnership > 0?entity.totalOwnership:entity.directOwnership)|number_format(2, '.', ',') }}</div>
