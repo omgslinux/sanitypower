@@ -53,6 +53,18 @@ class SheetProcessCommand extends Command
                 $io->error('¡Ha ocurrido un error: no se puede crear $outdir');
                 return Command::FAILURE;
             };
+            $sectionText = 'TODO';
+            if ($section == 'A') {
+                $sectionText = 'ACCIONISTAS';
+            } else {
+                if ($section == 'P') {
+                    $sectionText = 'PARTICIPADAS';
+                } else {
+                    if ($section == 'M') {
+                        $sectionText = 'MANAGERS';
+                    }
+                }
+            }
             $process->openResultsFiles();
             if (is_dir($filedir) && ($dh = opendir($filedir))) {
                 dump(getcwd());
@@ -64,14 +76,16 @@ class SheetProcessCommand extends Command
                 }
                 closedir($dh);
                 sort($sortedFiles);
+                $total = count($sortedFiles);
                 $index = 0;
                 foreach ($sortedFiles as $file) {
                     $index++;
-                    $io->info(" ($index) filename: $filedir$file \n");
+                    $io->info(" ($index de $total) seccion: ($sectionText) filename: $filedir$file \n");
                     $process->processFile($filedir . $file, $writeResults);
                     //$io->info("Procesado " . $process->getCompany());
                 }
             } else {
+                $io->info("Seccion: ($sectionText) filename: $filedir\n");
                 $process->processFile($filedir, $writeResults);
             }
         } else {
