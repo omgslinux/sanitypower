@@ -140,9 +140,9 @@ class CompanyRepository extends ServiceEntityRepository
         // Create our query
         $query = $this->createQueryBuilder('c')
             ->orderBy('c.fullname', 'ASC')
-            ->andWhere('c.active = :active')
+            //->andWhere('c.active = :active')
             ->andWhere('c.fullname LIKE :pattern')
-            ->setParameter('active', true)
+            //->setParameter('active', true)
             ->setParameter('pattern', '%' . $pattern . '%')
             ->getQuery();
 
