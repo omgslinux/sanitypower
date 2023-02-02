@@ -715,11 +715,12 @@ class CompanyController extends AbstractController
                         foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
                             $keys = explode(",", $line);
                             if (!empty($fullname = str_replace('.', '', str_replace('"', '', $keys[0])))) {
-                                $_country = $country = str_replace('"', '', $keys[1]);
+                                $_country = $country = str_replace('"', '', $keys[2]);
                                 if ($country == 'n.d.') {
                                     $country = '--';
                                 }
-                                $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[2]));
+                                $via = (str_replace('"', '', $keys[1]));
+                                $category = $categoryRepo->findOneByLetter(str_replace('"', '', $keys[3]));
                                 if (null == ($owned = $this->repo->findOneBy(
                                     [
                                         'fullname' => $fullname,
@@ -740,14 +741,14 @@ class CompanyController extends AbstractController
                                         'owner' => $parent,
                                     ]
                                 ))) {
-                                    $_direct = $direct = str_replace('"', '', $keys[3]);
-                                    $_percent = $percent = str_replace('"', '', $keys[4]);
+                                    $_direct = $direct = str_replace('"', '', $keys[4]);
+                                    $_percent = $percent = str_replace('"', '', $keys[5]);
                                     $data =
                                     [
                                         'country' => $_country,
                                         'name' => $fullname,
                                         'active' => false,
-                                    //    'via' => $via,
+                                        'via' => $via,
                                         'direct' => $_direct,
                                         'total' => $_percent
                                     ];
@@ -770,6 +771,7 @@ class CompanyController extends AbstractController
                                     ->setOwned($owned)
                                     ->setDirect($direct)
                                     ->setPercent($percent)
+                                    ->setVia(!empty($via))
                                     ->setData($data)
                                     ;
                                     //dump($data); die();

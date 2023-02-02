@@ -66,6 +66,7 @@ class SubsidiaryType extends AbstractType
                     ;
                 }
                 $builder
+                ->add('via')
                 ->add('direct')
                 ->add('percent')
                 ;

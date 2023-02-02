@@ -24,6 +24,11 @@ class Subsidiary
     private $owner;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $via = false;
+
+    /**
      * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="ownerSubsidiaries")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -57,6 +62,18 @@ class Subsidiary
     public function setOwner(?Company $owner): self
     {
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getVia(): bool
+    {
+        return $this->via;
+    }
+
+    public function setVia(int $via): self
+    {
+        $this->via = $via;
 
         return $this;
     }

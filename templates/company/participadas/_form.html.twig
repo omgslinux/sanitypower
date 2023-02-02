@@ -7,6 +7,13 @@
             </div>
         </div>
     {% endif %}
+    {% if form.via is defined %}
+        <div class="row">
+            <div class="col1">
+            {{ form_row(form.via) }}
+            </div>
+        </div>
+    {% endif %}
     {% if form.direct is defined %}
         <div class="row">
             <div class="col-3">

@@ -120,7 +120,7 @@ class Shareholder
         return $this;
     }
 
-    public function getVia()
+    public function getVia(): bool
     {
         return $this->via;
     }
@@ -130,11 +130,6 @@ class Shareholder
         $this->via = $via;
 
         return $this;
-    }
-
-    public function __toString()
-    {
-        return $this->getHolder() . ($this->getVia() !=0 ? ' (via its funds)':'');
     }
 
     public function isSkip(): ?bool
@@ -171,5 +166,10 @@ class Shareholder
         $this->data = $data;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getHolder() . ($this->getVia() !=0 ? ' (via its funds)':'');
     }
 }
