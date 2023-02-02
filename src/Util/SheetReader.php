@@ -372,15 +372,34 @@ class SheetReader
                         if ($this->readValue($colTitles['Nombre'].$rowIndex)=='Leyenda') {
                             $end = true;
                         } else {
-                            $line = [
-                                'Nombre' => $Nombre,
-                                'via' => $via,
-                                'Pais' => $this->readValue($colTitles['Pais'].$rowIndex),
-                                'Tipo' => $this->readValue($colTitles['Tipo'].$rowIndex),
-                                'Direct' => $this->readValue($colTitles['Direct'].$rowIndex),
-                                'Total' => $this->readValue($colTitles['Total'].$rowIndex),
-                                'row' => $rowIndex,
-                            ];
+                            if (strlen($Nombre)<5 && $this->readValue($colTitles['Pais'].$rowIndex)) {
+                                foreach ($cellIterator as $cell) {
+                                    if ($key==$keys['Pais']) {
+                                        break;
+                                    }
+                                    $key = $cell->getColumn();
+                                    $value= $cell->getValue();
+                                    //dump("row: $rowIndex, key: $key, value: $value, xfound: $xfound");
+                                    if (($key > 'A') && (strlen($value)>3)) {
+                                        //$xfound = true;
+                                        //$colTitles['Nombre'] = $key;
+                                        $Nombre = $value;
+                                        dump($colTitles);
+                                        break;
+                                    }
+                                }
+                            }
+                            if (strlen($Nombre)>4) {
+                                $line = [
+                                    'Nombre' => $Nombre,
+                                    'via' => $via,
+                                    'Pais' => $this->readValue($colTitles['Pais'].$rowIndex),
+                                    'Tipo' => $this->readValue($colTitles['Tipo'].$rowIndex),
+                                    'Direct' => $this->readValue($colTitles['Direct'].$rowIndex),
+                                    'Total' => $this->readValue($colTitles['Total'].$rowIndex),
+                                    'row' => $rowIndex,
+                                ];
+                            }
                         }
                     }
                 } else {
