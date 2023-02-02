@@ -232,7 +232,7 @@ class SheetReader
                 !empty($this->results['P'])?$this->results['P']:
                     $this->results['total']))
             );
-            dump("limit = $limit");
+            #dump("limit = $limit");
             $colTitle = null;
             foreach ($this->worksheet->getRowIterator($this->results['M'], $limit) as $row) {
                 $cellIterator = $row->getCellIterator('A', 'Z');
@@ -539,12 +539,14 @@ class SheetReader
                             // ORBIS, no tenemos la columna del nombre
                             foreach ($cellIterator as $cell) {
                                 $key = $cell->getColumn();
+                                if ($key==$keys['Pais']) {
+                                    break;
+                                }
                                 $value= $cell->getValue();
-                                //dump("row: $rowIndex, key: $key, value: $value, xfound: $xfound");
-                                if (($key > 'A') && ($key<$keys['Pais']) && (strlen($value)>3)) {
-                                    //$xfound = true;
-                                    $colTitles['Nombre'] = $key;
-                                    $Nombre = $this->readValue($colTitles['Nombre'].$rowIndex);
+                                //dump("row: $rowIndex, key: $key, value: $value");
+                                if (($key != 'A') && (strlen($value)>3)) {
+                                    //$colTitles['Nombre'] = $key;
+                                    $Nombre = $value;
                                     //dump($colTitles);
                                     break;
                                 }

@@ -48,13 +48,13 @@
             const showSkippedHeld = heldextraDiv.querySelector('#showSkippedHeld');
             showSkippedHeld.addEventListener('click', function(e) {
                 e.preventDefault();
-                const skippedItems = heldSummary.parentElement.querySelectorAll('.table-danger');
-                if (skippedItems[0].classList.contains('d-none')) {
-                    showSkippedHolders.innerText = 'Ocultar';
+                const skippedHeldItems = heldSummary.parentElement.querySelectorAll('.table-danger');
+                if (skippedHeldItems[0].classList.contains('d-none')) {
+                    showSkippedHeld.innerText = 'Ocultar';
                 } else {
-                    showSkippedHolders.innerText = 'Mostrar';
+                    showSkippedHeld.innerText = 'Mostrar';
                 }
-                skippedItems.forEach(function(skippedItem) {
+                skippedHeldItems.forEach(function(skippedItem) {
                     skippedItem.classList.toggle('d-none');
                     }
                 );
