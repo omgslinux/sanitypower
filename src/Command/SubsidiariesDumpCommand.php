@@ -88,16 +88,16 @@ class SubsidiariesDumpCommand extends Command
                         $prev=$parent->getFullname();
                     }
                     if (!empty($fullname = str_replace('"', '', $keys[1])) && (strtolower($fullname)!='nan')) {
-                        $holderCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[3]));
-                        $_country = $country = str_replace('"', '', $keys[2]);
+                        $holderCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[4]));
+                        $_country = $country = str_replace('"', '', $keys[3]);
                         if ($country == 'n.d.') {
                             $country = '--';
                         }
                         if (strlen($country)>2) {
                             $io->error(sprintf('Error en el pais(%s), participada %s', $country, $fullname));
                         }
-                        $_direct = $direct = str_replace('"', '', $keys[4]);
-                        $_total = $total = str_replace('"', '', $keys[5]);
+                        $_direct = $direct = str_replace('"', '', $keys[5]);
+                        $_total = $total = str_replace('"', '', $keys[6]);
                         if (null == ($owned = $this->repo->findOneBy(
                             [
                                 'fullname' => $fullname,
@@ -111,17 +111,6 @@ class SubsidiariesDumpCommand extends Command
                             ->setLevel($level)
                             ->setCategory($companyCategory);
                         }
-                        $io->info(sprintf(
-                            'Parent: %s, Participada: %s, Pais: %s, Directo: %s, Port: %s',
-                            $parentname,
-                            $fullname,
-                            $country,
-                            $_direct,
-                            $_total
-                        ));
-                        //$em->persist($owned);
-                        //dump($owned);
-                        //$em->flush();
                         $this->repo->add($owned, true);
 
                         if (null == ($entity = $this->SR->findOneBy(
@@ -130,12 +119,12 @@ class SubsidiariesDumpCommand extends Command
                                 'owner' => $parent,
                             ]
                         ))) {
-                            //$via = (str_replace('"', '', $keys[2]));
+                            $via = (str_replace('"', '', $keys[2]));
                             $data = [
                                 'country' => $_country,
                                 'name' => $fullname,
                                 'active' => false,
-                            //    'via' => $via,
+                                'via' => $via,
                                 'direct' => $_direct,
                                 'total' => $_total
                             ];
@@ -158,6 +147,7 @@ class SubsidiariesDumpCommand extends Command
                             ->setOwned($owned)
                             ->setDirect($direct)
                             ->setPercent($total)
+                            ->setVia(!empty($via))
                             ->setData($data)
                             ;
                             //$em->persist($entity);
