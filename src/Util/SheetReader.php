@@ -129,8 +129,8 @@ class SheetReader
 
     private function stripCompanyName($company): string
     {
-        $search = ['@@SLASH@@', '@@QUOTE@@', ',', '.', '  '];
-        $replace = ['/', '’', ' ', '', ' '];
+        $search = ['@@SLASH@@', '@@QUOTE@@', ',', '.', '  ', '@@COMMA@@'];
+        $replace = ['/', '’', ' ', '', ' ', ','];
         //$_empresa = substr($company, 0, strpos($company, '.'));
         $empresa = trim(str_replace($search, $replace, strtoupper($company)));
 
