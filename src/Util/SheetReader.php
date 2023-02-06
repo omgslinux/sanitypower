@@ -72,6 +72,15 @@ class SheetReader
         $this->prefix = $prefix;
     }
 
+    public function checkSection($section)
+    {
+        if ($this->section == self::SECTALL) {
+            return true;
+        }
+
+        return $this->section = $section;
+    }
+
     public function getCompany(): string
     {
         return $this->company;
@@ -184,6 +193,7 @@ class SheetReader
         //$sheetData = $spreadsheet->getActiveSheet()->toArray(false, true, true, true);
         $this->worksheet = $spreadsheet->getActiveSheet();
         $store = false;
+        $Mends = ['Leyenda', "Directores y gerentes previos", "Estructura de propiedad" ];
         foreach ($this->worksheet->getRowIterator() as $row) {
             $cellIterator = $row->getCellIterator('A', 'F');
             // This loops through all cells, even if a cell value is not set.
@@ -198,11 +208,14 @@ class SheetReader
                         $result['M'] = $rowIndex;
                     }
                 }
-                if ($cell == 'Estructura de propiedad') {
-                    if (empty($result['E'])) {
-                        $result['E'] = $rowIndex;
+                if (!empty($result['M']) && empty($result['Mend']) && empty($result['A'])) {
+                    foreach ($Mends as $Mend) {
+                        if ($cell->getValue()==$Mend) {
+                            $result['Mend'] = $rowIndex;
+                        }
                     }
                 }
+
                 if ($cell == 'Accionistas actuales') {
                     $result['A'] = $rowIndex;
                 }
@@ -225,64 +238,25 @@ class SheetReader
     public function generateManagers($write = false)
     {
         $managers = [];
-        if (!empty($this->results['M'])) {
-            $limit = (
-                !empty($this->results['E'])?$this->results['E']:(
-                !empty($this->results['A'])?$this->results['A']:(
-                !empty($this->results['P'])?$this->results['P']:
-                    $this->results['total']))
-            );
-            #dump("limit = $limit");
-            $colTitle = null;
-            foreach ($this->worksheet->getRowIterator($this->results['M'], $limit) as $row) {
-                $cellIterator = $row->getCellIterator('A', 'Z');
-                $cellIterator->setIterateOnlyExistingCells(true);
-                $rowIndex = $row->getRowIndex();
-                $i = ''; // Inicializamos el indice en cada fila
-                //dump("A$rowIndex: " .$this->readValue('A'.$rowIndex));
-                $line = [];
-                /*if (!empty($this->readValue('G', $rowIndex))) {
-                    $datos = $this->readValue('G', $rowIndex);
-                }*/
-                //if ($class=='ORBIS') {
-                $end = false;
-                if (!empty($this->readValue('A'. $rowIndex))) {
-                    if ($this->readValue('A'. $rowIndex) == 'Leyenda') {
-                        $end = true;
-                    }
-                }
-                if (!$end) {
-                    if (null==$colTitle) {
-                        $x = 0;
-                        foreach ($cellIterator as $cell) {
-                            $x++;
-                            if ($x>1 && null==$colTitle) {
-                                $value = $this->readValue($cell->getColumn() . $rowIndex);
-                                if (!empty($value)) {
-                                    $colTitle = $cell->getColumn();
-                                    dump("Columna para managers: $colTitle");
-                                }
-                            }
-                        }
-                    }
-                    //if (!empty($this->readValue('G'. $rowIndex))) {
-                    if ($colTitle) {
-                        $cell = $this->readValue($colTitle. $rowIndex);
-                        if (!empty($cell)) {
-                            $datos = explode("\n", $cell);
-                            $cargo = $datos[count($datos)-1];
-                            $line = [
-                                'datos' => $cell,
-                                'Nombre' => $datos[0]??null,
-                                'Fecha' => $datos[1]??null,
-                                'Cargo' => $datos[2]??null,
-                                'row' => $rowIndex
-                            ];
-                        }
-                    }
-                }
-                if (count($line)) {
-                    $managers[] = $line;
+        if (empty($this->results['M']) || empty($this->results['Mend'])) {
+            return $managers;
+        }
+
+        foreach ($this->worksheet->getRowIterator($this->results['M'], $this->results['Mend']) as $row) {
+            $cellIterator = $row->getCellIterator('A', 'N');
+            $cellIterator->setIterateOnlyExistingCells(true);
+            $rowIndex = $row->getRowIndex();
+
+            //dump($rowIndex);
+            // Buscamos la columna
+            $search = ["\n"]; // "\xa0"];
+            $replace = ["@@"]; //, " "];
+            foreach ($cellIterator as $cell) {
+                $lines = explode('@@', str_replace($search, $replace, $cell->getValue()));
+                //dump($lines);
+                if (count($lines)>2) {
+                    $managers[] = $lines;
+                    break;
                 }
             }
         }
@@ -384,7 +358,7 @@ class SheetReader
                                         //$xfound = true;
                                         //$colTitles['Nombre'] = $key;
                                         $Nombre = $value;
-                                        dump($colTitles);
+                                        //dump($colTitles);
                                         break;
                                     }
                                 }
@@ -601,299 +575,23 @@ class SheetReader
         return $subsidiaries;
     }
 
-    public function generateManagersOLD($write = false)
-    {
-        $managers = [];
-        $contents = $this->contents;
-        if (!empty($contents['M'])) {
-            $rowIndex = $contents['M'];
-            $limit = $contents['A'];
-
-            //dump($rowIndex);
-            while ($rowIndex<$limit) {
-                $line = [];
-                if (!empty($contents[$rowIndex]['G'])) {
-                    $datos = $contents[$rowIndex]['G'];
-                }
-                //if ($class=='ORBIS') {
-                $end = false;
-                if (!empty($contents[$rowIndex]['A'])) {
-                    if ($contents[$rowIndex]['A'] == 'Leyenda') {
-                        $rowIndex = $limit;
-                        $end = true;
-                    }
-                }
-                if (!$end) {
-                    if (!empty($contents[$rowIndex]['G'])) {
-                        $cell = $contents[$rowIndex]['G'];
-                        $datos = explode("\n", $cell);
-                        $cargo = $datos[count($datos)-1];
-                        $line = [
-                            'datos' => $cell,
-                            'Nombre' => $datos[0]??null,
-                            'Fecha' => $datos[1]??null,
-                            'Cargo' => $datos[2]??null,
-                            'row' => $rowIndex
-                        ];
-                    }
-                }
-                //}
-                if (count($line)) {
-                    $managers[] = $line;
-                }
-                $rowIndex++;
-            }
-        }
-        //dump($managers);
-        return $managers;
-    }
-
-    public function generateShareholdersOLD($write = false)
-    {
-        // INICIO DE ACCIONISTAS
-        $shareholders = [];
-        $contents = $this->contents;
-        $rowIndex = $contents['A'];
-        $colTitles = [];
-        $keys = $orbisKeys = self::ORBISKEYS;
-        $sabiKeys = self::SABIKEYS;
-        $limit = $contents['P'];
-        while (count($colTitles)<5 && $rowIndex <$limit) {
-            if (!empty($contents[$rowIndex])) {
-                foreach ($contents[$rowIndex] as $key => $value) {
-                    if ($value==$orbisKeys['A']['Nombre'] || ($value==$sabiKeys['A']['Nombre'])) {
-                        $colTitles['Nombre'] = $key;
-                        if ($value==$sabiKeys['A']['Nombre']) {
-                            $keys = $sabiKeys;
-                        }
-                    }
-                    if ($value==$keys['A']['Pais']) {
-                        $colTitles['Pais'] = $key;
-                    }
-                    if ($value==$keys['A']['Tipo']) {
-                        $colTitles['Tipo'] = $key;
-                    }
-                    if ($value==$keys['A']['Direct']) {
-                        $colTitles['Direct'] = $key;
-                    }
-                    if ($value==$keys['A']['Total']) {
-                        $colTitles['Total'] = $key;
-                    }
-                }
-            }
-            $rowIndex++;
-        }
-        if (count($colTitles)) {
-            $colTitles['class'] = $keys['class'];
-            $colTitles['empresa'] = $this->company;
-        } else {
-            $keys = $orbisKeys; // Inicializamos por no haber accionistas
-        }
-        $class = $keys['class'];
-
-        //dump($colTitles);
-        $index = 0;
-        while ($rowIndex<$limit) {
-            $line = [];
-            $viastr = 'via its funds';
-            $via= '';
-            if (!empty($contents[$rowIndex][$colTitles['Nombre']])) {
-                $Nombre = $contents[$rowIndex][$colTitles['Nombre']];
-                $funds = stripos($Nombre, $viastr);
-                if ($funds) {
-                    $via = $viastr;
-                    $Nombre = trim(substr($Nombre, 0, $funds));
-                }
-            }
-            if ($class=='ORBIS') {
-                if (!empty($contents[$rowIndex][$colTitles['Nombre']])) {
-                    if ($contents[$rowIndex][$colTitles['Nombre']]=='Leyenda') {
-                        $rowIndex = $limit;
-                    } else {
-                        $line = [
-                            'Nombre' => $Nombre,
-                            'via' => $via,
-                            'Pais' => $contents[$rowIndex][$colTitles['Pais']],
-                            'Tipo' => $contents[$rowIndex][$colTitles['Tipo']],
-                            'Direct' => $contents[$rowIndex][$colTitles['Direct']],
-                            'Total' => $contents[$rowIndex][$colTitles['Total']],
-                            'row' => $rowIndex
-                        ];
-                    }
-                }
-            } else {
-                if (!empty($contents[$rowIndex]['A'])) {
-                    $i = $contents[$rowIndex]['A'];
-                    $i = substr($i, 0, strpos($i, '.'));
-                    //dump($i);
-                    if (is_numeric($i) && ($i==($index+1))) {
-                        if (!empty($contents[$rowIndex][$colTitles['Nombre']])) {
-                            $Nombre = $contents[$rowIndex][$colTitles['Nombre']];
-                        } else {
-                            foreach ($contents[$rowIndex] as $key => $value) {
-                                //dump($key, $value);
-                                if ($key>'A' && $value != $contents[$rowIndex][$colTitles['Pais']]) {
-                                    $Nombre = $value;
-                                    break;
-                                }
-                            }
-                        }
-                        $funds = stripos($Nombre, $viastr);
-                        if ($funds) {
-                            $via = $viastr;
-                            $Nombre = substr($Nombre, 0, $funds);
-                        }
-                        $line = [
-                            'index' => ++$index,
-                            'Nombre' => $Nombre,
-                            'via' => $via,
-                            'Pais' => $contents[$rowIndex][$colTitles['Pais']],
-                            'Tipo' => $contents[$rowIndex][$colTitles['Tipo']],
-                            'Direct' => str_replace(',', '.', $contents[$rowIndex][$colTitles['Direct']]),
-                            'Total' => str_replace(',', '.', $contents[$rowIndex][$colTitles['Total']]),
-                            'row' => $rowIndex
-                        ];
-                    }
-                }
-            }
-            if (count($line)) {
-                if (!empty($Nombre)) {
-                    //$line['Nombre'] = str_replace($NombreSearch, $NombreReplace, $Nombre);
-                    $line['Nombre'] = $this->stripCompanyName($Nombre);
-                }
-                $shareholders[] = $line;
-            }
-            $rowIndex++;
-        }
-        $this->class = $keys['class'];
-
-        return $shareholders;
-        // FIN ACCIONISTAS
-    }
-
-    public function generateSubsidiariesOLD($write = false)
-    {
-        $contents = $this->contents;
-        $colTitles = $subsidiaries = [];
-        $colTitles = [
-            'index' => 'A',
-            'P' => $contents['P'],
-        ];
-        $keys = self::ORBISKEYS;
-        if ($this->class != 'ORBIS') {
-            $keys = self::SABIKEYS;
-        }
-        $limit = $contents['limit'];
-        $rowIndex = $contents['P'];
-        while (count($colTitles)<5 && $rowIndex <$limit) {
-            if (!empty($contents[$rowIndex])) {
-                foreach ($contents[$rowIndex] as $key => $value) {
-                    if ($value==self::SABIKEYS['P']['Nombre']) {
-                        $colTitles['Nombre'] = $key;
-                        $keys = self::SABIKEYS;
-                        $this->class = 'SABI';
-                    }
-                    if ($value==$keys['P']['Pais']) {
-                        $colTitles['Pais'] = $key;
-                    }
-                    if ($value==$keys['P']['Tipo']) {
-                        $colTitles['Tipo'] = $key;
-                    }
-                    if ($value==$keys['P']['Direct']) {
-                        $colTitles['Direct'] = $key;
-                    }
-                    if ($value==$keys['P']['Total']) {
-                        $colTitles['Total'] = $key;
-                        $colTitles['row'] = $rowIndex;
-                    }
-                }
-            }
-            $rowIndex++;
-        }
-        $colTitles['class'] = $keys['class'];
-        $colTitles['empresa'] = $this->company;
-        //dump("rowIndex($rowIndex), limit($limit), colTitles:", $colTitles);
-
-        $index = 0; // Indice de participadas
-        // El count es por si no hay participadas
-        while ($rowIndex<$limit && count($colTitles)) {
-            if (empty($colTitles['Nombre'])) {
-                // ORBIS, no tenemos la columna del nombre
-                /*foreach ($contents[$rowIndex] as $key => $value) {
-                    dump($key, $value);
-                    if ($key>'A' && $value != $contents[$rowIndex][$colTitles['Pais']]) {
-                        $colTitles['Nombre'] = $value;
-                        //$Nombre = $value;
-                        //break;
-                    } else {
-                        break;
-                    }
-                }*/
-                $x = 0;
-                $xfound = false;
-                foreach ($contents[$rowIndex] as $key => $value) {
-                    $x++;
-                    if ($x>1 && (strlen($value)>2) && !$xfound) {
-                        $colTitles['Nombre'] = $key;
-                        //dump("key: $key, value: $value, Nombre: " . $colTitles['Nombre']);
-                        $xfound = true;
-                        break;
-                    }
-                }
-                //dump($colTitles);
-            }
-            if ((!empty($contents[$rowIndex]['A'])) && ($contents[$rowIndex]['A']=='Leyenda')) {
-                $rowIndex = $limit;
-            } else {
-            }
-            //dump($colTitles);
-            if (!empty($contents[$rowIndex]['A'])) {
-                $i = $contents[$rowIndex]['A'];
-                if (substr($i, 0, strpos($i, '.'))) {
-                    $i = substr($i, 0, strpos($i, '.'));
-                } else {
-                    $i = rtrim($i);
-                }
-                //dump("linea: $rowIndex, index: $i");
-                if (is_numeric($i) && ($i==($index+1))) {
-                    if (!empty($contents[$rowIndex][$colTitles['Nombre']])) {
-                    }
-                    if (empty($colTitles['Tipo'])) {
-                        $Tipo = 'C';
-                    } else {
-                        $Tipo = $contents[$rowIndex][$colTitles['Tipo']];
-                    }
-                    $subsidiaries[] = [
-                        'index' => ++$index,
-                        'Nombre' => $this->stripCompanyName($contents[$rowIndex][$colTitles['Nombre']]),
-                        'Pais' => $contents[$rowIndex][$colTitles['Pais']]??'--',
-                        'Tipo' => $Tipo,
-                        'Direct' => str_replace(',', '.', $contents[$rowIndex][$colTitles['Direct']])??0,
-                        'Total' => str_replace(',', '.', $contents[$rowIndex][$colTitles['Total']])??0,
-                        'row' => $rowIndex,
-                    ];
-                }
-            }
-            $rowIndex++;
-        }
-
-        return $subsidiaries;
-    }
-
     public function openResultsFiles()
     {
         if (null!=$this->section) {
             $this->handlers['summary'] = fopen($this->outdir . '__resultados__' . $this->prefix, 'w');
         }
-        if ($this->section == self::SECTALL || $this->section == self::SECTMANAGERS) {
+        //if ($this->section == self::SECTALL || $this->section == self::SECTMANAGERS) {
+        if ($this->checkSection(self::SECTMANAGERS)) {
             $this->handlers['detailManagers'] = fopen($this->outdir . '__detalles_MANAGERS_' . $this->prefix, 'w');
             $this->handlers['summaryManagers'] = fopen($this->outdir . '__resultados_MANAGERS_' . $this->prefix, 'w');
         }
-        if ($this->section == self::SECTALL || $this->section == self::SECTHOLDERS) {
+        //if ($this->section == self::SECTALL || $this->section == self::SECTHOLDERS) {
+        if ($this->checkSection(self::SECTHOLDERS)) {
             $this->handlers['detailShareholders'] = fopen($this->outdir . '__detalles_ACCIONISTAS_'.$this->prefix, 'w');
             $this->handlers['summaryShareholders']= fopen($this->outdir.'__resultados_ACCIONISTAS_'.$this->prefix, 'w');
         }
-        if ($this->section == self::SECTALL || $this->section == self::SECTOWNED) {
+        //if ($this->section == self::SECTALL || $this->section == self::SECTOWNED) {
+        if ($this->checkSection(self::SECTOWNED)) {
             $this->handlers['detailSubsidiaries'] = fopen($this->outdir .'__detalles_PARTICIPADAS_'.$this->prefix, 'w');
             $this->handlers['summarySubsidiaries']=fopen($this->outdir.'__resultados_PARTICIPADAS_'.$this->prefix, 'w');
         }
@@ -927,7 +625,8 @@ class SheetReader
 
         // Inicializamos para evitar error
         $shares = $subs = $managers = [];
-        if ($this->section == self::SECTALL || $this->section == self::SECTHOLDERS) {
+        //if ($this->section == self::SECTALL || $this->section == self::SECTHOLDERS) {
+        if ($this->checkSection(self::SECTHOLDERS)) {
             $shares = $this->generateShareholders($write);
             if (count($shares)) {
                 if ($write) {
@@ -955,7 +654,8 @@ class SheetReader
             }
         }
 
-        if ($this->section == self::SECTALL || $this->section == self::SECTOWNED) {
+        //if ($this->section == self::SECTALL || $this->section == self::SECTOWNED) {
+        if ($this->checkSection(self::SECTOWNED)) {
             $subs = $this->generateSubsidiaries($write);
             if (count($subs)) {
                 $fp = $this->openSubsidiariesDetail($outputfile);
@@ -983,19 +683,20 @@ class SheetReader
         // Escribimos el resumen
         fputcsv($this->handlers['summary'], [$this->company, count($shares), count($subs)]);
 
-        if ($this->section == self::SECTALL || $this->section == self::SECTMANAGERS) {
+        //if ($this->section == self::SECTALL || $this->section == self::SECTMANAGERS) {
+        if ($this->checkSection(self::SECTMANAGERS)) {
             $managers = $this->generateManagers($write);
             //return fopen($this->outdir . $pattern, 'w');
             if (count($managers)) {
                 $fp = $this->openManagersDetail($outputfile);
                 //$fp = fopen($this->outdir . $pattern, 'w');
                 // Escribimos las participadas
-                foreach ($managers as $line) {
-                    $array = [
+                foreach ($managers as $array) {
+                    /*$array = [
                             $line['Nombre'],
                             $line['Fecha'],
                             $line['Cargo'],
-                    ];
+                    ];*/
                     fputcsv($fp, $array);
                     fputcsv(
                         $this->handlers['detailManagers'],
