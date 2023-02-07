@@ -208,6 +208,12 @@ class SheetReader
                         $result['M'] = $rowIndex;
                     }
                 }
+                if ($cell == 'Administradores / contactos actuales') {
+                    $Mends = ['Auditores de Cuentas y Bancos'];
+                    if (empty($result['M'])) {
+                        $result['M'] = $rowIndex;
+                    }
+                }
                 if (!empty($result['M']) && empty($result['Mend']) && empty($result['A'])) {
                     foreach ($Mends as $Mend) {
                         if ($cell->getValue()==$Mend) {
@@ -239,24 +245,73 @@ class SheetReader
     {
         $managers = [];
         if (empty($this->results['M']) || empty($this->results['Mend'])) {
+            dump($this->results, "No hay managers");
             return $managers;
         }
 
+        $colKeys = ['Nombre', 'Título original de la función', 'Comité'];
+        $colTitles = [];
+
         foreach ($this->worksheet->getRowIterator($this->results['M'], $this->results['Mend']) as $row) {
-            $cellIterator = $row->getCellIterator('A', 'N');
+            $cellIterator = $row->getCellIterator('A', 'AZ');
             $cellIterator->setIterateOnlyExistingCells(true);
             $rowIndex = $row->getRowIndex();
 
-            //dump($rowIndex);
-            // Buscamos la columna
-            $search = ["\n"]; // "\xa0"];
-            $replace = ["@@"]; //, " "];
-            foreach ($cellIterator as $cell) {
-                $lines = explode('@@', str_replace($search, $replace, $cell->getValue()));
-                //dump($lines);
-                if (count($lines)>2) {
-                    $managers[] = $lines;
-                    break;
+            if ($this->results['class'] != 'SABI') {
+                //dump($rowIndex);
+                // Buscamos la columna
+                $search = ["\n"]; // "\xa0"];
+                $replace = ["@@"]; //, " "];
+                foreach ($cellIterator as $cell) {
+                    $lines = explode('@@', str_replace($search, $replace, $cell->getValue()));
+                    //dump($lines);
+                    if (count($lines)>2) {
+                        $managers[] = $lines;
+                        break;
+                    }
+                }
+            } else {
+                if (count($colTitles)<count($colKeys)) {
+                    foreach ($cellIterator as $cell) {
+                        $column = $cell->getColumn();
+                        $value = $cell->getValue();
+                        foreach ($colKeys as $colkey) {
+                            //dump("key: $key, value: $value, colkey: $colkey, colvalue: $colvalue");
+                            if ($value==$colkey) {
+                                $colTitles[$colkey] = $column;
+                            }
+                        }
+                        $index = 1;
+                    }
+                } else {
+                    //dump($colTitles);
+                    foreach ($cellIterator as $cell) {
+                        $column = $cell->getColumn();
+                        $value = $cell->getValue();
+                        $line = [];
+                        $i = substr($value, 0, strpos($value, '.'));
+                        //dump("value = $i, index: $index, icol: ".ord($column));
+                        if ($i==$index) {
+                            foreach ($colTitles as $colkey => $colletter) {
+                                $text = $this->readValue($colletter . $rowIndex);
+                                if (strlen($text)<3) {
+                                    $nextcol = chr(ord($colletter)+1);
+                                    if (strlen($colletter)==1) {
+                                        if ($colletter =='Z') {
+                                            $nextcol = 'AA';
+                                        }
+                                    } else {
+                                        dump("key: $cell, value: $value, colkey: $colkey, colletter: $colletter");
+                                    }
+                                    //$text = $this->readValue((chr(ord($colletter)+1)) . $rowIndex);
+                                    $text = $this->readValue($nextcol . $rowIndex);
+                                }
+                                $line[$colkey] = $text;
+                            }
+                            $managers [] = $line;
+                            $index++;
+                        }
+                    }
                 }
             }
         }
@@ -471,9 +526,9 @@ class SheetReader
                     $value = $cell->getValue();
                     if ($value==self::SABIKEYS['P']['Nombre']) {
                         $colTitles['Nombre'] = $key;
-                        if ($class != 'SABI') {
+                        if ($class == '') {
                             $keys = self::SABIKEYS['P'];
-                            dump("(P) Cambio en deteccion de class a SABI para ".$this->results['company']);
+                            dump("(P) Cambio en deteccion por key($value) de class a SABI para ".$this->results['company']);
                         }
                         $class = $this->results['class'] = 'SABI';
                     }
@@ -680,9 +735,6 @@ class SheetReader
             fputcsv($this->handlers['summarySubsidiaries'], [$this->company, count($subs)]);
         }
 
-        // Escribimos el resumen
-        fputcsv($this->handlers['summary'], [$this->company, count($shares), count($subs)]);
-
         //if ($this->section == self::SECTALL || $this->section == self::SECTMANAGERS) {
         if ($this->checkSection(self::SECTMANAGERS)) {
             $managers = $this->generateManagers($write);
@@ -707,6 +759,9 @@ class SheetReader
             }
             fputcsv($this->handlers['summaryManagers'], [$this->company, count($managers)]);
         }
+        // Escribimos el resumen
+        fputcsv($this->handlers['summary'], [$this->company, count($managers), count($shares), count($subs)]);
+
         $this->worksheet = null;
         //sleep(1);
         unset($this->worksheet);
