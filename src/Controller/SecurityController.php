@@ -30,11 +30,11 @@ class SecurityController extends AbstractController
     /**
      * @Route("/", name="homepage")
      */
-    public function homepage(CompanyRepository $CR, ShareholderRepository $HR, SubsidiaryRepository $SR)
+    public function homepage(CompanyRepository $CR, ShareholderRepository $HR)
     {
         $totalCompanies = $CR->getInlistCount();
-        $totalHolders = $HR->getFullCount();
-        $totalSubsidiaries = $SR->getFullCount();
+        $totalHolders = $HR->getHolderCount();
+        $totalSubsidiaries = $HR->getSubsidiaryCount();
 
         //return $this->redirectToRoute('company_index');
         return $this->render('security/homepage.html.twig', [
