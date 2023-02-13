@@ -237,6 +237,7 @@ class CompanyController extends AbstractController
         Company $company,
         CurrencyExchangeRepository $cexRepo,
         SubsidiaryRepository $subrepo,
+        ShareholderRepository $SHR,
         $activetab = 'incomings'
     ): Response {
         return $this->render('company/show.html.twig', [
@@ -246,7 +247,7 @@ class CompanyController extends AbstractController
             'activetab' => $activetab,
             'incomings' => $this->incomingFindExchange($company, $cexRepo),
             'groupparticipants' => $this->groupIndex($company, $subrepo),
-            'subsidiaries' => $subrepo->findByCompanyOwner($company),
+            'subsidiaries' => $SHR->findSubsidiariesByHolder($company), //$subrepo->findByCompanyOwner($company),
         ]);
     }
 

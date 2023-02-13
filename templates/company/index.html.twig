@@ -66,8 +66,8 @@
                 {% endif %}
                 </a></div>
                 <div class="col-2 table-bordered p-1">{{ company.level }}</div>
-                <div class="col-1 table-bordered p-1 text-right">{{ company.companyHolders|length }}</div>
-                <div class="col-1 table-bordered p-1 text-right">{{ company.ownedSubsidiaries|length }}</div>
+                <div class="col-1 table-bordered p-1 text-right">{{ company.holders|length }}</div>
+                <div class="col-1 table-bordered p-1 text-right">{{ company.subsidiaries|length }}</div>
                 <div class="col-1 table-bordered p-1">{{ company.active ? 'Yes' : 'No' }}</div>
             </div>
         {% else %}

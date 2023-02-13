@@ -74,16 +74,16 @@ class Company
     /**
      * Empresas de las que la actual es accionista (posee)
      *
-     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="holder")
+     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="holder", cascade={"persist"})
      */
-    private $heldCompanys;
+    private $subsidiaries;
 
     /**
      * Empresas que son propietarias de la actual
      *
-     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="company", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="subsidiary", cascade={"persist"})
      */
-    private $companyHolders;
+    private $holders;
 
     /**
      * @ORM\OneToMany(targetEntity=StaffMembership::class, mappedBy="company")
@@ -121,8 +121,8 @@ class Company
         $this->companyIncomings = new ArrayCollection();
         $this->companyEvents = new ArrayCollection();
         $this->companyRelationships = new ArrayCollection();
-        $this->heldCompanys = new ArrayCollection();
-        $this->companyHolders = new ArrayCollection();
+        $this->subsidiiaries = new ArrayCollection();
+        $this->holders = new ArrayCollection();
         $this->staffMemberships = new ArrayCollection();
         $this->ownerSubsidiaries = new ArrayCollection();
         $this->ownedSubsidiaries = new ArrayCollection();
@@ -277,27 +277,27 @@ class Company
     /**
      * @return Collection|Shareholder[]
      */
-    public function getHeldCompanys(): Collection
+    public function getSubsidiaries(): Collection
     {
-        return $this->heldCompanys;
+        return $this->subsidiaries;
     }
 
-    public function addHeldCompany(Shareholder $company): self
+    public function addSubsidiary(Shareholder $sub): self
     {
-        if (!$this->heldCompanys->contains($company)) {
-            $this->heldCompanys[] = $company;
-            $company->setCompany($this);
+        if (!$this->subsidiaries->contains($sub)) {
+            $this->subsidiaries[] = $sub;
+            $sub->setSubsidiary($this);
         }
 
         return $this;
     }
 
-    public function removeHeldCompany(Shareholder $company): self
+    public function removeSubsidiary(Shareholder $sub): self
     {
-        if ($this->heldCompanys->removeElement($company)) {
+        if ($this->heldCompanys->removeElement($sub)) {
             // set the owning side to null (unless already changed)
-            if ($company->getCompany() === $this) {
-                $company->setCompany(null);
+            if ($sub->getCompany() === $this) {
+                $sub->setCompany(null);
             }
         }
 
@@ -307,27 +307,27 @@ class Company
     /**
      * @return Collection|Shareholder[]
      */
-    public function getCompanyHolders(): Collection
+    public function getHolders(): Collection
     {
-        return $this->companyHolders;
+        return $this->holders;
     }
 
-    public function addCompanyHolder(Shareholder $holder): self
+    public function addHolder(Shareholder $holder): self
     {
-        if (!$this->companyHolders->contains($holder)) {
-            $this->companyHolders[] = $holder;
-            $holder->setCompany($this);
+        if (!$this->holders->contains($holder)) {
+            $this->holders[] = $holder;
+            $holder->setHolder($this);
         }
 
         return $this;
     }
 
-    public function removeCompanyHolder(Shareholder $holder): self
+    public function removeHolder(Shareholder $holder): self
     {
-        if ($this->companyHolders->removeElement($holder)) {
+        if ($this->holders->removeElement($holder)) {
             // set the owning side to null (unless already changed)
-            if ($holder->getCompany() === $this) {
-                $holder->setCompany(null);
+            if ($holder->getHolder() === $this) {
+                $holder->setHolder(null);
             }
         }
 

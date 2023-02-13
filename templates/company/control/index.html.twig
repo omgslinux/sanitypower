@@ -1,4 +1,4 @@
-{% set total = parent.heldCompanys|length %}
+{% set total = parent.subsidiaries|length %}
 {%- if total > 0 %}
     <h4 id="heldSummary"></h4>{# Aqui dentro va a ir contenido en js #}
     <div class="row">
@@ -10,10 +10,10 @@
         <div class="col-2 font-weight-bold text-right">Valor</div>
     </div>{% set totalParticipacion = 0 %}{% set skipped = 0 %}
         {% set lastCompanyIncomings = 0 %}
-    {% for entity in parent.heldCompanys %}
+    {% for entity in parent.subsidiaries %}
         {% set lastCompanyIncomings = 0 %}
-        {% for i in entity.company.companyIncomings %}{% set lastCompanyIncomings = i.amount %}{% endfor %}
-        {% set participacion = (entity.totalOwnership>0?entity.totalOwnership:entity.directOwnership) * lastCompanyIncomings / 100 %}
+        {% for i in entity.subsidiary.companyIncomings %}{% set lastCompanyIncomings = i.amount %}{% endfor %}
+        {% set participacion = (entity.total>0?entity.total:entity.direct) * lastCompanyIncomings / 100 %}
         {%- if entity.skip -%}{% set showHideClasslist = " table-danger d-none" %}
             {% set skipped = skipped + 1 %}
         {% else %}
@@ -22,14 +22,14 @@
         {% endif -%}
         <div class="row border{{ showHideClasslist ~ (entity.holderCategory.letter == 'H'?" company-self-owned":"") }}">
             <div class="col-6 border-right">
-                {{ entity.company }} <span title="{{entity.company.country|country_name('es') }}">({{ entity.company.country }})</span>
-                <a href="{{ path(prefix ~ "show",  {'id': entity.company.id} )}}" title="Ver la empresa"><i class="fa fa-home"></i></a>
-            {% if entity.company.inlist %}<i class="fa-solid fa-star" title="Forma parte de la red"></i>{% endif %}
+                {{ entity.subsidiary.fullname }} <span title="{{entity.subsidiary.country|country_name('es') }}">({{ entity.subsidiary.country }})</span>
+                <a href="{{ path(prefix ~ "show",  {'id': entity.subsidiary.id} )}}" title="Ver la empresa"><i class="fa fa-home"></i></a>
+            {% if entity.subsidiary.inlist %}<i class="fa-solid fa-star" title="Forma parte de la muestra"></i>{% endif %}
             </div>
             <div class="col-2 text-right">{{ lastCompanyIncomings|number_format(0, '.', ',') }} €</div>
             <div class="col-1 text-center" title="{{entity.holderCategory.description }}">{{ entity.holderCategory.letter }}</div>
-            {# <div class="col-1 text-right">{{ entity.directOwnership > 0 ? entity.directOwnership|number_format(2, '.', ',') : '--' }}</div> #}
-            <div class="col-1 text-right">{{ (entity.totalOwnership > 0?entity.totalOwnership:entity.directOwnership)|number_format(2, '.', ',') }}</div>
+            {# <div class="col-1 text-right">{{ entity.direct > 0 ? entity.direct|number_format(2, '.', ',') : '--' }}</div> #}
+            <div class="col-1 text-right">{{ (entity.total > 0?entity.total:entity.direct)|number_format(2, '.', ',') }}</div>
             <div class="col-2 text-right">{{ participacion|number_format(0, '.', ',') }} €</div>
         </div>
     {% endfor %}

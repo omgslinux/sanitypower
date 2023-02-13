@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ShareholderRepository::class)
  * @ORM\Table(name="shareholders",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"company_id", "holder_id"})}
+ *   uniqueConstraints={@ORM\UniqueConstraint(columns={"holder_id", "subsidiary_id"})}
  * )
 */
 class Shareholder
@@ -23,28 +23,28 @@ class Shareholder
     /**
     * En accionistas, $company es $parent, la que es poseída por un holder
     *
-    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="companyHolders")
-    * @ORM\JoinColumn(nullable=false)
-    */
-    private $company;
-
-    /**
-    * En accionistas, $holder es quien tiene acciones de $company
-    *
-    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="heldCompanys")
+    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="subsidiaries")
     * @ORM\JoinColumn(nullable=false)
     */
     private $holder;
 
     /**
-     * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
-     */
-    private $directOwnership;
+    * En accionistas, $holder es quien tiene acciones de $company
+    *
+    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="holders")
+    * @ORM\JoinColumn(nullable=false)
+    */
+    private $subsidiary;
 
     /**
      * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
      */
-    private $totalOwnership;
+    private $direct;
+
+    /**
+     * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
+     */
+    private $total;
 
     /**
      * @ORM\Column(type="boolean")
@@ -72,50 +72,50 @@ class Shareholder
         return $this->id;
     }
 
-    public function getCompany(): ?Company
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?Company $company): self
-    {
-        $this->company = $company;
-
-        return $this;
-    }
-
     public function getHolder(): ?Company
     {
         return $this->holder;
     }
 
-    public function setHolder(?Company $holder): self
+    public function setHolder(?Company $company): self
     {
-        $this->holder = $holder;
+        $this->holder = $company;
 
         return $this;
     }
 
-    public function getDirectOwnership(): ?string
+    public function getSubsidiary(): ?Company
     {
-        return $this->directOwnership;
+        return $this->subsidiary;
     }
 
-    public function setDirectOwnership(?string $directOwnership): self
+    public function setSubsidiary(?Company $value): self
     {
-        $this->directOwnership = $directOwnership;
+        $this->subsidiary = $value;
 
         return $this;
     }
 
-    public function getTotalOwnership(): ?string
+    public function getDirect(): ?string
     {
-        return $this->totalOwnership;
+        return $this->direct;
     }
 
-    public function setTotalOwnership(?string $totalOwnership): self
+    public function setDirect(?string $direct): self
     {
-        $this->totalOwnership = $totalOwnership;
+        $this->direct = $direct;
+
+        return $this;
+    }
+
+    public function getTotal(): ?string
+    {
+        return $this->total;
+    }
+
+    public function setTotal(?string $total): self
+    {
+        $this->total = $total;
 
         return $this;
     }

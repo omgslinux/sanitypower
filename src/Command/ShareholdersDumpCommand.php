@@ -74,34 +74,37 @@ class ShareholdersDumpCommand extends Command
                 //$io->note(sprintf('Contenido: %s', $contents));
                 //$keys = explode(",", $line);
                 $lineNumber++;
-                if (!empty($parentname = str_replace('"', '', $keys[0]))) {
-                    if ($prev != $parentname) {
+                if (!empty($subName = str_replace('"', '', $keys[0]))) {
+                    if ($prev != $subName) {
                         if (null!=$prev) {
                             $this->HR->flush();
                         }
-                        $parent=$this->repo->findOneByFullname($parentname);
-                        if (null==$parent) {
-                            $io->error(sprintf('Fallo en: %s', $parentname));
+                        $subsidiary=$this->repo->findOneByFullname($subName);
+                        if (null==$subsidiary) {
+                            $io->error(sprintf('Fallo en: %s', $subName));
                         }
-                        $prev=$parent->getFullname();
+                        $prev=$subsidiary->getFullname();
                     }
-                    if (!empty($fullname = str_replace('"', '', $keys[1])) && (strtolower($fullname)!='nan')) {
+                    if (!empty($holderName = str_replace('"', '', $keys[1])) && (strtolower($holderName)!='nan')) {
                         $holderCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[4]));
+                        if (null==$holderCategory) {
+                            $io->error(sprintf('Fallo en: %s', $subName));
+                        }
                         $_country = $country = str_replace('"', '', $keys[3]);
                         if ($country == 'n.d.') {
                             $country = '--';
                         }
                         if ($holderCategory->getLetter() == 'H') {
-                            $holder = $parent;
+                            $holder = $subsidiary;
                         } else {
                             if (null == ($holder = $this->repo->findOneBy(
                                 [
-                                    'fullname' => $fullname,
-                                    'country' => $country,
+                                    'fullname' => $holderName,
+                                    //'country' => $country,
                                 ]
                             ))) {
                                 $holder = new Company();
-                                $holder->setFullname($fullname)
+                                $holder->setFullname($holderName)
                                 ->setCountry($country)
                                 ->setActive(false)
                                 ->setLevel($level)
@@ -114,41 +117,43 @@ class ShareholdersDumpCommand extends Command
                         if (null == ($entity = $this->HR->findOneBy(
                             [
                                 'holder' => $holder,
-                                'company' => $parent,
+                                'subsidiary' => $subsidiary,
                             ]
                         ))) {
                             $via = (str_replace('"', '', $keys[2]));
-                            $directOwnership = str_replace('"', '', $keys[5]);
-                            $totalOwnership = str_replace('"', '', $keys[6]);
+                            $direct = str_replace('"', '', $keys[5]);
+                            $total = str_replace('"', '', $keys[6]);
                             $data = [
+                                'holder' => $holderName,
+                                'subsidiary' => $subsidiary,
                                 'country' => $_country,
-                                'name' => $fullname,
                                 'active' => false,
                                 'via' => $via,
-                                'direct' => $directOwnership,
-                                'total' => $totalOwnership
+                                'direct' => $direct,
+                                'total' => $total
                             ];
                             $entity = new Shareholder();
-                            $entity->setCompany($parent)
-                            ->setHolder($holder)
+                            $entity->setHolder($holder)
+                            ->setSubsidiary($subsidiary)
                             ->setVia(!empty($via))
-                            ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
-                            ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
-                            ->setSkip(!($entity->getDirectOwnership()+$entity->getTotalOwnership())>0)
+                            ->setDirect((is_numeric($direct)?$direct:0))
+                            ->setTotal((is_numeric($total)?$total:0))
+                            ->setSkip(!($entity->getDirect()+$entity->getTotal())>0)
                             ->setHolderCategory($holderCategory)
                             ->setData($data)
                             ;
-                            $parent->addCompanyHolder($entity);
+                            $holder->addHolder($entity);
                             $io->info(
                                 sprintf(
-                                    '(%d omitidos de %d), Company: %s, Accionista: %s',
+                                    '(%d omitidos de %d), Participada: %s, Accionista: %s',
                                     $skipped,
                                     $lineNumber,
-                                    $parent->getFullname(),
+                                    $subsidiary->getFullname(),
                                     $holder->getFullname()
                                 )
                             );
-                            $this->repo->add($parent, true);
+                            //dump($holder);
+                            $this->repo->add($holder, true);
                         } else {
                             $skipped++;
                         }

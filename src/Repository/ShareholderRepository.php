@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Company;
 use App\Entity\Shareholder as Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,6 +22,15 @@ class ShareholderRepository extends ServiceEntityRepository
 
     public function add(Entity $entity, bool $flush = false): void
     {
+        if (!count($entity->getData())) {
+            $data = [
+                'country' => $entity->getSubsidiary()->getCountry(),
+                'name' => $entity->getSubsidiary()->getFullname(),
+                'direct' => $entity->getDirect(),
+                'total' => $entity->getTotal()
+            ];
+            $entity->setData($data);
+        }
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
@@ -40,6 +50,29 @@ class ShareholderRepository extends ServiceEntityRepository
         if ($flush) {
             $this->flush();
         }
+    }
+
+    public function findSubsidiariesByHolder(Company $company)
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->leftJoin('s.subsidiary', 'c')
+            ->andWhere('s.holder = :holder')
+            ->andWhere('c.active = :active')
+            //->andWhere('s.percent >= :percent')
+            ->setParameter('active', 1)
+            ->setParameter('holder', $company)
+            //->setParameter('percent', 50)
+            ->orderBy('s.subsidiary', 'ASC');
+
+        if ($company->isInList()) {
+            $qb = $qb->andWhere('c.country = :country')
+            ->setParameter('country', 'ES')
+            ;
+        }
+        return $qb->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
     public function getFullCount()
