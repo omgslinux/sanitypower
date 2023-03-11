@@ -2,7 +2,11 @@
 <html>
     <head>
         <meta charset="UTF-8">
-    <title>{% block title %}Welcome!{% endblock %}{% if is_granted('ROLE_USER') %} - {{ app.user }}{% endif %}</title>
+        <title>
+            {%- block title %}Redes de poder en sanidad{% endblock -%}
+            {%- if is_granted('ROLE_USER') %} - {{ app.user }}{% endif -%}
+        </title>
+        <link rel="shortcut icon" type="image/png" href="{{ asset('custom/red.png')}}"/>
         {# Run `composer require symfony/webpack-encore-bundle`
            and uncomment the following Encore helpers to start using Symfony UX #}
         {% block stylesheets %}
@@ -46,11 +50,11 @@
           <!-- jQuery -->
           <script type="text/javascript" src="{{ asset('components/jquery.min.js') }}"></script>
           <!-- Bootstrap tooltips -->
-          <script type="text/javascript" src="{{ asset('js/popper.min.js') }}"></script>
+          {#{<script type="text/javascript" src="{{ asset('js/popper.min.js') }}"></script>#}
           <!-- Bootstrap core JavaScript -->
           <script type="text/javascript" src="{{ asset('components/js/bootstrap.min.js') }}"></script>
           <!-- Your custom scripts (optional) -->
-          <script type="text/javascript" src="{{ asset('app.js') }}"></script>
+          {#<script type="text/javascript" src="{{ asset('app.js') }}"></script>#}
           <script type="text/javascript"></script>
     </body>
 </html>
