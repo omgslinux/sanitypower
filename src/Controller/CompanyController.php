@@ -38,6 +38,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
+use App\Util\CompanyUtil;
 
 /**
  * @Route("/manage/company", name="company_")
@@ -67,11 +68,7 @@ class CompanyController extends AbstractController
         ],
         [
             'n' => 'control',
-            't' => 'Control',
-        ],
-        [
-            'n' => 'propiedades',
-            't' => 'Propiedades',
+            't' => 'Valor de control',
         ],
         [
             'n' => 'grupo',
@@ -531,7 +528,7 @@ class CompanyController extends AbstractController
         ShareholderCategoryRepository $holdercatRepo
     ): Response {
         $entity = new Shareholder();
-        $entity->setCompany($parent);
+        $entity->setSubsidiary($parent);
         $form = $this->createForm(ShareholderType::class, $entity, [ 'batch' => true ]);
         $form->handleRequest($request);
 
@@ -546,12 +543,13 @@ class CompanyController extends AbstractController
                 if (!empty($param['batch'])) {
                     //$level = $em->getRepository(CompanyLevel::class)->findOneBy(['level' => 'Sin identificar']);
                     $level = $companyLevelRepo->findOneBy(['level' => 'Sin identificar']);
-                    $companyCategory = $categoryRepo->findOneByLetter('C');
+                    $companyCategory = $categoryRepo->findOneByLetter('K');
 
                     $batch = true;
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
                         $keys = explode(",", $line);
-                        if (!empty($fullname = str_replace('"', '', $keys[0]))) {
+                        if (!empty($holderRealname = str_replace('"', '', $keys[0]))) {
+                            $holderFullname = CompanyUtil::stripCompanyName($holderRealname);
                             //dump($keys);
                             $holderCategory = $holdercatRepo->findOneByLetter(str_replace('"', '', $keys[3]));
                             $_country = $country = str_replace('"', '', $keys[2]);
@@ -563,50 +561,56 @@ class CompanyController extends AbstractController
                             } else {
                                 if (null == ($holder = $this->repo->findOneBy(
                                     [
-                                        'fullname' => $fullname,
+                                        'fullname' => $holderFullname,
                                         'country' => $country,
                                     ]
                                 ))) {
                                     $holder = new Company();
-                                    $holder->setFullname($fullname)
+                                    $holder->setFullname($holderFullname)
+                                    ->setRealname($holderRealname)
                                     ->setCountry($country)
+                                    ->setCategory($companyCategory)
                                     ->setActive(false)
                                     ->setLevel($level)
                                     ;
+                                } else {
+                                    if ($holder->getRealname()!=$holderRealname) {
+                                        $holder->setRealname($holderRealname);
+                                    }
                                 }
-                                $holder->setCategory($companyCategory);
                                 //$em->persist($holder);
-                                $this->repo->add($holder);
+                                $this->repo->add($holder, true);
                             }
                             //dump($holder);
                             if (null == ($entity = $holderRepo->findOneBy(
                                 [
                                     'holder' => $holder,
-                                    'company' => $parent,
+                                    'subsidiary' => $parent,
                                 ]
                             ))) {
                                 $via = (str_replace('"', '', $keys[1]));
-                                $directOwnership = str_replace('"', '', $keys[4]);
-                                $totalOwnership = str_replace('"', '', $keys[5]);
+                                $direct = str_replace('"', '', $keys[4]);
+                                $total = str_replace('"', '', $keys[5]);
                                 $data = [
                                     'country' => $_country,
-                                    'name' => $fullname,
+                                    'name' => $holderFullname,
+                                    'realname' => $holderRealname,
                                     'active' => false,
                                     'via' => $via,
-                                    'direct' => $directOwnership,
-                                    'total' => $totalOwnership
+                                    'direct' => $direct,
+                                    'total' => $total
                                 ];
                                 $entity = new Shareholder();
-                                $entity->setCompany($parent)
+                                $entity->setSubsidiary($parent)
                                 ->setHolder($holder)
                                 ->setVia(!empty($via))
-                                ->setDirectOwnership((is_numeric($directOwnership)?$directOwnership:0))
-                                ->setTotalOwnership((is_numeric($totalOwnership)?$totalOwnership:0))
-                                ->setSkip(!($entity->getDirectOwnership()+$entity->getTotalOwnership())>0)
+                                ->setDirect((is_numeric($direct)?$direct:0))
+                                ->setTotal((is_numeric($total)?$total:0))
+                                ->setSkip(!($entity->getDirect()+$entity->getTotal())>0)
                                 ->setHolderCategory($holderCategory)
                                 ->setData($data)
                                 ;
-                                $parent->addCompanyHolder($entity);
+                                $parent->addHolder($entity);
                                 $this->repo->add($parent, true);
                             }
                         }
@@ -616,7 +620,7 @@ class CompanyController extends AbstractController
 
             if (!$batch) {
                 //$em->persist($entity);
-                $parent->addCompanyHolder($entity);
+                $parent->addHolder($entity);
             }
             //$em->flush();
             $this->repo->add($parent, true);
@@ -651,7 +655,7 @@ class CompanyController extends AbstractController
             return $this->redirectToRoute(
                 self::PREFIX . 'show',
                 [
-                    'id' => $entity->getCompany()->getId(),
+                    'id' => $entity->getHolder()->getId(),
                     'activetab' => 'shareholders',
                 ]
             );
