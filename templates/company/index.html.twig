@@ -58,13 +58,8 @@
             </div>
         {% for company in companies %}
             <div class="row">
-                <div class="col-7 table-bordered p-1"><a href="{{ path('company_show', {'id': company.id}) }}">{{ company.fullname }}
-                {% if company.level == 'Matriz' %}
-                [{{ company.country }}]
-                {% else %}
-                ({{ company.country }})
-                {% endif %}
-                </a></div>
+                <div class="col-7 table-bordered p-1"><a href="{{ path('company_show', {'id': company.id}) }}">
+                {{- company.realname }} {{ company.countrySuffix }}</a></div>
                 <div class="col-2 table-bordered p-1">{{ company.level }}</div>
                 <div class="col-1 table-bordered p-1 text-right">{{ company.holders|length }}</div>
                 <div class="col-1 table-bordered p-1 text-right">{{ company.subsidiaries|length }}</div>

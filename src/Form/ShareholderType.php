@@ -53,14 +53,14 @@ class ShareholderType extends AbstractType
                 ]
             )
             ->add(
-                'directOwnership',
+                'direct',
                 null,
                 [
                     self::LABEL => '% directo'
                 ]
             )
             ->add(
-                'totalOwnership',
+                'total',
                 null,
                 [
                     self::LABEL => '% total'

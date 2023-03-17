@@ -19,7 +19,14 @@ class CompanyType extends AbstractType
                 'fullname',
                 null,
                 [
-                    self::LABEL => 'Nombre largo'
+                    self::LABEL => 'Nombre normalizado'
+                ]
+            )
+            ->add(
+                'realname',
+                null,
+                [
+                    self::LABEL => 'Nombre real'
                 ]
             )
             ->add(

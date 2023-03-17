@@ -582,36 +582,38 @@ class CompanyController extends AbstractController
                                 $this->repo->add($holder, true);
                             }
                             //dump($holder);
+                            $via = !empty(str_replace('"', '', $keys[1]));
+                            $direct = str_replace('"', '', $keys[4]);
+                            $total = str_replace('"', '', $keys[5]);
+                            $data = [
+                                'country' => $_country,
+                                'name' => $holderFullname,
+                                'realname' => $holderRealname,
+                                'active' => false,
+                                'via' => $via,
+                                'direct' => $direct,
+                                'total' => $total
+                            ];
                             if (null == ($entity = $holderRepo->findOneBy(
                                 [
                                     'holder' => $holder,
                                     'subsidiary' => $parent,
+                                    'via' => $via,
                                 ]
                             ))) {
-                                $via = (str_replace('"', '', $keys[1]));
-                                $direct = str_replace('"', '', $keys[4]);
-                                $total = str_replace('"', '', $keys[5]);
-                                $data = [
-                                    'country' => $_country,
-                                    'name' => $holderFullname,
-                                    'realname' => $holderRealname,
-                                    'active' => false,
-                                    'via' => $via,
-                                    'direct' => $direct,
-                                    'total' => $total
-                                ];
                                 $entity = new Shareholder();
                                 $entity->setSubsidiary($parent)
                                 ->setHolder($holder)
-                                ->setVia(!empty($via))
+                                ->setVia($via)
                                 ->setDirect((is_numeric($direct)?$direct:0))
                                 ->setTotal((is_numeric($total)?$total:0))
                                 ->setSkip(!($entity->getDirect()+$entity->getTotal())>0)
                                 ->setHolderCategory($holderCategory)
                                 ->setData($data)
                                 ;
-                                $parent->addHolder($entity);
-                                $this->repo->add($parent, true);
+                                //$parent->addHolder($entity);
+                                //$this->repo->add($parent, true);
+                                $holderRepo->add($entity, true);
                             }
                         }
                     }

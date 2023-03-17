@@ -116,6 +116,11 @@ class Company
      */
     private $childRelationships;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $realname;
+
     public function __construct()
     {
         $this->companyIncomings = new ArrayCollection();
@@ -170,6 +175,14 @@ class Company
         $this->country = $country;
 
         return $this;
+    }
+
+    public function getCountrySuffix(): ?string
+    {
+        if ($this->getLevel()->getLevel()!='Matriz') {
+            return '(' . $this->country . ')';
+        }
+        return '[' . $this->country . ']';
     }
 
     /**
@@ -266,12 +279,6 @@ class Company
         $this->notes = $notes;
 
         return $this;
-    }
-
-
-    public function __toString()
-    {
-        return $this->getFullname();
     }
 
     /**
@@ -506,5 +513,22 @@ class Company
         }
 
         return $this;
+    }
+
+    public function getRealname(): ?string
+    {
+        return $this->realname;
+    }
+
+    public function setRealname(string $realname): self
+    {
+        $this->realname = $realname;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getRealname() . ' ' . $this->getCountrySuffix();
     }
 }

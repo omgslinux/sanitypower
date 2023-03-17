@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ShareholderRepository::class)
  * @ORM\Table(name="shareholders",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"holder_id", "subsidiary_id"})}
+ *   uniqueConstraints={@ORM\UniqueConstraint(columns={"holder_id", "subsidiary_id" , "via"})}
  * )
 */
 class Shareholder

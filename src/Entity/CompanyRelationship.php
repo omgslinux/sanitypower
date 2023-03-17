@@ -92,6 +92,4 @@ class CompanyRelationship
 
         return $this;
     }
-
-
 }

@@ -5,9 +5,11 @@
 {% block body %}
 
     <h1>Editar accionista</h1>
+    <p>Accionista: {{ entity.holder.fullname }}</p>
+    <p>Participada: {{ entity.subsidiary.fullname }}</p>
 
     {{ include('company/shareholders/_form.html.twig') }}
 
-    <a href="{{ path('company_show', { 'id': entity.company.id }) }}">Volver a {{ entity.company }}</a>
+    <a href="{{ path('company_show', { 'id': entity.subsidiary.id, activetab: 'shareholders' }) }}">Volver a {{ entity.subsidiary.fullname }}</a>
 
 {% endblock %}
