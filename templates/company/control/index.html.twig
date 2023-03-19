@@ -8,7 +8,7 @@
         {#<div class="col-1 font-weight-bold text-right">% directo</div>#}
         <div class="col-1 font-weight-bold text-right">% part.</div>
         <div class="col-2 font-weight-bold text-right">Valor</div>
-    </div>{% set totalParticipacion = 0 %}{% set skipped = 0 %}
+    </div><div class="cambio-fondo">{% set totalParticipacion = 0 %}{% set skipped = 0 %}
         {% set lastCompanyIncomings = 0 %}
     {% for entity in parent.subsidiaries %}
         {% set lastCompanyIncomings = 0 %}
@@ -32,7 +32,7 @@
             <div class="col-1 text-right">{{ (entity.total > 0?entity.total:entity.direct)|number_format(2, '.', ',') }}</div>
             <div class="col-2 text-right">{{ participacion|number_format(0, '.', ',') }} €</div>
         </div>
-    {% endfor %}
+    {% endfor %}</div>
     <div class="row">
         <div class="col text-right">Total: {{ totalParticipacion|number_format(0, '.', ',') }} €</div>
     </div>

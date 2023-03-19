@@ -35,6 +35,10 @@ body {
     font-weight: 300;
 }
 
+.cambio-fondo .row:nth-child(even) {
+    background-color: lightgray;
+}
+
 .company-inlist {
     background: lightgreen;
 }

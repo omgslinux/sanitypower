@@ -7,7 +7,7 @@
         <div class="col font-weight-bold">Tipo</div>
         <div class="col font-weight-bold">% Directo</div>
         <div class="col font-weight-bold">% Total</div>
-    </div>
+    </div><div class="cambio-fondo">
     {% for entity in subsidiaries %}
         <div class="row border">
             <div class="col-8 border-right">{{ entity.subsidiary.fullname }}&nbsp{{ entity.via ? '(via its funds)' : '' }} <span title="{{entity.subsidiary.country|country_name('es') }}">{{ entity.subsidiary.getCountrySuffix }}</span>
@@ -18,7 +18,7 @@
             <div class="col">{{ entity.direct == 0 ? '--' : entity.direct == 50.01 ? ">50": entity.direct|number_format(2, '.', ',') }}</div>
             <div class="col">{{ entity.total == 0 ? '--': entity.total == 50.01 ? ">50": entity.total|number_format(2, '.', ',') }}</div>
         </div>
-    {% endfor %}
+    {% endfor %}</div>
 {% else %}
     <p>No hay participadas en España para esta empresa, teniendo un total de {{ parent.subsidiaries|length }} participadas.</p>
 {% endif %}
