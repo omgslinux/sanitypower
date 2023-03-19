@@ -21,8 +21,8 @@
                 <td>{{ shareholder_category.letter }}</td>
                 <td>{{ shareholder_category.description }}</td>
                 <td>
-                    <a href="{{ path('app_shareholder_category_show', {'id': shareholder_category.id}) }}">show</a>
-                    <a href="{{ path('app_shareholder_category_edit', {'id': shareholder_category.id}) }}">edit</a>
+                    <a href="{{ path(PREFIX ~ 'show', {'id': shareholder_category.id}) }}">show</a>
+                    <a href="{{ path(PREFIX ~ 'edit', {'id': shareholder_category.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
@@ -33,5 +33,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_shareholder_category_new') }}">Create new</a>
+    <a href="{{ path(PREFIX ~ 'new') }}">Create new</a>
 {% endblock %}
