@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=CompanyRepository::class)
  * @ORM\Table(name="company",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"fullname", "country"})}
+ *   uniqueConstraints={@ORM\UniqueConstraint(columns={"realname", "country"})}
  * )
  */
 class Company
@@ -91,17 +91,6 @@ class Company
     private $staffMemberships;
 
     /**
-     * @ORM\OneToMany(targetEntity=Subsidiary::class, mappedBy="owner")
-     */
-    private $ownedSubsidiaries;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Subsidiary::class, mappedBy="owned")
-     * @ORM\OrderBy({"owned" = "ASC"})
-     */
-    private $ownerSubsidiaries;
-
-    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $inList;
@@ -129,8 +118,6 @@ class Company
         $this->subsidiiaries = new ArrayCollection();
         $this->holders = new ArrayCollection();
         $this->staffMemberships = new ArrayCollection();
-        $this->ownerSubsidiaries = new ArrayCollection();
-        $this->ownedSubsidiaries = new ArrayCollection();
         $this->child = new ArrayCollection();
         $this->parentRelationships = new ArrayCollection();
         $this->childRelationships = new ArrayCollection();
@@ -371,66 +358,6 @@ class Company
         return $this;
     }
 
-    /**
-     * @return Collection|Subsidiary[]
-     */
-    public function getOwnerSubsidiaries(): Collection
-    {
-        return $this->ownerSubsidiaries;
-    }
-
-    public function addOwnerSubsidiary(Subsidiary $ownerSubsidiary): self
-    {
-        if (!$this->ownerSubsidiaries->contains($ownerSubsidiary)) {
-            $this->ownerSubsidiaries[] = $ownerSubsidiary;
-            $ownerSubsidiary->setOwner($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOwnerSubsidiary(Subsidiary $ownerSubsidiary): self
-    {
-        if ($this->ownerSubsidiaries->removeElement($ownerSubsidiary)) {
-            // set the owning side to null (unless already changed)
-            if ($ownerSubsidiary->getOwner() === $this) {
-                $ownerSubsidiary->setOwner(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Subsidiary[]
-     */
-    public function getOwnedSubsidiaries(): Collection
-    {
-        return $this->ownedSubsidiaries;
-    }
-
-    public function addOwnedSubsidiary(Subsidiary $ownedSubsidiary): self
-    {
-        if (!$this->ownedSubsidiaries->contains($ownedSubsidiary)) {
-            $this->ownedSubsidiaries[] = $ownedSubsidiary;
-            $ownedSubsidiary->setOwned($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOwnedSubsidiary(Subsidiary $ownedSubsidiary): self
-    {
-        if ($this->ownedSubsidiaries->removeElement($ownedSubsidiary)) {
-            // set the owning side to null (unless already changed)
-            if ($ownedSubsidiary->getOwned() === $this) {
-                $ownedSubsidiary->setOwned(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getCategory(): ?CompanyActivityCategory
     {
         return $this->category;
@@ -529,6 +456,6 @@ class Company
 
     public function __toString()
     {
-        return $this->getRealname() . ' ' . $this->getCountrySuffix();
+        return ($this->getRealname()??$this->getFullname()) . ' ' . $this->getCountrySuffix();
     }
 }

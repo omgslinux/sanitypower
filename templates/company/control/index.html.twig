@@ -22,7 +22,7 @@
         {% endif -%}
         <div class="row border{{ showHideClasslist ~ (entity.holderCategory.letter == 'H'?" company-self-owned":"") }}">
             <div class="col-6 border-right">
-                {{ entity.subsidiary.fullname }} <span title="{{entity.subsidiary.country|country_name('es') }}">{{ entity.subsidiary.getCountrySuffix }}</span>
+                {{ entity.subsidiary.fullname }} {{ entity.via ? '(via its funds)' : '' }} <span title="{{entity.subsidiary.country|country_name('es') }}">{{ entity.subsidiary.getCountrySuffix }}</span>
                 <a href="{{ path(prefix ~ "show",  {'id': entity.subsidiary.id} )}}" title="Ver la empresa"><i class="fa fa-home"></i></a>
             {% if entity.subsidiary.inlist %}<i class="fa-solid fa-star" title="Forma parte de la muestra"></i>{% endif %}
             </div>

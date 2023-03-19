@@ -4,7 +4,7 @@ namespace App\Util;
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
-use App\Util\PhpreaderHelper;
+use App\Repository\CompanyRepository as REPO;
 
 class SheetReader
 {
@@ -65,11 +65,12 @@ class SheetReader
         'summaryShareholders' => null,
         'summarySubsidiaries' => null,
     ];
+    private $repo; // Repo de Company
     private $write; // Para indicar si se guardan ficheros CSV
 
-    public function __construct($prefix = 'TEST')
+    public function __construct()
     {
-        $this->prefix = $prefix;
+        //$this->repo = $repo;
     }
 
     public function checkSection($section)
@@ -136,10 +137,23 @@ class SheetReader
         return $this;
     }
 
+    private function stripCompanyFileName($companyFilename): string
+    {
+        return REPO::getStrippedFileName($companyFilename);
+        $search = ['@@SLASH@@', '@@QUOTE@@', '@@COMMA@@', '@@DOT@@'];
+        $replace = ['/', '’', ',', '.'];
+        // Obtenemos el nombre formal de la empresa, con todos sus caracteres imprimibles
+        //$_empresa = substr($company, 0, strpos($company, '.'));
+        $empresa = trim(str_replace($search, $replace, strtoupper($companyFilename)));
+
+        return $empresa;
+    }
+
     private function stripCompanyName($company): string
     {
-        $search = ['@@SLASH@@', '@@QUOTE@@', ',', '.', '  ', '@@COMMA@@'];
-        $replace = ['/', '’', ' ', '', ' ', ','];
+        return REPO::getStrippedCN($company);
+        $search = [',', '.', '  '];
+        $replace = [' ', '', ' '];
         //$_empresa = substr($company, 0, strpos($company, '.'));
         $empresa = trim(str_replace($search, $replace, strtoupper($company)));
 
@@ -169,8 +183,9 @@ class SheetReader
         //empresa = file.replace("@@SLASH@@", "/").replace("@@QUOTE@@","’")
         $_empresa = substr($_empresa, 0, strpos($_empresa, '.'));
         $result['companyfilename'] = $_empresa;
-        $empresa = $this->stripCompanyName($_empresa);
-        $this->company = $result['company'] = $empresa;
+        $empresa = $this->stripCompanyFileName($_empresa);
+        $result['realname'] = $empresa;
+        $this->company = $result['company'] = $this->stripCompanyName($empresa);
         $inputFileType = IOFactory::identify(
             $inputFileName,
             [
@@ -184,8 +199,6 @@ class SheetReader
         //$helper->log('Loading file ' . /** @scrutinizer ignore-type */ pathinfo($inputFileName, PATHINFO_BASENAME)
         //    . ' using IOFactory to identify the format');
         //$spreadsheet = PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
-        $filter = new PhpreaderHelper();
-        //$reader->setReadFilter($filter);
         /**  Advise the Reader that we only want to load cell data  **/
         $reader->setReadDataOnly(true)
         ->setReadEmptyCells(false);
@@ -193,6 +206,7 @@ class SheetReader
         //$sheetData = $spreadsheet->getActiveSheet()->toArray(false, true, true, true);
         $this->worksheet = $spreadsheet->getActiveSheet();
         $store = false;
+        $result['class'] = '';
         $Mends = ['Leyenda', "Directores y gerentes previos", "Estructura de propiedad" ];
         foreach ($this->worksheet->getRowIterator() as $row) {
             $cellIterator = $row->getCellIterator('A', 'F');
@@ -212,6 +226,7 @@ class SheetReader
                     $Mends = ['Auditores de Cuentas y Bancos'];
                     if (empty($result['M'])) {
                         $result['M'] = $rowIndex;
+                        $result['class'] = 'SABI';
                     }
                 }
                 if (!empty($result['M']) && empty($result['Mend']) && empty($result['A'])) {
@@ -232,7 +247,7 @@ class SheetReader
                 }
             }
         }
-        $result['class'] = '';
+        //$result['class'] = '';
         $result['total'] = $this->worksheet->getHighestRow(); //$rowIndex;
         //dump($result);
         $this->results = $result;
@@ -249,28 +264,19 @@ class SheetReader
             return $managers;
         }
 
-        $colKeys = ['Nombre', 'Título original de la función', 'Comité'];
-        $colTitles = [];
+        if ($this->results['class'] != 'SABI') {
+            $managers = $this->managersORBISSearch1();
+            if ($managers) return $managers;
+            $managers = $this->managersORBISSearch2();
+            if ($managers) return $managers;
+        } else {
+            $colKeys = ['Nombre', 'Título original de la función', 'Comité'];
+            $colTitles = [];
 
-        foreach ($this->worksheet->getRowIterator($this->results['M'], $this->results['Mend']) as $row) {
-            $cellIterator = $row->getCellIterator('A', 'AZ');
-            $cellIterator->setIterateOnlyExistingCells(true);
-            $rowIndex = $row->getRowIndex();
-
-            if ($this->results['class'] != 'SABI') {
-                //dump($rowIndex);
-                // Buscamos la columna
-                $search = ["\n"]; // "\xa0"];
-                $replace = ["@@"]; //, " "];
-                foreach ($cellIterator as $cell) {
-                    $lines = explode('@@', str_replace($search, $replace, $cell->getValue()));
-                    //dump($lines);
-                    if (count($lines)>2) {
-                        $managers[] = $lines;
-                        break;
-                    }
-                }
-            } else {
+            foreach ($this->worksheet->getRowIterator($this->results['M'], $this->results['Mend']) as $row) {
+                $cellIterator = $row->getCellIterator('A', 'AZ');
+                $cellIterator->setIterateOnlyExistingCells(true);
+                $rowIndex = $row->getRowIndex();
                 if (count($colTitles)<count($colKeys)) {
                     foreach ($cellIterator as $cell) {
                         $column = $cell->getColumn();
@@ -339,7 +345,6 @@ class SheetReader
             $i = ''; // Inicializamos el indice en cada fila
             //dump("A$rowIndex: " .$this->readValue('A'.$rowIndex));
             $line = [];
-            $via= '';
 
             if ($end) {
                 break;
@@ -389,11 +394,6 @@ class SheetReader
             } else {
                 if (!empty($this->readValue($colTitles['Nombre'].$rowIndex))) {
                     $Nombre = $this->readValue($colTitles['Nombre'].$rowIndex);
-                    $funds = stripos($Nombre, self::VIASTR);
-                    if ($funds) {
-                        $via = self::VIASTR;
-                        $Nombre = trim(substr($Nombre, 0, $funds));
-                    }
                 }
                 //dump("class: $class");
                 if ($class=='ORBIS') {
@@ -421,11 +421,11 @@ class SheetReader
                             if (strlen($Nombre)>4) {
                                 $line = [
                                     'Nombre' => $Nombre,
-                                    'via' => $via,
+                                    //'via' => $via,
                                     'Pais' => $this->readValue($colTitles['Pais'].$rowIndex),
                                     'Tipo' => $this->readValue($colTitles['Tipo'].$rowIndex),
-                                    'Direct' => $this->readValue($colTitles['Direct'].$rowIndex),
-                                    'Total' => $this->readValue($colTitles['Total'].$rowIndex),
+                                    'Direct' => str_replace(',', '.', $this->readValue($colTitles['Direct'].$rowIndex)),
+                                    'Total' => str_replace(',', '.', $this->readValue($colTitles['Total'].$rowIndex)),
                                     'row' => $rowIndex,
                                 ];
                             }
@@ -459,15 +459,10 @@ class SheetReader
                                 }
                                 //dump("Nombre: $Nombre");
                             }
-                            $funds = stripos($Nombre, self::VIASTR);
-                            if ($funds) {
-                                $via = self::VIASTR;
-                                $Nombre = substr($Nombre, 0, $funds);
-                            }
                             $line = [
                                 'index' => ++$index,
                                 'Nombre' => $Nombre,
-                                'via' => $via,
+                                //'via' => $via,
                                 'Pais' => $this->readValue($colTitles['Pais'].$rowIndex),
                                 'Tipo' => $this->readValue($colTitles['Tipo'].$rowIndex),
                                 'Direct' => str_replace(',', '.', $this->readValue($colTitles['Direct'].$rowIndex)),
@@ -479,10 +474,10 @@ class SheetReader
                 }
             }
             if (count($line)) {
-                if (!empty($Nombre)) {
+                /* if (!empty($Nombre)) {
                     //$line['Nombre'] = str_replace($NombreSearch, $NombreReplace, $Nombre);
                     $line['Nombre'] = $this->stripCompanyName($Nombre);
-                }
+                } */
                 $line['S'] = 'A'; // Seccion: accionistas
                 //dump($line);
                 $shareholders[] = $line;
@@ -593,24 +588,16 @@ class SheetReader
                                 $value= $cell->getValue();
                                 //dump("row: $rowIndex, key: $key, value: $value");
                                 if (($key != 'A') && (strlen($value)>3)) {
-                                    //$colTitles['Nombre'] = $key;
                                     $Nombre = $value;
                                     //dump($colTitles);
                                     break;
                                 }
                             }
                         }
-                        $via= '';
-                        $funds = stripos($Nombre, self::VIASTR);
-                        if ($funds) {
-                            $via = self::VIASTR;
-                            $Nombre = trim(substr($Nombre, 0, $funds));
-                        }
                         $line = [
                             'index' => ++$index,
-                            //'Nombre' => $this->stripCompanyName($this->readValue($colTitles['Nombre'].$rowIndex)),
-                            'Nombre' => $this->stripCompanyName($Nombre),
-                            'Via' => $via,
+                            'Nombre' => $Nombre, // NO HAY QUE HACER STRIP
+                            //'Via' => $via,
                             'Pais' => $this->readValue($colTitles['Pais'].$rowIndex)??'--',
                             'Tipo' => $Tipo,
                             'Direct' => str_replace(',', '.', $this->readValue($colTitles['Direct'].$rowIndex))??0,
@@ -628,6 +615,59 @@ class SheetReader
         }
 
         return $subsidiaries;
+    }
+
+    private function managersORBISSearch1()
+    {
+        $managers = [];
+        foreach ($this->worksheet->getRowIterator($this->results['M'], $this->results['Mend']) as $row) {
+            $cellIterator = $row->getCellIterator('A', 'AZ');
+            $cellIterator->setIterateOnlyExistingCells(true);
+            $rowIndex = $row->getRowIndex();
+            $search = ["\n"]; // "\xa0"];
+            $replace = ["@@"]; //, " "];
+            foreach ($cellIterator as $cell) {
+                $lines = explode('@@', str_replace($search, $replace, $cell->getValue()));
+                //dump($lines);
+                if (count($lines)>2) {
+                    $managers[] = $lines;
+                    break;
+                }
+            }
+        }
+
+        return $managers;
+    }
+
+    private function managersORBISSearch2()
+    {
+        $managers = [];
+        $line = [];
+        foreach ($this->worksheet->getRowIterator($this->results['M'], $this->results['Mend']) as $row) {
+            $cellIterator = $row->getCellIterator('A', 'AZ');
+            $cellIterator->setIterateOnlyExistingCells(true);
+            $rowIndex = $row->getRowIndex();
+
+            $colIndex = null;
+            // Buscamos la primera columna que tenga contenido, y la usamos como columna de contenido
+            foreach ($cellIterator as $cell) {
+                $column = $cell->getColumn();
+                $value = $cell->getValue();
+                if (strlen($value)>4 && $column != 'A') {
+                    $colIndex = $cell->getColumn();
+                    break;
+                }
+            }
+            if (null!=$colIndex) {
+                $line[] = $this->readValue($colIndex . $rowIndex);
+                if (count($line)==3) {
+                    $managers[]=$line;
+                    $line=[];
+                }
+            }
+        }
+
+        return $managers;
     }
 
     public function openResultsFiles()
@@ -680,7 +720,7 @@ class SheetReader
 
         // Inicializamos para evitar error
         $shares = $subs = $managers = [];
-        //if ($this->section == self::SECTALL || $this->section == self::SECTHOLDERS) {
+
         if ($this->checkSection(self::SECTHOLDERS)) {
             $shares = $this->generateShareholders($write);
             if (count($shares)) {
@@ -691,16 +731,17 @@ class SheetReader
                     foreach ($shares as $line) {
                         $array = [
                             $line['Nombre'],
-                            $line['via'],
+                            //$line['via'],
                             $line['Pais'],
                             $line['Tipo'],
                             $line['Direct'],
                             $line['Total'],
                         ];
-                        fputcsv($fp, $array);
+                        fputcsv($fp, $array, "\t");
                         fputcsv(
                             $this->handlers['detailShareholders'],
-                            array_merge([$this->company], $array)
+                            array_merge([$this->company], $array),
+                            "\t",
                         );
                     }
                     fclose($fp);
@@ -718,16 +759,17 @@ class SheetReader
                 foreach ($subs as $line) {
                     $array = [
                             $line['Nombre'],
-                            $line['Via'],
+                            //$line['Via'],
                             $line['Pais'],
                             $line['Tipo'],
                             $line['Direct'],
                             $line['Total'],
                     ];
-                    fputcsv($fp, $array);
+                    fputcsv($fp, $array, "\t");
                     fputcsv(
                         $this->handlers['detailSubsidiaries'],
-                        array_merge([$this->company], $array)
+                        array_merge([$this->company], $array),
+                        "\t"
                     );
                 }
                 fclose($fp);
@@ -749,10 +791,11 @@ class SheetReader
                             $line['Fecha'],
                             $line['Cargo'],
                     ];*/
-                    fputcsv($fp, $array);
+                    fputcsv($fp, $array, "\t");
                     fputcsv(
                         $this->handlers['detailManagers'],
-                        array_merge([$this->company], $array)
+                        array_merge([$this->company], $array),
+                        "\t"
                     );
                 }
                 fclose($fp);
@@ -826,8 +869,6 @@ class SheetReader
             //$helper->log('Loading file ' . /** @scrutinizer ignore-type */ pathinfo($inputFileName, PATHINFO_BASENAME)
             //    . ' using IOFactory to identify the format');
             //$spreadsheet = PhpOffice\PhpSpreadsheet\IOFactory::load($inputFileName);
-            $filter = new PhpreaderHelper();
-            //$reader->setReadFilter($filter);
             /**  Advise the Reader that we only want to load cell data  **/
             $reader->setReadDataOnly(true)
             ->setReadEmptyCells(false);

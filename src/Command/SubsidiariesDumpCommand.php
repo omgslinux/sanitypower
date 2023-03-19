@@ -21,11 +21,12 @@ class SubsidiariesDumpCommand extends Command
     protected static $defaultName = 'app:subsidiaries:dump';
     protected static $defaultDescription = 'Massive dump for subsidiaries';
 
-    private $SR;
-    private $CACR;
+    private $HR;
+    private $CCR;
     private $CLR;
     private $repo;
     private $SCR;
+    const VIASTR = 'via its funds';
 
     public function __construct(
         ShareholderRepository $holderRepo,
@@ -34,8 +35,8 @@ class SubsidiariesDumpCommand extends Command
         CompanyRepository $repo,
         ShareholderCategoryRepository $holdercatRepo
     ) {
-        $this->SR = $holderRepo;
-        $this->CACR = $companycatRepo;
+        $this->HR = $holderRepo;
+        $this->CCR = $companycatRepo;
         $this->CLR = $companyLevelRepo;
         $this->repo = $repo;
         $this->SCR = $holdercatRepo;
@@ -66,60 +67,78 @@ class SubsidiariesDumpCommand extends Command
             $prev = null;
             $level = $this->CLR->findOneBy(['level' => 'Sin identificar']);
             // Asignamos por defecto el tipo 'K' a las empresas
-            $companyCategory = $this->CACR->findOneByLetter('K');
+            $companyCategory = $this->CCR->findOneByLetter('K');
             $lineNumber = $skipped = 0;
-            while (($keys = fgetcsv($handle, 1000, ",")) !== false) {
+            while (($keys = fgetcsv($handle, 1000, "\t")) !== false) {
+                //ACCIONISTAREALNAME{tab}PARTICIPADA [via its funds]{tab}PAIS{tab}TIPO{tab}Directo{tab}Total
                 //"DEUTSCHE BANK AG","ABSALON CREDIT FUND DESIGNATED ACTIVITY COMPANY",,IE,E,100.00,100.00
-                //"DEUTSCHE BANK AG","ALFRED HERRHAUSEN GESELLSCHAFT MBH",,DE,C,100.00,100.00
-                //"DEUTSCHE BANK AG","AMBER INVESTMENTS SÀ RL",,LU,E,100.00,100.00
-                //"DEUTSCHE BANK AG","AMBIDEXTER GMBH",,DE,C,100.00,100.00
-                //"DEUTSCHE BANK AG","AO DB SECURITIES",,KZ,E,100.00,100.00
-                //$io->note(sprintf('Contenido: %s', $contents));
-                //$keys = explode(",", $line);
+                //"DEUTSCHE BANK AG","ALFRED HERRHAUSEN GESELLSCHAFT MBH",DE,C,100.00,100.00
+                //"DEUTSCHE BANK AG","AMBER INVESTMENTS SÀ RL",LU,E,100.00,100.00
+                //"DEUTSCHE BANK AG","AMBIDEXTER GMBH via its funds",DE,C,100.00,100.00
+                //"DEUTSCHE BANK AG","AO DB SECURITIES",KZ,E,100.00,100.00
                 $lineNumber++;
-                if (!empty($holderName = str_replace('"', '', $keys[0]))) {
-                    if ($prev != $holderName) {
+                if (!empty($holderRealName = str_replace('"', '', $keys[0]))) {
+                    if ($prev != $holderRealName) {
                         /*if (null!=$prev) {
                             $this->repo->flush();
                         } */
                         unset($holder);
                         $holder=null;
-                        $holder=$this->repo->findOneByFullname($holderName);
+                        $holder=$this->repo->findOneBy(
+                            [
+                                'realname' => $holderRealName,
+                                'inList' => true,
+                            ]
+                        );
+                        $holderName = $this->repo->getStrippedCN($holderRealName);
                         if (null==$holder) {
-                            $io->error(sprintf('Fallo en: %s', $holderName));
+                            $holder=$this->repo->findOneBy(
+                                [
+                                    'fullname' => $holderName,
+                                    'inList' => true,
+                                ]
+                            );
+                        } else {
+                            $holder->setFullname($holderName);
                         }
-                        $prev=$holder->getFullname();
+                        if (null==$holder) {
+                            $io->error(sprintf('Fallo en: %s', $holderRealName));
+                        }
+                        if (($holder->getRealname() != $holderRealName) || ($holder->getFullname() != $holderName)) {
+                            $holder
+                            ->setRealname($holderRealName)
+                            ->setFullname($holderName);
+                            $this->repo->add($holder, true);
+                        }
+                        $prev=$holder->getRealname();
                     }
-                    if (!empty($subName = str_replace('"', '', $keys[1])) && (strtolower($subName)!='nan')) {
-                        $subCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[4]));
-                        $_country = $subCountry = str_replace('"', '', $keys[3]);
+                    if (!empty($subRawName = str_replace('"', '', strtoupper($keys[1])))) {
+                        $via = false;
+                        if ($viapos = stripos($subRawName, self::VIASTR)) {
+                            $subRawName = trim(substr($subRawName, 0, $viapos));
+                            $via = true;
+                        }
+                        $subName = $this->repo->getStrippedCN($subRawName);
+                        $_country = $subCountry = str_replace('"', '', $keys[2]);
                         if ($subCountry == 'n.d.') {
                             $subCountry = '--';
                         }
-                        $via = (str_replace('"', '', $keys[2]));
-                        $direct = str_replace('"', '', $keys[5]);
-                        $total = str_replace('"', '', $keys[6]);
-                        $data = [
-                            'holder' => $holderName,
-                            'subsidiary' => $subName,
-                            'country' => $_country,
-                            'active' => false,
-                            'via' => $via,
-                            'direct' => $direct,
-                            'total' => $total
-                        ];
+                        $subCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[3]));
+                        $direct = str_replace('"', '', $keys[4]);
+                        $total = str_replace('"', '', $keys[5]);
                         //dump($data);
                         if ($subCategory->getLetter() == 'H') {
-                            $sub = $holder;
+                            $subsidiary = $holder;
                         } else {
-                            if (null == ($sub = $this->repo->findOneBy(
+                            if (null == ($subsidiary = $this->repo->findOneBy(
                                 [
                                     'fullname' => $subName,
-                                    //'country' => $subCountry,
+                                    'country' => $subCountry,
                                 ]
                             ))) {
-                                $sub = new Company();
-                                $sub->setFullname($subName)
+                                $subsidiary = new Company();
+                                $subsidiary->setFullname($subName)
+                                ->setRealname($subRawName)
                                 ->setCountry($subCountry)
                                 ->setActive(false)
                                 ->setLevel($level)
@@ -129,40 +148,51 @@ class SubsidiariesDumpCommand extends Command
                             } else {
                                 //dump("Ya existe empresa: $subName");
                             }
-                            $this->repo->add($sub, true);
+                            $this->repo->add($subsidiary);
                         }
                         //dump($holder);
                         //dump($data);
-                        if (null == ($entity = $this->SR->findOneBy(
+                        if (null == ($entity = $this->HR->findOneBy(
                             [
                                 'holder' => $holder,
-                                'subsidiary' => $sub,
+                                'subsidiary' => $subsidiary,
+                                'via' => $via,
                             ]
                         ))) {
+                            $data = [
+                                'holder' => $holderName,
+                                'realname' => $holderRealName,
+                                'subsidiary' => $subsidiary->getRealname(),
+                                'country' => $_country,
+                                'active' => false,
+                                'via' => $via,
+                                'direct' => $direct,
+                                'total' => $total
+                            ];
                             $entity = new Shareholder();
                             $entity->setHolder($holder)
-                            ->setSubsidiary($sub)
-                            ->setVia(!empty($via))
+                            ->setSubsidiary($subsidiary)
+                            ->setVia($via)
                             ->setDirect((is_numeric($direct)?$direct:0))
                             ->setTotal((is_numeric($total)?$total:0))
                             ->setSkip(!($entity->getDirect()+$entity->getTotal())>0)
                             ->setHolderCategory($subCategory)
                             ->setData($data)
                             ;
-                            $this->SR->add($entity, true);
+                            $holder->addHolder($entity);
                             $io->info(
                                 sprintf(
                                     '(%d omitidos de %d), Accionista: %s, Participada: %s',
                                     $skipped,
                                     $lineNumber,
                                     $holder->getFullname(),
-                                    $sub->getFullname(),
+                                    $subsidiary->getFullname(),
                                 )
                             );
-                            //dump($data);
-                            //$this->repo->add($holder, true);
+                            //dump($holder);
+                            $this->repo->add($holder, true);
                         } else {
-                            //dump("NO SE CREA entrada share:", $entity);
+                            //$io->error(sprintf('Se omite duplicado: (a: %s), (p: %s)', $holderName, $subName));
                             $skipped++;
                         }
                     }

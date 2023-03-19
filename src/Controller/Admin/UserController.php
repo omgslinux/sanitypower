@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Form\UserType;
+use App\Form\ManagePasswordType;
 use App\Repository\UserRepository as REPO;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -110,5 +111,35 @@ class UserController extends AbstractController
         }
 
         return $this->redirectToRoute(self::PREFIX . 'index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Displays a form to change the password.
+     *
+     * @Route("/pass", name="pass", methods={"GET", "POST"})
+     */
+    public function password(Request $request)
+    {
+        $user=$this->getUser();
+        $form = $this->createForm(
+            ManagePasswordType::class,
+            $user,
+            [
+                'action' => $this->generateUrl(self::VARS['PREFIX'] . 'pass'),
+            ]
+        );
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->repo->formSubmit($form);
+
+            return $this->redirectToRoute('homepage');
+        }
+
+        return $this->render('user/_pass.html.twig', array(
+            'user' => $user,
+            'form' => $form->createView(),
+            'VARS' => self::VARS,
+        ));
     }
 }

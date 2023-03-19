@@ -191,4 +191,31 @@ class CompanyRepository extends ServiceEntityRepository
 
         return $paginator;
     }
+
+    public static function getStrippedFileName($companyFilename): string
+    {
+        $search = ['@@SLASH@@', '@@QUOTE@@', '@@COMMA@@', '@@DOT@@'];
+        $replace = ['/', '’', ',', '.'];
+        // Obtenemos el nombre formal de la empresa, con todos sus caracteres imprimibles
+        //$_empresa = substr($company, 0, strpos($company, '.'));
+        $empresa = trim(str_replace($search, $replace, strtoupper($companyFilename)));
+
+        return $empresa;
+    }
+
+    public static function getStrippedCN($company): string
+    {
+        // Cambiamos los acentos y alguna más a sus correspondientes
+        $search = ['À', 'Á', 'È', 'É', 'Ì', 'Í', 'Ò', 'Ó', 'Ù', 'Ú', 'ü', 'Ü'];
+        $replace = ['A', 'A', 'E', 'E', 'I', 'I', 'O', 'O', 'U', 'U', 'U', 'U'];
+        $company = trim(str_replace($search, $replace, strtoupper(self::getStrippedFileName($company))));
+
+        $search = [',', '.', '  '];
+        $replace = [' ', '', ' '];
+        // Obtenemos el nombre de la empresa para comparar con los informes
+        //$_empresa = substr($company, 0, strpos($company, '.'));
+        $empresa = trim(str_replace($search, $replace, strtoupper(self::getStrippedFileName($company))));
+
+        return $empresa;
+    }
 }

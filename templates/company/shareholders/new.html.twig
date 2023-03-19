@@ -8,7 +8,7 @@
 
     {{ include('company/shareholders/_form.html.twig') }}
 
-    <a href="{{ path('company_show', { 'id': parent.id } ) }}">Volver a {{ parent }}</a>
+    <a href="{{ path('company_show', { 'id': parent.id, 'activetab': 'shareholders' } ) }}">Volver a {{ parent }}</a>
 
 </div>
 </div>

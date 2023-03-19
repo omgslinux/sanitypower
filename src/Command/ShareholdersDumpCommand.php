@@ -15,6 +15,7 @@ use App\Repository\ShareholderRepository;
 use App\Repository\ShareholderCategoryRepository;
 use App\Repository\CompanyLevelRepository;
 use App\Repository\CompanyActivityCategoryRepository;
+use App\Util\CompanyUtil;
 
 class ShareholdersDumpCommand extends Command
 {
@@ -26,6 +27,7 @@ class ShareholdersDumpCommand extends Command
     private $CLR;
     private $repo;
     private $SCR;
+    const VIASTR = 'via its funds';
 
     public function __construct(
         ShareholderRepository $holderRepo,
@@ -68,43 +70,75 @@ class ShareholdersDumpCommand extends Command
             // Asignamos por defecto el tipo 'C' a las empresas
             $companyCategory = $this->CCR->findOneByLetter('C');
             $lineNumber = $skipped = 0;
-            while (($keys = fgetcsv($handle, 1000, ",")) !== false) {
-                //"3M COMPANY","VANGUARD GROUP INC","","US","F","8.94","n.d."
-                //"3M COMPANY","STATE STREET CORPORATION","VIA ITS FUNDS","US","B","-","7.36"
+            while (($keys = fgetcsv($handle, 1000, "\t")) !== false) {
+                //SUBSIDIARYREALNAME{tab}ACCIONISTA(HOLDER) [via its funds]{tab}PAIS{tab}TIPO{tab}Directo{tab}Total
+                //"3M COMPANY"{tab}"VANGUARD GROUP INC via its funds"{tab}"US"{tab}"F"{tab}"8.94"{tab}"n.d."
+                //"3M COMPANY","STATE STREET CORPORATION","US","B","-","7.36"
                 //$io->note(sprintf('Contenido: %s', $contents));
                 //$keys = explode(",", $line);
                 $lineNumber++;
-                if (!empty($subName = str_replace('"', '', $keys[0]))) {
-                    if ($prev != $subName) {
+                if (!empty($subRealName = str_replace('"', '', $keys[0]))) {
+                    if ($prev != $subRealName) {
                         if (null!=$prev) {
                             $this->HR->flush();
                         }
-                        $subsidiary=$this->repo->findOneByFullname($subName);
+                        $subName = $this->repo->getStrippedCN($subRealName);
+                        $subsidiary=$this->repo->findOneBy(
+                            [
+                                'realname' => $subRealName,
+                                'inList' => true,
+                            ]
+                        );
+                        if (null==$subsidiary) {
+                            $io->error(sprintf('No se encontró nombre real: %s', $subRealName));
+                            $subsidiary=$this->repo->findOneBy(
+                                [
+                                    'fullname' => $subName,
+                                    'inList' => true,
+                                ]
+                            );
+                        } else {
+                            $subsidiary
+                            ->setRealname($subRealName)
+                            ->setFullname($subName);
+                        }
                         if (null==$subsidiary) {
                             $io->error(sprintf('Fallo en: %s', $subName));
                         }
-                        $prev=$subsidiary->getFullname();
+                        //dump($subsidiary);
+                        $this->repo->add($subsidiary, true);
+                        $prev=$subsidiary->getRealname();
                     }
-                    if (!empty($holderName = str_replace('"', '', $keys[1])) && (strtolower($holderName)!='nan')) {
-                        $holderCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[4]));
-                        if (null==$holderCategory) {
-                            $io->error(sprintf('Fallo en: %s', $subName));
+                    if (!empty($holderRealName = str_replace('"', '', strtoupper($keys[1])))) {
+                        $via = false;
+                        if ($viapos = stripos($holderRealName, self::VIASTR)) {
+                            $holderRealName = trim(substr($holderRealName, 0, $viapos));
+                            $via = true;
                         }
-                        $_country = $country = str_replace('"', '', $keys[3]);
+                        $holderName = $this->repo->getStrippedCN($holderRealName);
+
+                        $_country = $country = str_replace('"', '', $keys[2]);
                         if ($country == 'n.d.') {
                             $country = '--';
                         }
+                        $holderCategory = $this->SCR->findOneByLetter(str_replace('"', '', $keys[3]));
+                        if (null==$holderCategory) {
+                            $io->error(sprintf('Fallo en: %s', $subName));
+                        }
+                        $direct = str_replace('"', '', $keys[4]);
+                        $total = str_replace('"', '', $keys[5]);
                         if ($holderCategory->getLetter() == 'H') {
                             $holder = $subsidiary;
                         } else {
                             if (null == ($holder = $this->repo->findOneBy(
                                 [
-                                    'fullname' => $holderName,
-                                    //'country' => $country,
+                                    'realname' => $holderRealName,
+                                    'country' => $country,
                                 ]
                             ))) {
                                 $holder = new Company();
                                 $holder->setFullname($holderName)
+                                ->setRealname($holderRealName)
                                 ->setCountry($country)
                                 ->setActive(false)
                                 ->setLevel($level)
@@ -118,14 +152,13 @@ class ShareholdersDumpCommand extends Command
                             [
                                 'holder' => $holder,
                                 'subsidiary' => $subsidiary,
+                                'via' => $via,
                             ]
                         ))) {
-                            $via = (str_replace('"', '', $keys[2]));
-                            $direct = str_replace('"', '', $keys[5]);
-                            $total = str_replace('"', '', $keys[6]);
                             $data = [
                                 'holder' => $holderName,
-                                'subsidiary' => $subsidiary,
+                                'realname' => $holderRealName,
+                                'subsidiary' => $subsidiary->getRealname(),
                                 'country' => $_country,
                                 'active' => false,
                                 'via' => $via,
@@ -135,7 +168,7 @@ class ShareholdersDumpCommand extends Command
                             $entity = new Shareholder();
                             $entity->setHolder($holder)
                             ->setSubsidiary($subsidiary)
-                            ->setVia(!empty($via))
+                            ->setVia($via)
                             ->setDirect((is_numeric($direct)?$direct:0))
                             ->setTotal((is_numeric($total)?$total:0))
                             ->setSkip(!($entity->getDirect()+$entity->getTotal())>0)
@@ -148,13 +181,14 @@ class ShareholdersDumpCommand extends Command
                                     '(%d omitidos de %d), Participada: %s, Accionista: %s',
                                     $skipped,
                                     $lineNumber,
-                                    $subsidiary->getFullname(),
+                                    $subsidiary->getRealname(),
                                     $holder->getFullname()
                                 )
                             );
                             //dump($holder);
                             $this->repo->add($holder, true);
                         } else {
+                            $io->error(sprintf('Se omite por existir accionista %s, participada %s', $holderName, $subName));
                             $skipped++;
                         }
                     }

@@ -30,6 +30,7 @@ class ShareholderCategoryController extends AbstractController
     {
         return $this->render('shareholder_category/index.html.twig', [
             'shareholder_categories' => $this->repo->findAll(),
+            'PREFIX' => self::PREFIX,
         ]);
     }
 

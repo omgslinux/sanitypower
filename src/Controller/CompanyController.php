@@ -55,7 +55,7 @@ class CompanyController extends AbstractController
             't' => 'Historial',
         ],
         [
-            'n' => 'directiva',
+            'n' => 'managers',
             't' => 'Consejo de administración',
         ],
         [
@@ -70,10 +70,10 @@ class CompanyController extends AbstractController
             'n' => 'control',
             't' => 'Valor de control',
         ],
-        [
+        /*[
             'n' => 'grupo',
             't' => 'Grupo',
-        ],
+        ],*/
     ];
     const PREFIX = 'company_';
 
@@ -233,7 +233,6 @@ class CompanyController extends AbstractController
     public function companyShow(
         Company $company,
         CurrencyExchangeRepository $cexRepo,
-        SubsidiaryRepository $subrepo,
         ShareholderRepository $SHR,
         $activetab = 'incomings'
     ): Response {
@@ -243,7 +242,7 @@ class CompanyController extends AbstractController
             'prefix' => self::PREFIX,
             'activetab' => $activetab,
             'incomings' => $this->incomingFindExchange($company, $cexRepo),
-            'groupparticipants' => $this->groupIndex($company, $subrepo),
+            //'groupparticipants' => $this->groupIndex($company, $subrepo),
             'subsidiaries' => $SHR->findSubsidiariesByHolder($company), //$subrepo->findByCompanyOwner($company),
         ]);
     }
@@ -547,12 +546,20 @@ class CompanyController extends AbstractController
 
                     $batch = true;
                     foreach (preg_split("/((\r?\n)|(\r\n?))/", $param['batch']) as $line) {
-                        $keys = explode(",", $line);
-                        if (!empty($holderRealname = str_replace('"', '', $keys[0]))) {
-                            $holderFullname = CompanyUtil::stripCompanyName($holderRealname);
+                        //"VANGUARD GROUP INC via its funds"{tab}"US"{tab}"F"{tab}"8.94"{tab}"n.d."
+                        //"STATE STREET CORPORATION"{tab}"US"{tab}"B"{tab}"-"{tab}"7.36"
+                        $keys = explode("\t", $line);
+                        if (!empty($holderRealName = str_replace('"', '', $keys[0]))) {
+                            $via = false;
+                            if ($viapos = stripos($holderRealName, 'via its funds')) {
+                                $holderRealName = trim(substr($holderRealName, 0, $viapos));
+                                $via = true;
+                            }
+                            //$holderName = $this->repo->getStrippedCN($holderRealName);
+                            $holderFullname = $this->repo->getStrippedCN($holderRealName);
                             //dump($keys);
-                            $holderCategory = $holdercatRepo->findOneByLetter(str_replace('"', '', $keys[3]));
-                            $_country = $country = str_replace('"', '', $keys[2]);
+                            $holderCategory = $holdercatRepo->findOneByLetter(str_replace('"', '', $keys[2]));
+                            $_country = $country = str_replace('"', '', $keys[1]);
                             if ($country == 'n.d.') {
                                 $country = '--';
                             }
@@ -567,28 +574,28 @@ class CompanyController extends AbstractController
                                 ))) {
                                     $holder = new Company();
                                     $holder->setFullname($holderFullname)
-                                    ->setRealname($holderRealname)
+                                    ->setRealname($holderRealName)
                                     ->setCountry($country)
                                     ->setCategory($companyCategory)
                                     ->setActive(false)
                                     ->setLevel($level)
                                     ;
                                 } else {
-                                    if ($holder->getRealname()!=$holderRealname) {
-                                        $holder->setRealname($holderRealname);
+                                    if ($holder->getRealname()!=$holderRealName) {
+                                        $holder->setRealname($holderRealName);
                                     }
                                 }
                                 //$em->persist($holder);
                                 $this->repo->add($holder, true);
                             }
                             //dump($holder);
-                            $via = !empty(str_replace('"', '', $keys[1]));
-                            $direct = str_replace('"', '', $keys[4]);
-                            $total = str_replace('"', '', $keys[5]);
+                            //$via = !empty(str_replace('"', '', $keys[1]));
+                            $direct = str_replace('"', '', $keys[3]);
+                            $total = str_replace('"', '', $keys[4]);
                             $data = [
                                 'country' => $_country,
                                 'name' => $holderFullname,
-                                'realname' => $holderRealname,
+                                'realname' => $holderRealName,
                                 'active' => false,
                                 'via' => $via,
                                 'direct' => $direct,

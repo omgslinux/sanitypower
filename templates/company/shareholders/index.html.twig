@@ -4,7 +4,7 @@
 {%- if total > 0 %}
     <h4 id="holderSummary"></h4>{# Aqui dentro va a ir contenido en js #}
     <div class="row">
-        <div class="col-6 font-weight-bold">Nombre del accionista</div>
+        <div class="col-7 font-weight-bold">Nombre del accionista</div>
         <div class="col-1 font-weight-bold text-center">Tipo</div>
         {#<div class="col-1 font-weight-bold text-right">% directo</div>#}
         <div class="col-2 font-weight-bold text-right">% participación</div>
@@ -20,7 +20,7 @@
         {% set totalParticipacion = totalParticipacion + participacion %}
     {% endif -%}
         <div class="row border{{ showHideClasslist ~ (entity.holderCategory.letter == 'H'?" company-self-owned":"") }}">
-            <div class="col-6 border-right">{{ entity.holder.fullname }} {{ entity.via?'via its funds ':'' }}<span title="{{entity.holder.country|country_name('es') }}">{{ entity.holder.getCountrySuffix}}</span>
+            <div class="col-7 border-right">{{ entity.holder.fullname }} {{ entity.via?'via its funds ':'' }}<span title="{{entity.holder.country|country_name('es') }}">{{ entity.holder.getCountrySuffix}}</span>
                 <a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}" title="Editar registro de accionista"><i class="fa fa-edit"></i></a>
                 <a href="{{ path(prefix ~ "show",  {'id': entity.holder.id} )}}" title="Ver la empresa"><i class="fa fa-home"></i></a>
             {% if entity.holder.inlist %}<i class="fa-solid fa-star" title="Forma parte de la red"></i>{% endif %}
