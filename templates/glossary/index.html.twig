@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Glosario de términos{% endblock %}
+
+{% block body %}
+    <h1>Glosario de términos</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for glossary in glossaries %}
+            <tr>
+                <td><a href="{{ path(PREFIX ~ 'edit', {'id': glossary.id}) }}">{{ glossary.id }}</a></td>
+                <td><a href="{{ path(PREFIX ~ 'show', {'id': glossary.id}) }}">{{ glossary.name }}</a></td>
+                <td>{{ glossary.description }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">No se encontraron registros</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path(PREFIX ~ 'new') }}">Crear</a>
+{% endblock %}

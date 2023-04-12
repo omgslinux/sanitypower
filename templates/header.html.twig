@@ -18,6 +18,15 @@
                     <a class="dropdown-item" href="{{ path('company_matriz') }}">Ordenadas por matriz<span></span></a>
                 </div>
             </li>
+            {% if is_granted('ROLE_USER') %}
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                  aria-haspopup="true" aria-expanded="false">Glosario</a>
+                <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="{{ path('app_glossary_index') }}">Indice</a>
+                </div>
+              </li>
+            {% endif %}
             {% if is_granted('ROLE_ADMIN') %}
               <!-- Dropdown -->
               <li class="nav-item dropdown">
