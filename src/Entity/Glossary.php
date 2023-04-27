@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use App\Repository\GlossaryRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass=GlossaryRepository::class)
+ * @ORM\Table(name="glossary", indexes={@Index(name="glossary_idx", fields={"name"})})
  */
 class Glossary
 {
@@ -19,6 +21,7 @@ class Glossary
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @ORM\OrderBy({"name" = "ASC"})
      */
     private $name;
 

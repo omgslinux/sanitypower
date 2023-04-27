@@ -22,7 +22,7 @@ class GlossaryController extends AbstractController
     public function index(GlossaryRepository $glossaryRepository): Response
     {
         return $this->render('glossary/index.html.twig', [
-            'glossaries' => $glossaryRepository->findAll(),
+            'glossaries' => $glossaryRepository->findBy([], ['name' => 'ASC']),
             'PREFIX' => self::PREFIX,
         ]);
     }
