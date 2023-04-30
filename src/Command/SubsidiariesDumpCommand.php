@@ -104,7 +104,9 @@ class SubsidiariesDumpCommand extends Command
                         if (null==$holder) {
                             $io->error(sprintf('Fallo en: %s', $holderRealName));
                         }
-                        if (($holder->getRealname() != $holderRealName) || ($holder->getFullname() != $holderName)) {
+                        if (($holderRealName != $holderName) &&
+                            (($holder->getRealname() != $holderRealName) || ($holder->getFullname() != $holderName))
+                        ) {
                             $holder
                             ->setRealname($holderRealName)
                             ->setFullname($holderName);
