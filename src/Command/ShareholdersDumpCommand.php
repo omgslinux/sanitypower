@@ -136,16 +136,25 @@ class ShareholdersDumpCommand extends Command
                                     'country' => $country,
                                 ]
                             ))) {
-                                $holder = new Company();
-                                $holder->setFullname($holderName)
-                                ->setRealname($holderRealName)
-                                ->setCountry($country)
-                                ->setActive(false)
-                                ->setLevel($level)
-                                ->setCategory($companyCategory);
-                                ;
+                                if (null == ($holder = $this->repo->findOneBy(
+                                    [
+                                        'fullname' => $holderName,
+                                        'country' => $country,
+                                    ]
+                                ))) {
+                                    $holder = new Company();
+                                    $holder->setFullname($holderName)
+                                    ->setRealname($holderRealName)
+                                    ->setCountry($country)
+                                    ->setActive(false)
+                                    ->setLevel($level)
+                                    ->setCategory($companyCategory);
+                                    ;
+                                } else {
+                                    $holder->setRealname($holderRealName);
+                                }
                             }
-                            $this->repo->add($holder);
+                            $this->repo->add($holder, true);
                         }
                         //dump($holder);
                         if (null == ($entity = $this->HR->findOneBy(

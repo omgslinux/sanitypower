@@ -132,23 +132,30 @@ class SubsidiariesDumpCommand extends Command
                         } else {
                             if (null == ($subsidiary = $this->repo->findOneBy(
                                 [
-                                    'fullname' => $subName,
+                                    'realname' => $subRawName,
                                     'country' => $subCountry,
                                 ]
                             ))) {
-                                $subsidiary = new Company();
-                                $subsidiary->setFullname($subName)
-                                ->setRealname($subRawName)
-                                ->setCountry($subCountry)
-                                ->setActive(false)
-                                ->setLevel($level)
-                                ->setCategory($companyCategory);
-                                ;
-                                //dump("Creando empresa: $subName");
+                                if (null==($subsidiary = $this->repo->findOneBy(
+                                    [
+                                        'fullname' => $subName,
+                                        'country' => $subCountry,
+                                    ]
+                                ))) {
+                                    $subsidiary = new Company();
+                                    $subsidiary->setFullname($subName)
+                                    ->setRealname($subRawName)
+                                    ->setCountry($subCountry)
+                                    ->setActive(false)
+                                    ->setLevel($level)
+                                    ->setCategory($companyCategory);
+                                    ;
+                                    //dump("Creando empresa: $subName");
+                                }
                             } else {
                                 //dump("Ya existe empresa: $subName");
                             }
-                            $this->repo->add($subsidiary);
+                            $this->repo->add($subsidiary, true);
                         }
                         //dump($holder);
                         //dump($data);
