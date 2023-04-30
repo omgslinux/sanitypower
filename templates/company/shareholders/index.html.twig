@@ -20,7 +20,7 @@
         {% set totalParticipacion = totalParticipacion + participacion %}
     {% endif -%}
         <div class="row border{{ showHideClasslist ~ (entity.holderCategory.letter == 'H'?" company-self-owned":"") }}">
-            <div class="col-7 border-right">{{ entity.holder.fullname }} {{ entity.via?'via its funds ':'' }}<span title="{{entity.holder.country|country_name('es') }}">{{ entity.holder.getCountrySuffix}}</span>
+            <div class="col-7 border-right">{{ entity.holder.fullname }} {{ entity.via?'via its funds ':'' }}<span title="{{entity.holder.country|country_name('es') }}">{{ entity.holder.countrySuffix}}</span>
                 <a href="{{ path(prefix ~ 'shareholder_edit', { 'id': entity.id }) }}" title="Editar registro de accionista"><i class="fa fa-edit"></i></a>
                 <a href="{{ path(prefix ~ "show",  {'id': entity.holder.id} )}}" title="Ver la empresa"><i class="fa fa-home"></i></a>
             {% if entity.holder.inlist %}<i class="fa-solid fa-star" title="Forma parte de la red"></i>{% endif %}

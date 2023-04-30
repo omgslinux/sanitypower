@@ -14,7 +14,7 @@
     </div>
     <div class="row">
         <div class="col-2">
-            <a href="{{ path(prefix~ 'edit', {'id': parent.id}) }}">{{ parent.ShortName == '' ? '(no tiene)' : parent.ShortName }}</a>
+            <a href="{{ path(prefix~ 'edit', {'id': parent.id}) }}">{{ parent.ShortName == '' ? '(no tiene)' : parent.ShortName ~ ' ' ~ parent.countrySuffix}}</a>
         </div>
         <div class="col-2">{{ parent.country|country_name('es') }}</div>
         <div class="col-2">{{ parent.level }}</div>
