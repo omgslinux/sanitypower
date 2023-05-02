@@ -52,6 +52,42 @@ class ShareholderRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByCompanyGroup(Company $company)
+    {
+        // Recuperamos primero la matriz
+        $owner = $this->findSubsidiaryOwner($company);
+
+        if (null!==$owner) {
+            $groupmembers = $this->createQueryBuilder('s')
+            ->leftJoin('s.subsidiary', 'c')
+            ->andWhere('s.holder = :company')
+            //->andWhere('c.country = :country')
+            ->andWhere('c.active = :active')
+            ->andWhere('s.total >= :percent')
+            ->setParameter('active', 1)
+            ->setParameter('company', $owner->getHolder())
+            //->setParameter('country', 'ES')
+            ->setParameter('percent', 50)
+            ->orderBy('s.subsidiary', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+            ;
+            $group = [
+                'owner' => $owner,
+                'owned' => [],
+            ];
+            foreach ($groupmembers as $member) {
+                $group['owned'][] = $member;
+            }
+        } else {
+            $group = [];
+        }
+
+        return $group;
+    }
+
+
     public function findSubsidiariesByHolder(Company $company)
     {
         $qb = $this->createQueryBuilder('s')
@@ -69,11 +105,35 @@ class ShareholderRepository extends ServiceEntityRepository
             ->setParameter('country', 'ES')
             ;
         }
-        return $qb->setMaxResults(10)
+        return $qb
+            //->setMaxResults(10)
             ->getQuery()
             ->getResult()
         ;
     }
+
+    public function findSubsidiaryOwner(Company $company)
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->leftJoin('s.holder', 'c')
+            ->andWhere('s.subsidiary = :company')
+            ->andWhere('c.active = :active')
+            ->setParameter('active', 1)
+            ->setParameter('company', $company)
+            //->setParameter('country', 'ES')
+            //->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+            //dump($qb);
+            //$qb = $qb->getOneOrNullResult()
+        ;
+
+        return (count($qb)?$qb[0]:null);
+    }
+
+
+
+
 
     public function getFullCount()
     {

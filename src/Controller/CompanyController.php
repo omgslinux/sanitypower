@@ -242,8 +242,8 @@ class CompanyController extends AbstractController
             'prefix' => self::PREFIX,
             'activetab' => $activetab,
             'incomings' => $this->incomingFindExchange($company, $cexRepo),
-            //'groupparticipants' => $this->groupIndex($company, $subrepo),
-            'subsidiaries' => $SHR->findSubsidiariesByHolder($company), //$subrepo->findByCompanyOwner($company),
+            'subsidiaries' => $SHR->findSubsidiariesByHolder($company),
+            //'groupparticipants' => $SHR->findByCompanyGroup($company), // activar cuando se active la pestaña de grupo
         ]);
     }
 
