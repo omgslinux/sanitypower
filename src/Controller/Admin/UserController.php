@@ -11,9 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/user", name="admin_user_")
- */
+#[Route(path: '/admin/user', name: 'admin_user_')]
 class UserController extends AbstractController
 {
     const PREFIX = 'admin_user_';
@@ -34,9 +32,7 @@ class UserController extends AbstractController
         $this->repo = $repo;
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('user/index.html.twig', [
@@ -45,9 +41,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET", "POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $user = new User();
@@ -68,9 +62,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'show', methods: ['GET'])]
     public function show(User $user): Response
     {
         return $this->render('user/show.html.twig', [
@@ -79,9 +71,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user): Response
     {
         $form = $this->createForm(UserType::class, $user, ['new' => false]);
@@ -101,9 +91,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, User $user): Response
     {
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
@@ -115,9 +103,8 @@ class UserController extends AbstractController
 
     /**
      * Displays a form to change the password.
-     *
-     * @Route("/pass", name="pass", methods={"GET", "POST"})
      */
+    #[Route(path: '/pass', name: 'pass', methods: ['GET', 'POST'])]
     public function password(Request $request)
     {
         $user=$this->getUser();

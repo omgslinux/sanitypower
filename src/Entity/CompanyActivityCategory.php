@@ -7,34 +7,23 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CompanyActivityCategoryRepository::class)
- * @ORM\Table(name="company_activity_categories",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"letter"})}
- * )
- */
+#[ORM\Table(name: 'company_activity_categories')]
+#[ORM\UniqueConstraint(columns: ['letter'])]
+#[ORM\Entity(repositoryClass: CompanyActivityCategoryRepository::class)]
 class CompanyActivityCategory
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=2)
-     */
+    #[ORM\Column(type: 'string', length: 2)]
     private $letter;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $description;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Company::class, mappedBy="category")
-     */
+    #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'category')]
     private $companies;
 
     public function __construct()

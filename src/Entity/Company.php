@@ -7,107 +7,72 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CompanyRepository::class)
- * @ORM\Table(name="company",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"realname", "country"})}
- * )
- */
+#[ORM\Table(name: 'company')]
+#[ORM\UniqueConstraint(columns: ['realname', 'country'])]
+#[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $fullname;
 
-    /**
-     * @ORM\Column(type="string", length=32, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 32, nullable: true)]
     private $ShortName;
 
-    /**
-     * @ORM\Column(type="string", length=2)
-     */
+    #[ORM\Column(type: 'string', length: 2)]
     private $country;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CompanyIncoming::class, mappedBy="Company", orphanRemoval=true, cascade={"persist"})
-     * @ORM\OrderBy({"year" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: CompanyIncoming::class, mappedBy: 'Company', orphanRemoval: true, cascade: ['persist'])]
+    #[ORM\OrderBy(['year' => 'ASC'])]
     private $companyIncomings;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CompanyEvent::class, mappedBy="company")
-     * @ORM\OrderBy({"date" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: CompanyEvent::class, mappedBy: 'company')]
+    #[ORM\OrderBy(['date' => 'ASC'])]
     private $companyEvents;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=CompanyLevel::class, inversedBy="companies")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: CompanyLevel::class, inversedBy: 'companies')]
+    #[ORM\JoinColumn(nullable: false)]
     private $level;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $active;
 
-    /**
-    * @ORM\ManyToOne(targetEntity=CompanyActivityCategory::class, inversedBy="companies")
-    * @ORM\JoinColumn(nullable=true)
-    */
+    #[ORM\ManyToOne(targetEntity: CompanyActivityCategory::class, inversedBy: 'companies')]
+    #[ORM\JoinColumn(nullable: true)]
     private $category;
 
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $notes;
 
     /**
      * Empresas de las que la actual es accionista (posee)
-     *
-     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="holder", cascade={"persist"})
      */
+    #[ORM\OneToMany(targetEntity: Shareholder::class, mappedBy: 'holder', cascade: ['persist'])]
     private $subsidiaries;
 
     /**
      * Empresas que son propietarias de la actual
-     *
-     * @ORM\OneToMany(targetEntity=Shareholder::class, mappedBy="subsidiary", cascade={"persist"})
      */
+    #[ORM\OneToMany(targetEntity: Shareholder::class, mappedBy: 'subsidiary', cascade: ['persist'])]
     private $holders;
 
-    /**
-     * @ORM\OneToMany(targetEntity=StaffMembership::class, mappedBy="company")
-     */
+    #[ORM\OneToMany(targetEntity: StaffMembership::class, mappedBy: 'company')]
     private $staffMemberships;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $inList;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CompanyRelationship::class, mappedBy="parent")
-     */
+    #[ORM\OneToMany(targetEntity: CompanyRelationship::class, mappedBy: 'parent')]
     private $parentRelationships;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CompanyRelationship::class, mappedBy="child")
-     */
+    #[ORM\OneToMany(targetEntity: CompanyRelationship::class, mappedBy: 'child')]
     private $childRelationships;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $realname;
 
     public function __construct()

@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/companylevel", name="admin_company_level_")
- */
+#[Route(path: '/admin/companylevel', name: 'admin_company_level_')]
 class CompanyLevelController extends AbstractController
 {
     const PREFIX = 'admin_company_level_';
@@ -24,9 +22,7 @@ class CompanyLevelController extends AbstractController
         $this->repo = $repo;
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('company_level/index.html.twig', [
@@ -35,9 +31,7 @@ class CompanyLevelController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $entity = new CompanyLevel();
@@ -57,9 +51,7 @@ class CompanyLevelController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'show', methods: ['GET'])]
     public function show(CompanyLevel $entity): Response
     {
         return $this->render('company_level/show.html.twig', [
@@ -68,9 +60,7 @@ class CompanyLevelController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, CompanyLevel $entity): Response
     {
         $form = $this->createForm(CompanyLevelType::class, $entity);
@@ -89,9 +79,7 @@ class CompanyLevelController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, CompanyLevel $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {

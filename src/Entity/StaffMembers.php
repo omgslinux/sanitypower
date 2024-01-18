@@ -7,39 +7,24 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=StaffMembersRepository::class)
- * ORM\Table(name="members",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"surname", "name"})
- * )
- */
+#[ORM\Entity(repositoryClass: StaffMembersRepository::class)]
 class StaffMembers
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $surname;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $notes;
 
-    /**
-     * @ORM\OneToMany(targetEntity=StaffMembership::class, mappedBy="staffMember")
-     */
+    #[ORM\OneToMany(targetEntity: StaffMembership::class, mappedBy: 'staffMember')]
     private $staffMemberships;
 
     public function __construct()

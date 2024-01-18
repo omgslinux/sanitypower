@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/members", name="staff_members_")
- */
+#[Route(path: '/members', name: 'staff_members_')]
 class StaffMembersController extends AbstractController
 {
     const PREFIX = 'staff_members_';
@@ -24,9 +22,7 @@ class StaffMembersController extends AbstractController
         $this->repo = $repo;
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('members/index.html.twig', [
@@ -35,9 +31,7 @@ class StaffMembersController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $member = new StaffMembers();
@@ -57,9 +51,7 @@ class StaffMembersController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'show', methods: ['GET'])]
     public function show(StaffMembers $member): Response
     {
         return $this->render('members/show.html.twig', [
@@ -68,9 +60,7 @@ class StaffMembersController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, StaffMembers $member): Response
     {
         $form = $this->createForm(StaffMembersType::class, $member);
@@ -89,9 +79,7 @@ class StaffMembersController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Members $member): Response
     {
         if ($this->isCsrfTokenValid('delete'.$member->getId(), $request->request->get('_token'))) {

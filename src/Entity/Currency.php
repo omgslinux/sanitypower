@@ -7,41 +7,27 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CurrencyRepository::class)
- */
+#[ORM\Entity(repositoryClass: CurrencyRepository::class)]
 class Currency
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=32)
-     */
+    #[ORM\Column(type: 'string', length: 32)]
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=4)
-     */
+    #[ORM\Column(type: 'string', length: 4)]
     private $code;
 
-    /**
-     * @ORM\Column(type="string", length=4)
-     */
+    #[ORM\Column(type: 'string', length: 4)]
     private $symbol;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CurrencyExchange::class, mappedBy="currency")
-     */
+    #[ORM\OneToMany(targetEntity: CurrencyExchange::class, mappedBy: 'currency')]
     private $currencyExchanges;
 
-    /**
-     * @ORM\OneToMany(targetEntity=CompanyIncoming::class, mappedBy="currency")
-     */
+    #[ORM\OneToMany(targetEntity: CompanyIncoming::class, mappedBy: 'currency')]
     private $incomings;
 
     public function __construct()

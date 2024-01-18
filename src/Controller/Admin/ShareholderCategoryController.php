@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/shareholdercategory", name="admin_shareholder_category_")
- */
+#[Route(path: '/admin/shareholdercategory', name: 'admin_shareholder_category_')]
 class ShareholderCategoryController extends AbstractController
 {
     const PREFIX = 'admin_shareholder_category_';
@@ -23,9 +21,7 @@ class ShareholderCategoryController extends AbstractController
         $this->repo = $repo;
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('shareholder_category/index.html.twig', [
@@ -34,9 +30,7 @@ class ShareholderCategoryController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET", "POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $shareholderCategory = new ShareholderCategory();
@@ -56,9 +50,7 @@ class ShareholderCategoryController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'show', methods: ['GET'])]
     public function show(ShareholderCategory $shareholderCategory): Response
     {
         return $this->render('shareholder_category/show.html.twig', [
@@ -67,9 +59,7 @@ class ShareholderCategoryController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET", "POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, ShareholderCategory $shareholderCategory): Response
     {
         $form = $this->createForm(ShareholderCategoryType::class, $shareholderCategory);
@@ -88,9 +78,7 @@ class ShareholderCategoryController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, ShareholderCategory $shareholderCategory): Response
     {
         if ($this->isCsrfTokenValid('delete'.$shareholderCategory->getId(), $request->request->get('_token'))) {

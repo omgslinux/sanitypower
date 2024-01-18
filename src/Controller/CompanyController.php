@@ -40,9 +40,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\SearchType;
 use App\Util\CompanyUtil;
 
-/**
- * @Route("/manage/company", name="company_")
- */
+#[Route(path: '/manage/company', name: 'company_')]
 class CompanyController extends AbstractController
 {
     const TABS = [
@@ -84,9 +82,7 @@ class CompanyController extends AbstractController
     }
 
 
-    /**
-     * @Route("/index/{page}", name="index", methods={"GET"})
-     */
+    #[Route(path: '/index/{page}', name: 'index', methods: ['GET'])]
     public function index($page = 1): Response
     {
         $limit = 50;
@@ -102,9 +98,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/matriz/{page}", name="matriz", methods={"GET"})
-     */
+    #[Route(path: '/matriz/{page}', name: 'matriz', methods: ['GET'])]
     public function indexMatriz($page = 1): Response
     {
         $limit = 40;
@@ -121,9 +115,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/delete/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/delete/{id}', name: 'delete', methods: ['POST'])]
     public function companyDelete(Request $request, Company $company): Response
     {
         if ($this->isCsrfTokenValid('delete'.$company->getId(), $request->request->get('_token'))) {
@@ -133,9 +125,7 @@ class CompanyController extends AbstractController
         return $this->redirectToRoute(self::PREFIX . 'index');
     }
 
-    /**
-     * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/edit/{id}', name: 'edit', methods: ['GET', 'POST'])]
     public function companyEdit(Request $request, Company $company): Response
     {
         $form = $this->createForm(CompanyType::class, $company);
@@ -154,9 +144,7 @@ class CompanyController extends AbstractController
     }
 
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function companyNew(Request $request): Response
     {
         $company = new Company();
@@ -175,9 +163,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-    * @Route("/search", name="search", methods={"GET","POST"})
-    */
+    #[Route(path: '/search', name: 'search', methods: ['GET', 'POST'])]
     public function companySearch(Request $request): Response
     {
         // Para dibujar el cuadro de búsqueda
@@ -207,9 +193,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/searchResults/{page}", name="searchResults", methods={"GET", "POST"})
-     */
+    #[Route(path: '/searchResults/{page}', name: 'searchResults', methods: ['GET', 'POST'])]
     public function companySearchResults(Request $request, $page = 1): Response
     {
         $pattern = $request->get('form')['pattern'];
@@ -227,9 +211,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/show/{id}/{activetab}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/show/{id}/{activetab}', name: 'show', methods: ['GET'])]
     public function companyShow(
         Company $company,
         CurrencyExchangeRepository $cexRepo,
@@ -248,17 +230,13 @@ class CompanyController extends AbstractController
     }
 
 
-    /**
-     * @Route("/group/index/{page}", name="group_index", methods={"GET"})
-     */
+    #[Route(path: '/group/index/{page}', name: 'group_index', methods: ['GET'])]
     public function groupIndex(Company $company, SubsidiaryRepository $subrepo, $page = 1)
     {
         return $subrepo->findByCompanyGroup($company);
     }
 
-    /**
-     * @Route("/history/new/{id}", name="event_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/history/new/{id}', name: 'event_new', methods: ['GET', 'POST'])]
     public function historyAdd(Request $request, Company $company): Response
     {
         $child = new CompanyEvent();
@@ -287,9 +265,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/history/edit/{id}", name="event_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/history/edit/{id}', name: 'event_edit', methods: ['GET', 'POST'])]
     public function historyEdit(Request $request, CompanyEventRepository $ceRepo, CompanyEvent $entity): Response
     {
         $form = $this->createForm(CompanyEventType::class, $entity);
@@ -315,9 +291,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/incomings/new/{id}", name="incomings_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/incomings/new/{id}', name: 'incomings_new', methods: ['GET', 'POST'])]
     public function incomingsAdd(Request $request, Company $parent): Response
     {
         $entity = new CompanyIncoming();
@@ -346,9 +320,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/incomings/edit/{id}", name="incoming_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/incomings/edit/{id}', name: 'incoming_edit', methods: ['GET', 'POST'])]
     public function incomingEdit(Request $request, CompanyIncomingRepository $ciRepo, CompanyIncoming $entity): Response
     {
         $form = $this->createForm(CompanyIncomingType::class, $entity);
@@ -397,9 +369,7 @@ class CompanyController extends AbstractController
         return $converted;
     }
 
-    /**
-     * @Route("/membership/new/{id}", name="membership_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/membership/new/{id}', name: 'membership_new', methods: ['GET', 'POST'])]
     public function membershipAdd(
         Request $request,
         Company $parent,
@@ -485,9 +455,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/membership/edit/{id}", name="membership_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/membership/edit/{id}', name: 'membership_edit', methods: ['GET', 'POST'])]
     public function membershipEdit(Request $request, StaffMembersRepository $smRepo, StaffMembership $entity): Response
     {
         $form = $this->createForm(StaffMembershipType::class, $entity);
@@ -515,9 +483,7 @@ class CompanyController extends AbstractController
     }
 
 
-    /**
-     * @Route("/shareholder/new/{id}", name="shareholder_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/shareholder/new/{id}', name: 'shareholder_new', methods: ['GET', 'POST'])]
     public function shareholderAdd(
         Request $request,
         Company $parent,
@@ -648,9 +614,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/shareholder/edit/{id}", name="shareholder_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/shareholder/edit/{id}', name: 'shareholder_edit', methods: ['GET', 'POST'])]
     public function shareholderEdit(Request $request, ShareholderRepository $sRepo, Shareholder $entity): Response
     {
         $form = $this->createForm(ShareholderType::class, $entity);
@@ -676,9 +640,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/subsidiary/new/{id}", name="subsidiary_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/subsidiary/new/{id}', name: 'subsidiary_new', methods: ['GET', 'POST'])]
     public function subsidiaryAdd(
         Request $request,
         Company $parent,
@@ -824,9 +786,7 @@ class CompanyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/subsidiary/edit/{id}", name="subsidiary_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/subsidiary/edit/{id}', name: 'subsidiary_edit', methods: ['GET', 'POST'])]
     public function subsidiaryEdit(Request $request, SubsidiaryRepository $sRepo, Subsidiary $entity): Response
     {
         $formOptions =
