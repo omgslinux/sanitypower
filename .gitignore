@@ -7,4 +7,8 @@
 /public/components/
 /var/
 /vendor/
+/TEST/
+/TODAS/
+/FALLOS/
+/migrations/
 ###< symfony/framework-bundle ###
