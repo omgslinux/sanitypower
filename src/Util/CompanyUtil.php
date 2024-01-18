@@ -25,7 +25,7 @@ use App\Repository\CompanyActivityCategoryRepository;
 use App\Repository\CompanyIncomingRepository;
 use App\Repository\CurrencyExchangeRepository;
 use App\Util\PhpreaderHelper;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+//use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class CompanyUtil
 {
@@ -35,11 +35,13 @@ class CompanyUtil
     private $shareholder; // Entidad shareholder
     private $EM; // EntityManager
 
-    public function __construct(ServiceEntityRepository $SER)
+    public function __construct(REPO $repo, ShareholderRepository $SHR)
     {
-        $this->EM = $SER->getEntityManager();
-        $this->repo = $SER->getRepository(REPO::class);
-        $this->SHR = $SER->getRepository(ShareholderRepository::class);
+        //$this->EM = $SER->getEntityManager();
+        //$this->repo = $SER->getRepository(REPO::class);
+        //$this->SHR = $SER->getRepository(ShareholderRepository::class);
+        $this->repo = $repo;
+        $this->SHR = $SHR;
     }
 
     public function setCompany(Company $company)
@@ -194,7 +196,7 @@ class CompanyUtil
         return $empresa;
     }
 
-    public function stripCompanyFileName($companyFilename): string
+    /*public function stripCompanyFileName($companyFilename): string
     {
         $search = ['@@SLASH@@', '@@QUOTE@@', '@@COMMA@@', '@@DOT@@'];
         $replace = ['/', '’', ',', '.'];
@@ -203,9 +205,9 @@ class CompanyUtil
         $empresa = trim(str_replace($search, $replace, strtoupper($companyFilename)));
 
         return $empresa;
-    }
+    } */
 
-    public function stripCompanyName($company): string
+    /*public function stripCompanyName($company): string
     {
         $search = [',', '.', '  '];
         $replace = [' ', '', ' '];
@@ -214,7 +216,7 @@ class CompanyUtil
         $empresa = trim(str_replace($search, $replace, strtoupper(self::stripCompanyFileName($company))));
 
         return $empresa;
-    }
+    }*/
 
     public function addSingleSubsidiary($keys)
     {
