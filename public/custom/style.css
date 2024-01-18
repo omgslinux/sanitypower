@@ -1,14 +1,19 @@
 @font-face {
     font-family: 'Roboto';
-    src: url('../fonts/Roboto-Regular.ttf'); /* IE9 Compat Modes */
+    font-stretch: 50% 200%;
+    /*src: url('../fonts/Roboto-Regular.ttf'); /* IE9 Compat Modes */
     /*src: url('mywebfont.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
     /*url('mywebfont.woff') format('woff'), /* Modern Browsers */
+    src: url('../fonts/Roboto-Regular.ttf'),
     url('../fonts/Roboto-Bold.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('../fonts/Roboto-Black.ttf') format('truetype'), /* Safari, Android, iOS */
     url('../fonts/Roboto-Italic.ttf') format('truetype'), /* Safari, Android, iOS */
     url('../fonts/Roboto-Light.ttf') format('truetype'), /* Safari, Android, iOS */
     url('../fonts/Roboto-Medium.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('../fonts/Roboto-Thin.ttf') format('truetype'), /* Safari, Android, iOS */
     url('../fonts/RobotoCondensed-Regular.ttf') format('truetype'), /* Safari, Android, iOS */
-    url('../fonts/Roboto-Medium.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('../fonts/RobotoCondensed-Bold.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('../fonts/RobotoCondensed-Light.ttf') format('truetype'), /* Safari, Android, iOS */
     /*url('mywebfont.svg#svgFontName') format('svg') /* Legacy iOS */
     ;
 }
