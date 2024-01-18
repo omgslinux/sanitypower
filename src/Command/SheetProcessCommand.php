@@ -10,10 +10,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use App\Util\SheetReader;
 
+#[AsCommand(
+    name: 'app:sheet:process',
+    description: 'Process spreadsheets',
+)]
 class SheetProcessCommand extends Command
 {
-    protected static $defaultName = 'app:sheet:process';
-    protected static $defaultDescription = 'Process spreadsheets';
 
     public function __construct()
     {

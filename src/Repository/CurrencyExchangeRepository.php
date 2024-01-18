@@ -2,8 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\CompanyIncoming;
+use App\Entity\CompanyIncoming as CI;
 use App\Entity\CurrencyExchange as Entity;
+use App\Entity\Currency as CU;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,7 +48,7 @@ class CurrencyExchangeRepository extends ServiceEntityRepository
     //  * @return CurrencyExchange[] Returns an array of CurrencyExchange objects
     //  */
 
-    public function getExchange(CompanyIncoming $incoming)
+    public function getExchange(CI $incoming)
     {
         /* SELECT ce.amount,i.amount,(i.amount * ce.amount) AS result FROM sanitypower.currency_exchange ce
             JOIN sanitypower.incomings i USING(currency_id)-- ON ce.currency_id = i.currency_id
@@ -58,8 +59,8 @@ class CurrencyExchangeRepository extends ServiceEntityRepository
             $query = $em->createQuery("SELECT u FROM CmsUser u LEFT JOIN u.articles a WITH a.topic LIKE :foo");
         */
         $query = $this->getEntityManager()->createQuery(
-            'SELECT ce.amount FROM App:CurrencyExchange ce
-            JOIN App:CompanyIncoming i
+            'SELECT ce.amount FROM ' . Entity::class . ' ce
+            JOIN ' . CI::class . ' i
             WHERE ce.currency = i.currency
             AND ce.year <= i.year
             AND i = :incoming
@@ -72,18 +73,18 @@ class CurrencyExchangeRepository extends ServiceEntityRepository
             ->getResult();
 
         return $this->createQueryBuilder('ce')
+            ->select('ce.amount')
             ->join('ce.currency', 'c')
             ->join('ce.currency', 'i')
             ->andWhere('ce.year <= i.year')
             ->andWhere('i = :incoming')
             ->setParameter('incoming', $incoming)
-            ->orderBy('c.year', 'ASC')
+            ->orderBy('ce.year', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
             ->getResult()
         ;
     }
-
 
     /*
     public function findOneBySomeField($value): ?CurrencyExchange
