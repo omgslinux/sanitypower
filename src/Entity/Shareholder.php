@@ -5,66 +5,47 @@ namespace App\Entity;
 use App\Repository\ShareholderRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=ShareholderRepository::class)
- * @ORM\Table(name="shareholders",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"holder_id", "subsidiary_id" , "via"})}
- * )
-*/
+#[ORM\Table(name: 'shareholders')]
+#[ORM\UniqueConstraint(columns: ['holder_id', 'subsidiary_id', 'via'])]
+#[ORM\Entity(repositoryClass: ShareholderRepository::class)]
 class Shareholder
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
-    * En accionistas, $company es $parent, la que es poseída por un holder
-    *
-    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="subsidiaries")
-    * @ORM\JoinColumn(nullable=false)
-    */
+     * En accionistas, $company es $parent, la que es poseída por un holder
+     */
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'subsidiaries')]
+    #[ORM\JoinColumn(nullable: false)]
     private $holder;
 
     /**
-    * En accionistas, $holder es quien tiene acciones de $company
-    *
-    * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="holders")
-    * @ORM\JoinColumn(nullable=false)
-    */
+     * En accionistas, $holder es quien tiene acciones de $company
+     */
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'holders')]
+    #[ORM\JoinColumn(nullable: false)]
     private $subsidiary;
 
-    /**
-     * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
-     */
+    #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true)]
     private $direct;
 
-    /**
-     * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
-     */
+    #[ORM\Column(type: 'decimal', precision: 5, scale: 2, nullable: true)]
     private $total;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private $via = false;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $skip;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=ShareholderCategory::class, inversedBy="shareholders")
-     * @ORM\JoinColumn(nullable=true)
-     */
+    #[ORM\ManyToOne(targetEntity: ShareholderCategory::class, inversedBy: 'shareholders')]
+    #[ORM\JoinColumn(nullable: true)]
     private $holderCategory;
 
-    /**
-     * @ORM\Column(type="json", nullable=true)
-     */
+    #[ORM\Column(type: 'json', nullable: true)]
     private $data = [];
 
     public function getId(): ?int

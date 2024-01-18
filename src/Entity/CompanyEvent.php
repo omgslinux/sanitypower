@@ -5,33 +5,23 @@ namespace App\Entity;
 use App\Repository\CompanyEventRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CompanyEventRepository::class)
- * @ORM\Table(name="company_events")
- */
+#[ORM\Table(name: 'company_events')]
+#[ORM\Entity(repositoryClass: CompanyEventRepository::class)]
 class CompanyEvent
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="companyEvents")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'companyEvents')]
+    #[ORM\JoinColumn(nullable: false)]
     private $company;
 
-    /**
-     * @ORM\Column(type="date")
-     */
+    #[ORM\Column(type: 'date')]
     private $date;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private $description;
 
     public function getId(): ?int

@@ -27,9 +27,7 @@ use App\Repository\ShareholderRepository;
  */
 class SecurityController extends AbstractController
 {
-    /**
-     * @Route("/", name="homepage")
-     */
+    #[Route(path: '/', name: 'homepage')]
     public function homepage(CompanyRepository $CR, ShareholderRepository $HR)
     {
         $totalCompanies = $CR->getInlistCount();
@@ -44,9 +42,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/login", name="app_login")
-     */
+    #[Route(path: '/login', name: 'app_login')]
     public function loginAction(AuthenticationUtils $helper)
     {
         return $this->render('security/login.html.twig', [
@@ -62,9 +58,8 @@ class SecurityController extends AbstractController
      *
      * But, this will never be executed. Symfony will intercept this first
      * and handle the logout automatically. See logout in app/config/security.yml
-     *
-     * @Route("/logout", name="app_logout")
      */
+    #[Route(path: '/logout', name: 'app_logout')]
     public function logoutAction()
     {
         throw new \Exception('This should never be reached!');

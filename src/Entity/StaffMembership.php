@@ -5,47 +5,32 @@ namespace App\Entity;
 use App\Repository\StaffMembershipRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=StaffMembershipRepository::class)
- * @ORM\Table(name="staff_memberships",
- *   uniqueConstraints={@ORM\UniqueConstraint(columns={"company_id", "staffmember_id", "title_id"})}
- * )
- */
+#[ORM\Table(name: 'staff_memberships')]
+#[ORM\UniqueConstraint(columns: ['company_id', 'staffmember_id', 'title_id'])]
+#[ORM\Entity(repositoryClass: StaffMembershipRepository::class)]
 class StaffMembership
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="staffMemberships")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'staffMemberships')]
+    #[ORM\JoinColumn(nullable: false)]
     private $company;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=StaffMembers::class, inversedBy="staffMemberships")
-     * @ORM\JoinColumn(name="staffmember_id", nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: StaffMembers::class, inversedBy: 'staffMemberships')]
+    #[ORM\JoinColumn(name: 'staffmember_id', nullable: false)]
     private $staffMember;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=StaffTitle::class)
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: StaffTitle::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private $title;
 
-    /**
-     * @ORM\Column(type="date", nullable=true)
-     */
+    #[ORM\Column(type: 'date', nullable: true)]
     private $datefrom;
 
-    /**
-     * @ORM\Column(type="date", nullable=true)
-     */
+    #[ORM\Column(type: 'date', nullable: true)]
     private $dateto;
 
     public function getId(): ?int
