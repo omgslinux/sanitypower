@@ -16,11 +16,12 @@ use App\Repository\ShareholderCategoryRepository;
 use App\Repository\CompanyLevelRepository;
 use App\Repository\CompanyActivityCategoryRepository;
 
+#[AsCommand(
+    name: 'app:subsidiaries:dump',
+    description: 'Massive dump for subsidiaries',
+)]
 class SubsidiariesDumpCommand extends Command
 {
-    protected static $defaultName = 'app:subsidiaries:dump';
-    protected static $defaultDescription = 'Massive dump for subsidiaries';
-
     private $HR;
     private $CCR;
     private $CLR;

@@ -17,6 +17,8 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
  */
 class CompanyRepository extends ServiceEntityRepository
 {
+    private $limit;
+    
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Entity::class);
@@ -73,24 +75,6 @@ class CompanyRepository extends ServiceEntityRepository
             ->setParameter('active', true)
             ->setParameter('inlist', true)
             ->getQuery()->getSingleScalarResult();
-    }
-
-    public function getActiveMatrizOLD($currentPage = 1, $limit = 5)
-    {
-        $this->limit = $limit;
-        // Create our query
-        $query = $this->createQueryBuilder('c')
-            ->join('c.level', 'l')
-            ->orderBy('c.fullname', 'ASC')
-            ->andWhere('c.active = :active')
-            ->andWhere('l.level = :level')
-            ->setParameter('active', true)
-            ->setParameter('level', 'Matriz')
-            ->getQuery();
-
-        // No need to manually get get the result ($query->getResult())
-
-        return $this->paginate($query, $currentPage);
     }
 
     public function getActivePaginated($currentPage = 1, $limit = 5)

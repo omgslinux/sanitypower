@@ -6,28 +6,21 @@ use App\Repository\GlossaryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 
-/**
- * @ORM\Entity(repositoryClass=GlossaryRepository::class)
- * @ORM\Table(name="glossary", indexes={@Index(name="glossary_idx", fields={"name"})})
- */
+#[ORM\Table(name: 'glossary')]
+#[Index(name: 'glossary_idx', fields: ['name'])]
+#[ORM\Entity(repositoryClass: GlossaryRepository::class)]
 class Glossary
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @ORM\OrderBy({"name" = "ASC"})
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\OrderBy(['name' => 'ASC'])]
     private $name;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private $description;
 
     public function getId(): ?int

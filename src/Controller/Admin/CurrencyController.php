@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/currency", name="admin_currency_")
- */
+#[Route(path: '/admin/currency', name: 'admin_currency_')]
 class CurrencyController extends AbstractController
 {
     const PREFIX = 'admin_currency_';
@@ -24,9 +22,7 @@ class CurrencyController extends AbstractController
         $this->repo = $repo;
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('currency/index.html.twig', [
@@ -35,9 +31,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $currency = new Currency();
@@ -57,9 +51,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/show/{id}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/show/{id}', name: 'show', methods: ['GET'])]
     public function show(Currency $currency): Response
     {
         return $this->render('currency/show.html.twig', [
@@ -68,9 +60,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/edit/{id}', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Currency $currency): Response
     {
         $form = $this->createForm(MyCurrencyType::class, $currency);
@@ -89,9 +79,7 @@ class CurrencyController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/delete/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/delete/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, Currency $currency): Response
     {
         if ($this->isCsrfTokenValid('delete'.$currency->getId(), $request->request->get('_token'))) {

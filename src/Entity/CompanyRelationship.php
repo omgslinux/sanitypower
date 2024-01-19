@@ -5,39 +5,27 @@ namespace App\Entity;
 use App\Repository\CompanyRelationshipRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CompanyRelationshipRepository::class)
- * @ORM\Table(name="company_relationships")
- */
+#[ORM\Table(name: 'company_relationships')]
+#[ORM\Entity(repositoryClass: CompanyRelationshipRepository::class)]
 class CompanyRelationship
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="date")
-     */
+    #[ORM\Column(type: 'date')]
     private $date;
 
-    /**
-     * @ORM\Column(type="text")
-     */
+    #[ORM\Column(type: 'text')]
     private $notes;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="parentRelationships")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'parentRelationships')]
+    #[ORM\JoinColumn(nullable: false)]
     private $parent;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Company::class, inversedBy="childRelationships")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Company::class, inversedBy: 'childRelationships')]
+    #[ORM\JoinColumn(nullable: false)]
     private $child;
 
     public function getId(): ?int

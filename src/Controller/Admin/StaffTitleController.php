@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/staff/title", name="admin_staff_title_")
- */
+#[Route(path: '/admin/staff/title', name: 'admin_staff_title_')]
 class StaffTitleController extends AbstractController
 {
     const PREFIX = 'admin_staff_title_';
@@ -24,9 +22,7 @@ class StaffTitleController extends AbstractController
         $this->repo = $repo;
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render(self::TDIR . '/index.html.twig', [
@@ -35,9 +31,7 @@ class StaffTitleController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $StaffTitle = new StaffTitle();
@@ -58,9 +52,7 @@ class StaffTitleController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'show', methods: ['GET'])]
     public function show(StaffTitle $StaffTitle): Response
     {
         return $this->render(self::TDIR . '/show.html.twig', [
@@ -69,9 +61,7 @@ class StaffTitleController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, StaffTitle $StaffTitle): Response
     {
         $form = $this->createForm(StaffTitleType::class, $StaffTitle);
@@ -91,9 +81,7 @@ class StaffTitleController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, StaffTitle $StaffTitle): Response
     {
         if ($this->isCsrfTokenValid('delete'.$StaffTitle->getId(), $request->request->get('_token'))) {

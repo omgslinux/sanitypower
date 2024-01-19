@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/currencyexchange", name="admin_currency_exchange_")
- */
+#[Route(path: '/admin/currencyexchange', name: 'admin_currency_exchange_')]
 class CurrencyExchangeController extends AbstractController
 {
     const PREFIX = 'admin_currency_exchange_';
@@ -24,9 +22,7 @@ class CurrencyExchangeController extends AbstractController
         $this->repo = $repo;
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('currency_exchange/index.html.twig', [
@@ -35,9 +31,7 @@ class CurrencyExchangeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $currencyExchange = new CurrencyExchange();
@@ -57,9 +51,7 @@ class CurrencyExchangeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'show', methods: ['GET'])]
     public function show(CurrencyExchange $currencyExchange): Response
     {
         return $this->render('currency_exchange/show.html.twig', [
@@ -68,9 +60,7 @@ class CurrencyExchangeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/edit", name="edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, CurrencyExchange $currencyExchange): Response
     {
         $form = $this->createForm(CurrencyExchangeType::class, $currencyExchange);
@@ -89,9 +79,7 @@ class CurrencyExchangeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, CurrencyExchange $currencyExchange): Response
     {
         if ($this->isCsrfTokenValid('delete'.$currencyExchange->getId(), $request->request->get('_token'))) {

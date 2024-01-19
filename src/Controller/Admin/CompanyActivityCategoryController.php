@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/admin/CompanyActivity", name="admin_company_activity_")
- */
+#[Route(path: '/admin/CompanyActivity', name: 'admin_company_activity_')]
 class CompanyActivityCategoryController extends AbstractController
 {
     const ENTITY = 'entity';
@@ -25,9 +23,7 @@ class CompanyActivityCategoryController extends AbstractController
         $this->repo = $repo;
     }
 
-    /**
-     * @Route("/", name="index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render(self::TDIR . '/index.html.twig', [
@@ -37,9 +33,7 @@ class CompanyActivityCategoryController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/new", name="new", methods={"GET","POST"})
-     */
+    #[Route(path: '/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         $entity = new CompanyActivityCategory();
@@ -60,9 +54,7 @@ class CompanyActivityCategoryController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/show/{id}", name="show", methods={"GET"})
-     */
+    #[Route(path: '/show/{id}', name: 'show', methods: ['GET'])]
     public function show(CompanyActivityCategory $entity): Response
     {
         return $this->render(self::TDIR . '/show.html.twig', [
@@ -72,9 +64,7 @@ class CompanyActivityCategoryController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/edit/{id}", name="edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/edit/{id}', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, CompanyActivityCategory $entity): Response
     {
         $form = $this->createForm(CompanyActivityCategoryType::class, $entity);
@@ -94,9 +84,7 @@ class CompanyActivityCategoryController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/delete/{id}", name="delete", methods={"POST"})
-     */
+    #[Route(path: '/delete/{id}', name: 'delete', methods: ['POST'])]
     public function delete(Request $request, CompanyActivityCategory $entity): Response
     {
         if ($this->isCsrfTokenValid('delete'.$entity->getId(), $request->request->get('_token'))) {

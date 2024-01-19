@@ -7,26 +7,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=CompanyLevelRepository::class)
- */
+#[ORM\Entity(repositoryClass: CompanyLevelRepository::class)]
 class CompanyLevel
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $level;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Company::class, mappedBy="level")
-     */
+    #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'level')]
     private $companies;
 
     public function __construct()
